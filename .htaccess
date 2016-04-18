@@ -1,0 +1,48 @@
+AddDefaultCharset On
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .tpl
+AddCharset UTF-8 .js
+AddCharset UTF-8 .css
+AddCharset UTF-8 .php
+
+<ifModule mod_headers.c>
+ExpiresActive On
+# 1 YEAR
+#<FilesMatch "\.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav)$">
+#Header set Cache-Control "max-age=31536000, public"
+#</FilesMatch>
+
+# 1 WEEK
+#<FilesMatch "\.(jpg|jpeg|png|gif|swf|js|woff)$">
+#Header set Cache-Control "max-age=604800, public"
+#</FilesMatch>
+
+# Expires after 1 day
+#<filesMatch ".(css)$">
+#Header set Cache-Control "max-age=86400"
+#</filesMatch>
+
+# 3 HOUR
+#<FilesMatch "\.(txt|xml|js|css)$">
+#Header set Cache-Control "max-age=10800"
+#</FilesMatch>
+
+# NEVER CACHE - notice the extra directives
+#<FilesMatch "\.(html|htm|php|cgi|pl)$">
+#Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidate"
+#</FilesMatch>
+
+#NEVER CACHE - notice the extra directives
+<FilesMatch "\.(html|htm|php|cgi|pl|css|js)$">
+Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidate"
+</FilesMatch>
+
+</ifModule>
+
+
+RewriteEngine on
+#www
+#RewriteCond %{HTTP_HOST} !^$
+#RewriteCond %{HTTP_HOST} !^www\. [NC]
+#RewriteCond %{HTTPS}s ^on(s)|
+#RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

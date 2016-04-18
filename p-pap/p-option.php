@@ -1,8 +1,6 @@
 <?php
-
 /* 
  * Option for PAP
- * by PoPsGet
  */
 $op_type_unit = array(
     10 => "เล่ม",

@@ -28,8 +28,5 @@ $content .= $menu->contact
         . "</div>"
         . "</div><!-- .banner -->"
         . "<script>response_index();</script>";
-
-
-
 $content .= $menu->showfooter();
 echo $content;
