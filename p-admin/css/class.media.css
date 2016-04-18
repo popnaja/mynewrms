@@ -1,0 +1,183 @@
+.md-input {
+    max-width:300px;
+    width:100%;
+    margin:10px auto;
+    margin-bottom:15px;
+    padding-bottom:15px;
+    background-color:#fff;
+    border:2px rgb(200,200,200) dashed;
+}
+.md-input input[type='file'],
+.md-minput input[type='file']{
+    display:none;
+}
+.md-add {
+    text-align:center;
+}
+.md-add-but {
+    display:inline-block;
+    padding:3px 15px;
+    font-size:30px;
+    line-height:30px;
+    font-weight:800;
+    cursor:pointer;
+    border:1px rgb(200,200,200) solid;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.md-add-but:hover {
+    border-color:#444;
+}
+.md-des {
+    text-align:center;
+    font-size:13px;
+}
+#ezfile {
+    display:none;
+}
+.md-status {
+    text-align:center;
+}
+.up-ng {
+    color:#ff5b42;
+    font-weight:600;
+}
+.md-view {
+    margin:10px auto;
+}
+.md-pic {
+    position:relative;
+    display:inline-block;
+    padding:15px;
+}
+.md-pic a {
+    position:absolute;
+    top:0;
+    right:0;
+    font-size:20px;
+}
+.md-view img {
+    max-width:100%;
+    height:auto;
+    background-color:#fff;
+    box-sizing:border-box;
+    padding:5px;
+    border:1px rgb(200,200,200) solid;
+}
+.del-food-pic {
+    display:inline-block;
+    float:right;
+    font-size:18px;
+    cursor:pointer;
+    color:#444;
+    z-index:2;
+}
+.del-food-pic:hover,
+.del-food-pic:active{
+    text-decoration:none;
+    color:#ff5b42;
+}
+
+/*=================================================     multiple media    =================================================================*/
+#md-pics-box {
+    position:relative;
+}
+.md-minput {
+    float:left;
+    width:100px;
+    height:100px;
+    background-color:#fff;
+    border:2px rgb(200,200,200) dashed;
+    margin:10px;
+    box-sizing:border-box;
+}
+.md-m-pic {
+    position:relative;
+    box-sizing:border-box;
+    float:left;
+    width:100px;
+    height:100px;
+    margin:10px;
+}
+.md-m-pic a {
+    position:absolute;
+    top:-13px;
+    right:-13px;
+}
+.md-m-pic img,
+.md-pic-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+}
+
+/*=================================================     multiple media VIEW   ============================================================*/
+.md-mul-view {
+    background-color:#fff;
+    border:#D7D8D7 solid 1px;
+    overflow:hidden;
+}
+.md-pic-thumb {
+    cursor:pointer;
+    position:relative;
+    box-sizing:border-box;
+    float:left;
+    width:120px;
+    height:120px;
+    margin:10px;
+    border:#fff 4px solid;
+}
+.md-pic-thumb:hover {
+    border:#ff6e40 4px solid;
+}
+
+body.md-showing {
+    overflow:hidden;
+}
+.md-dialog {
+    position:fixed;
+    z-index:200;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,.2);
+    text-align:center;
+}
+.md-dialog>div {
+    display:inline-block;
+    position:relative;
+    top:60px;
+    margin-left:auto;
+    margin-right:auto;
+    background-color:#fff;
+    border-radius:3px;
+    box-shadow: 3px 2px 5px rgba(0,0,0,.3);
+    padding:20px;
+}
+.md-dialog a {
+    display:inline-block;
+    position:absolute;
+    right:3px;
+    top:3px;
+    font-size:25px;
+}
+
+/*=================================================     MEDIA FILE   ============================================================*/
+.md-file-icon {
+    display:inline-block;
+    position:relative;
+    padding:15px 5px;
+}
+.md-file-icon .delete-md-file {
+    position:absolute;
+    top:0;
+    right:0;
+    font-size:18px;
+}
+.md-file-icon img {
+    height:100px;
+    width:auto;
+    cursor:pointer;
+}

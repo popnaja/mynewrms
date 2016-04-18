@@ -1,0 +1,29 @@
+#tb-deli-list th:nth-child(1){
+    width:40px;
+}
+#tb-deli-list th:nth-child(2){
+    width:40%;
+}
+#deli-list {
+    position:relative;
+    top:-3px;
+}
+#tb-deli-list {
+    padding-left:0;
+    padding-right:0;
+}
+#add-list {
+    float:right;
+}
+.but-right {
+    width:auto;
+}
+/* ==================================================     MAIN TABLE ===================================================================*/
+#tb-job-delivery {
+    padding-left:0;
+    padding-right:0;
+}
+#tb-job-delivery th:nth-child(5),
+#tb-job-delivery th:nth-child(6){
+    width:50px;
+}

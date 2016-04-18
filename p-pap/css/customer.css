@@ -1,0 +1,83 @@
+.cus-ct,
+.sup-ct,
+.note-edit{
+    cursor:pointer;
+    color:blue;
+}
+.cus-ct:hover,
+.sup-ct:hover,
+.note-edit:hover {
+    text-decoration:underline;
+}
+.ez-table td{
+    word-break:break-all;
+}
+.col-50 {
+    position:relative;
+}
+.but-right input {
+    width:auto;
+}
+#cancel-edit {
+    position:absolute;
+    bottom:15px;
+    left:15px;
+}
+#tb-cus tr th:first-child,
+#tb-cus tr th:nth-child(2),
+#tb-cus tr th:last-child{
+    width:30px;
+}
+#del-cus {
+    float:left;
+    clear:left;
+    margin-left:15px;
+}
+.but-right {
+    float:right;
+    clear:right;
+    width:auto;
+    margin-right:15px;
+}
+@media only screen and (min-width: 320px) {
+    #tb-cus tr th:first-child,
+    #tb-cus tr th:nth-child(2){
+        width:40px;
+    }
+}
+@media only screen and (min-width: 769px) {
+    #tb-cus tr th:first-child,
+    #tb-cus tr th:nth-child(2),
+    #tb-cus tr th:last-child {
+        width:7%;
+    }
+    #tb-cus tr th:nth-child(3){
+        width:30%;
+    }
+}
+
+
+//note
+#tb-note tr th:first-child {
+    width:90px;
+}
+#o_ref {
+    float:right;
+    width:100%;
+    font-size:13px;
+    text-align:left;
+    margin-bottom:10px;
+    box-sizing:border-box;
+    border:1px solid rgb(150,150,150);
+    padding:10px;
+    top:-10px;
+}
+.tag-list {
+    padding:3px;
+    font-size:14px;
+    word-break:break-all;
+}
+span.icon-delete-circle {
+    cursor:pointer;
+    padding-right:5px;
+}

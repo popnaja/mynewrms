@@ -1,0 +1,247 @@
+/*------------------------------------------------------------------- for print ---------------------------------------------------------*/
+.print-a4 {
+    box-sizing:border-box;
+    width:8.27in;
+    margin-left:auto;
+    margin-right:auto;
+    color:#222;
+    overflow:hidden;
+    background-color:#fff;
+}
+.print-a4-fix {
+    box-sizing:border-box;
+    width:8.27in;
+    height:11.69in;
+    margin-left:auto;
+    margin-right:auto;
+    color:#222;
+    overflow:hidden;
+    background-color:#fff;
+}
+.print-box {
+    overflow:hidden;
+    margin-bottom:0.1in;
+}
+.print-list {
+    display:inline-block;
+    float:left;
+}
+.print-list-title,.book-title {
+    width:1.4in;
+    display:inline-block;
+    float:left;
+    clear:left;
+}
+/*------------------------------------------------------------------- ใบสั่งงาน ---------------------------------------------------------*/
+#pto{
+    width:100%;
+    border-collapse:collapse;
+    border:1px #D7D8D7 solid;
+    table-layout:fixed;
+    font-size:11pt;
+    margin-left:auto;
+    margin-right:auto;
+}
+#pto .space {
+    height:0.25in;
+}
+#pto th, #pto td {
+    padding:5px;
+    border:1px #D7D8D7 solid;
+}
+#pto th {
+    background-color:#ffe699;
+}
+#pto .job-pic img{
+    width:100%;
+    height:auto;
+}
+
+/*------------------------------------------------------------------- DOC HEADER ---------------------------------------------------------*/
+.c-head {
+    margin-bottom:0.1in;
+    position:relative;
+}
+.c-logo {
+    display:inline-block;
+    height:0.8in
+}
+.c-logo img {
+    width:auto;
+    height:100%;
+}
+.c-info {
+    display:inline-block;
+    box-sizing:border-box;
+    width:60%;
+    padding-left:0.5cm;
+    font-size:11pt;
+    vertical-align: top;
+}
+.c-name {
+    font-weight:600;
+}
+.c-tax {
+    font-weight:600;
+}
+.doc-name {
+    position:absolute;
+    right:0.1in;
+    display:inline-block;
+    width:25%;
+    text-align:center;
+    vertical-align: top;
+}
+.doc-page {
+    position:absolute;
+    bottom:0in;
+    right:0.1in;
+    display:inline-block;
+    width:25%;
+    text-align:center;
+    font-size:11pt;
+    font-weight:600;
+}
+.doc-name span {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    background-color:#0690cf;
+    color:#fff;
+    font-size:18pt;
+    padding:0.2cm 0 0.3cm 0;
+    border-radius:0.2cm;
+    border:0.1cm solid #444;
+}
+
+/*------------------------------------------------------------------- DOC INFO ---------------------------------------------------------*/
+.doc-info {
+    position:relative;
+    padding:0.1in;
+    border:rgb(150,150,150) solid 1px;
+    font-size:11pt;
+}
+.doc-to {
+    display:inline-block;
+    width:67%;
+}
+.sup-info {
+    float:left;
+    padding-left:0.5cm;
+}
+.doc-date {
+    position:absolute;
+    right:0.5cm;
+    top:0.5cm;
+    width:33%;
+    text-align:right;
+    vertical-align: top;
+}
+.doc-600 {
+    font-weight:600;
+}
+
+/*------------------------------------------------------------------- DOC DETAIL ---------------------------------------------------------*/
+.doc-dt {
+    margin-top:0.3cm;
+}
+#tb-rp {
+    padding:0;
+    margin-bottom:0;
+}
+#tb-rp td {
+    font-size:10.5pt;
+}
+#tb-rp table {
+    border:rgb(150,150,150) solid 1px;
+}
+#tb-rp th {
+    background-color:#ffe699;
+}
+#tb-rp th:nth-child(1){
+    width:0.5in;
+}
+#tb-rp th:nth-child(2){
+    width:4in;
+}
+.tb-discount {
+    border:rgb(150,150,150) solid 1px;
+}
+.tb-sum td,
+.tb-sum th{
+    border:rgb(150,150,150) solid 1px;
+}
+.tb-gtt td {
+    font-size:12pt;
+    font-weight:600;
+}
+#tb-rp .tb-data td{
+    border-right:rgb(150,150,150) solid 1px;
+}
+#tb-rp tr.tb-data:nth-child(even){
+    border-top:#D7D8D7 solid 1px;
+    border-bottom:#D7D8D7 solid 1px;
+}
+#tb-rp .tb-head {
+    border:rgb(150,150,150) solid 1px;
+}
+#tb-rp .tb-data td:nth-child(2) {
+    padding-left:0.1in;
+    text-align:left;
+}
+#tb-rp tr.tb-data{
+    height:0.3in;
+}
+
+#tb-rp #tb-multi-q th {
+    width:2cm;
+    background-color:#f6f9fc;
+}
+#tb-rp #tb-multi-q .tb-data{
+    height:1cm;
+}
+#tb-rp #tb-multi-q td {
+    background-color:#fff;
+    text-align:center;
+}
+/*------------------------------------------------------------------- MULTI QUOTE ---------------------------------------------------------*/
+.print-extra {
+    font-size:11pt;
+    margin-top:0.1in;
+}
+#tb-multi-q {
+    padding:0;
+}
+/*------------------------------------------------------------------- DOC REMARK ---------------------------------------------------------*/
+.doc-final {
+    width:100%;
+    margin-top:0.3cm;
+    border:rgb(150,150,150) solid 1px;
+    border-collapse: collapse;
+}
+.doc-final th{
+    background-color:#ffe699;
+}
+.doc-final th,
+.doc-final td {
+    padding:3px 7px;
+    font-size:11pt;
+    border:rgb(150,150,150) solid 1px;
+    box-sizing:border-box;
+}
+.doc-final tr:nth-child(2) {
+    vertical-align: top;
+}
+.doc-sign {
+    text-align:center;
+    padding:0 !important;
+}
+.doc-sign img{
+    height:100%;
+    width:auto;
+}
+#rp-cus-sign td,
+#rp-cus-sign th {
+    font-size:10pt;
+}
+/*----------------------------------------------------------------  DOC REMARK 2 SIGN   -----------------------------------------------------*/

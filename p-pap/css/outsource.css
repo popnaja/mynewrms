@@ -1,0 +1,41 @@
+.process_os {
+    text-align:left;
+    padding-left:5px;
+}
+#tb-outsource tr th:last-child{
+    width:25%;
+}
+#edit-outsource {
+    padding-left:4px;
+}
+#tb-po-list tr th:nth-child(1),
+#tb-po-list tr th:nth-child(2) {
+    width:40px;
+}
+#tb-po-list tr th:nth-child(3),
+#tb-po-list tr th:nth-child(4) {
+    width:25%;
+}
+.del-po-list,
+.edit-po-list {
+    cursor:pointer;
+}
+.del-po-list:hover,
+.edit-po-list:hover {
+    color:#FB8C00;
+}
+#add-mat {
+    float:right;
+}
+#pro_auto-res,
+#oref-res{
+    float:right;
+}
+.but-right {
+    width:auto;
+}
+/*----------------------------------------------------------- PO VIEW TB ----------------------------------------------------------------*/
+#tb-po tr th:first-child,
+#tb-po tr th:last-child{
+    width:50px;
+}

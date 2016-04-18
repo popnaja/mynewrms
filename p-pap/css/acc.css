@@ -1,0 +1,37 @@
+#tb-bill-list {
+    padding:0;
+}
+.but-right {
+    width:auto;
+}
+.cd-icon {
+    font-size:18px;
+    padding:5px 7px;
+    color:#fff;
+    display:inline-block;
+    margin-right:4px;
+}
+.cd-icon.icon-banknote {
+    background-color:#009688;
+}
+.cd-icon.icon-file-text-o {
+    background-color:#03A9F4;
+}
+#tb-deli-list {
+    padding:0;
+    position:relative;
+    top:-3px;
+}
+#add-list {
+    float:right;
+}
+#tb-deli-list [class*='icon-']{
+    cursor:pointer;
+}
+#tb-deli-list [class*='icon-']:hover{
+    color:#FB8C00;
+}
+#del-invoice {
+    clear:left;
+    float:left;
+}

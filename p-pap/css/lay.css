@@ -1,0 +1,35 @@
+#show-lay-cover {
+    background-color:rgba(0,0,0,0.2);
+    border:rgb(150,150,150) solid 1px;
+    margin:20px auto;
+}
+#show-lay{
+    background-color:#0026AB;
+    margin:25px;
+    position:relative;
+}
+.page-lay{
+    float:left;
+    background-color:rgba(255,255,255,0.8);
+    border:#FFF 1px solid;
+    box-sizing:border-box;
+}
+.paper-grip {
+    position:absolute;
+    bottom:0;
+    background-color:#EF5350;
+}
+.lay-cover,
+.lay-inside,
+.lay-cover-r,
+.lay-inside-r {
+    cursor:pointer;
+}
+[class*='lay-box-'] {
+    cursor:pointer;
+}
+[class*='lay-box-']:hover{
+    color:#FFF;
+    font-weight:600;
+    background-color:#0026AB;
+}

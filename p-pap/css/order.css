@@ -1,0 +1,9 @@
+#scid-res {
+    float:right;
+}
+#tb-order tr th:first-child {
+    width:40px;
+}
+#tb-order tr th:last-child {
+    width:40px;
+}

@@ -1,0 +1,52 @@
+[class^="ez-circle-"],
+[class*="ez-circle-"]{
+    display:inline-block;
+    box-sizing:border-box;
+    width:20px;
+    height:20px;
+    border-radius: 50%;
+}
+.ez-circle-blank {
+    border:1px #777 solid;
+}
+.ez-circle-orange {
+    background-color:#FB8C00;
+}
+.ez-circle-yellow {
+    background-color:#FDD835;
+}
+.ez-circle-green {
+    background-color:#66BB6A;
+}
+.ez-circle-hgreen {
+    border:3px #66BB6A solid;
+}
+.ez-circle-red {
+    background-color:#ED1C24;
+}
+#quote-csv {
+    display:inline-block;
+    margin-left:15px;
+}
+.icon-adjust:before {
+    font-size:22px;
+    color:#66BB6A;
+}
+
+/*===============================================================  Status.php ==========================================================*/
+
+#tb-pstatus tr th:first-child{
+    width:50px;
+}
+#tb-pstatus tr th:nth-child(2){
+    width:30%;
+}
+#tb-job-status tr th:nth-child(3){
+    width:25%;
+}
+#tb-job-status,
+#tb-job-result{
+    position:relative;
+    top:-3px;
+    padding:0;
+}

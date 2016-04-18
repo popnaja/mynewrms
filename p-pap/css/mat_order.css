@@ -1,0 +1,75 @@
+span.icon-delete-circle {
+    cursor:pointer;
+    padding-right:5px;
+}
+#oref-res,
+#mat_auto-res {
+    float:right;
+}
+#add-mat {
+    float:right;
+}
+#tb-po-list th:first-child,
+#tb-po-list th:nth-child(2){
+    width:40px;
+}
+#tb-po-list th:nth-child(3),
+#tb-po-list th:nth-child(4){
+    width:25%;
+}
+.add-new {
+    margin-bottom:10px;
+    padding-left:17px;
+}
+.add-new a {
+    margin-right:15px;
+}
+.but-right{
+    width:auto;
+}
+@media only screen and (min-width: 414px){
+
+}
+/*------------------------------------------------------------------- เพิ่มรายการ -------------------------------------------------------------*/
+.form-box {
+    overflow: hidden;
+}
+#add-more-mat {
+    width:100%;
+    padding-left:5px;
+}
+#po-list {
+    position:relative;
+    top:-3px;
+}
+#tb-po-list {
+    padding-left:5px;
+    padding-right:5px;
+}
+/*--------------------------------------------------------------------- table ---------------------------------------------------------------*/
+#tb-matorder tr th:last-child {
+    width:35%;
+}
+.paper_order {
+    text-align:left;
+    padding-left:5px;
+}
+.paper_order input {
+    display:inline-block;
+    width:10%;
+    vertical-align: top;
+    margin-top:5px;
+}
+.paper_order label{
+    display:inline-block;
+    width:90%;
+}
+.paper_order p,
+.paper_po {
+    padding-left:10%;
+}
+
+/*------------------------------------------------------------------- table PO -------------------------------------------------------------*/
+#tb-po th:nth-child(3){
+    width:40%
+}

@@ -1,0 +1,207 @@
+#wrapper {
+    overflow:visible !important;
+}
+.my-prod {
+    float:left;
+    padding:15px;
+    background-color:#fff;
+    font-size:12px;
+}
+.but-right {
+    width:auto;
+}
+/*=============================================================   NAV  =================================================================*/
+.plan-menu {
+    position:relative;
+    overflow:hidden;
+    padding-bottom:9px;
+    border-bottom:#bbb 1px solid;
+}
+
+.plan-but-disable {
+    color:#aaa;
+    background:rgb(230,230,230);
+    cursor:default;
+}
+.plan-but-active {
+    color:#222;
+    background:rgb(230,230,230);
+    cursor:default;
+    font-weight:600;
+}
+.plan-but-disable:hover,
+.plan-but-active:hover{
+    border:1px solid rgb(180,180,180);
+}
+
+/*=============================================================   HEADER  =================================================================*/
+.plan-header table{
+    table-layout:fixed;
+    width:100%;
+    border-bottom:#bbb 1px solid;
+    border-right:#bbb 1px solid;
+    border-left:#bbb 1px solid;
+}
+.plan-header-date {
+    border-bottom:#bbb 1px solid;
+    font-weight:700 !important;
+}
+.plan-header table th{
+    font-weight:500;
+    text-align:left;
+    border-left:#bbb 1px solid;
+    box-sizing:border-box;
+}
+.plan-header table td{
+    text-align:center;
+}
+/*=============================================================   SCHEDULE  =================================================================*/
+.plan-schedule table {
+    table-layout:fixed;
+    width:100%;
+    border-right:#bbb 1px solid;
+    border-left:#bbb 1px solid;
+    overflow:hidden;
+}
+.plan-schedule table th{
+    border-bottom:#bbb 1px solid;
+}
+.plan-schedule table td{
+    border-left:#bbb 1px solid;
+    box-sizing:border-box;
+    padding:5px 0;
+    height:40px;
+    border-bottom:#bbb 1px solid;
+}
+.plan-schedule table td.plan-sub-min {
+    border-left:rgb(240,240,240) 1px solid;
+}
+.plan-rec-box {
+    position:relative;
+}
+.plan-bar {
+    position:absolute;
+    top:7px;
+    height:26px;
+    z-index:2;
+    cursor:pointer;
+}
+.plan-bar-info {
+    position:absolute;
+    display:none;
+    top:40px;
+    left:20px;
+    width:auto;
+    padding:10px 15px;
+    background-color:#2196F3;
+    color:#fff;
+    border:#aaa 1px solid;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.08);
+    z-index:3;
+    font-size:14px;
+}
+.plan-bar:hover+.plan-bar-info {
+    display:block;
+}
+
+.plan-schedule .plan-out td {
+    height:auto;
+}
+.plan-bar.plan-out {
+    height:10px;
+}
+/*=============================================================   BAR COLOR  =================================================================*/
+.bar-color-0{background-color:#F44336;}
+.bar-color-1{background-color:#9C27B0;}
+.bar-color-2{background-color:#673AB7;}
+.bar-color-3{background-color:#673AB7;}
+.bar-color-4{background-color:#3F51B5;}
+.bar-color-5{background-color:#2196F3;}
+.bar-color-6{background-color:#03A9F4;}
+.bar-color-7{background-color:#00BCD4;}
+.bar-color-8{background-color:#009688;}
+.bar-color-9{background-color:#4CAF50;}
+.bar-color-10{background-color:#8BC34A;}
+.bar-color-11{background-color:#CDDC39;}
+.bar-color-12{background-color:#FFC107;}
+.bar-color-13{background-color:#607D8B;}
+
+
+/*=============================================================   TABLE  =================================================================*/
+#tb-job-process,
+#tb-job-dt{
+    max-width:1200px;
+    padding:0;
+}
+#tb-job-process th:nth-child(3){
+    width:25%; 
+}
+.my-tab-inside {
+    box-sizing:border-box;
+    max-width:1200px;
+}
+
+/*=============================================================  VERTICAL  =================================================================*/
+#my-plan-div {
+    float:left;
+    clear:left;
+    font-size:14px;
+    background-color:#fff;
+    width:100%;
+}
+.plan-header {
+    background-color:#dfeffc;
+}
+.plan-header.plan-fixed{
+    position: fixed;
+    top: 44px;
+    z-index:3;
+}
+.plan-vschedule {
+    position:relative;
+    width:100%;
+}
+.plan-vschedule table {
+    width:100%;
+    overflow:hidden;
+}
+.my-vprod{
+    position:relative;
+}
+.my-vprod td{
+    border-right:#ddd 1px solid;
+    box-sizing:border-box;
+}
+.mach-vertical {
+    writing-mode:tb-rl;
+    -webkit-transform:rotate(-180deg);
+    -moz-transform:rotate(-180deg);
+    -o-transform: rotate(-180deg);
+    -ms-transform:rotate(-180deg);
+    transform: rotate(-180deg);
+    white-space:nowrap;
+    padding:3px 2px;
+}
+.plan-date {
+    border-top:#444 1px solid;
+}
+.plan-full {
+    border-top:#bbb 1px solid;
+}
+.plan-half-hr {
+    border-top:rgb(240,240,240) 1px solid;
+}
+.plan-vbar:hover+.plan-bar-info {
+    display:block;
+}
+.plan-vbar {
+    position:absolute;
+    width:50%;
+    left:25%;
+    z-index:2;
+    cursor:pointer;
+}
+.plan-vbar.plan-out {
+    width:5px;
+    
+}

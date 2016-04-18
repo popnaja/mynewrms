@@ -1,0 +1,43 @@
+body {
+    background-color:#00925e;
+    padding:0;
+}
+#wrapper {
+    padding:0;
+}
+#content {
+    padding:0;
+    position:relative;
+    text-align:center;
+    padding-bottom:110px;
+}
+footer {
+    padding:0;
+}
+footer #copyright {
+    padding:10px;
+}
+.banner {
+    margin-left:auto;
+    margin-right:auto;
+}
+.banner img {
+    width:100%;
+    max-width:200px;
+    height:auto;
+}
+.app-logo {
+    margin:15px;
+    display:inline-block;
+    width:140px;
+}
+.app-logo:hover {
+    opacity:1;
+    position:relative;
+    top:-2px;
+}
+@media only screen and (min-width: 321px){
+    .banner {
+        height:410px;
+    }
+}

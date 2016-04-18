@@ -1,0 +1,133 @@
+/*-------------------------------------------------------page css start ----------------------------------------------*/
+.pg-slide {
+    position:relative;
+    margin-left:auto;
+    margin-right:auto;
+    overflow:hidden;
+}
+.pg-slide>div {
+    width:100%;
+    float:left;
+    background-color:rgba(0,0,0,0.5);
+    color:#fff;
+}
+.pg-slide h2 {
+    padding-bottom:15px;
+    font-size:20px;
+}
+.pg-slide p {
+    font-size:16px;
+}
+@media only screen and (min-width: 768px) {
+    
+}
+
+
+/*-------------------------------------------------------page css end ------------------------------------------------*/
+/*-------------------------------------------------------slide css ---------------------------------------------------*/
+.ez-slide-frame{
+    padding:0;
+    float:left;
+    clear:both;
+    width:100%;
+    overflow:hidden;
+    position:relative;
+    margin-bottom:20px;
+}
+.ez-slide-cont{
+    width:200%;
+    position:relative;
+    overflow:hidden;
+}
+.ruler {
+    z-index:3;
+    position:absolute;
+}
+.ez-slide-nav,
+.ez-slide-dot {
+    position:absolute;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    z-index:99;
+    overflow:visible;
+}
+.ez-slide-nav{
+    width:100%;
+    top:300px;
+    height:0;
+}
+.ez-slide-dot {
+    width:100%;
+    bottom:5px;
+    text-align:center;
+    color:green;
+}
+.ez-dot-nav{
+    display:inline-block;
+    margin-right:15px;
+    border-radius:50%;
+    width:12px;
+    height:12px;
+    background-color:rgba(0,0,0,0.3);
+    border:#fff solid 2px;
+    cursor:pointer;
+    box-shadow:1px 2px 2px rgba(0,0,0,0.02);
+}
+.ez-dot-nav:hover,
+.ez-dot-nav.dot-nav-active{
+    background-color:#ff931e;
+}
+.ez-slide-img {
+    width:100%;
+    height:auto;
+}
+.ez-slide-item{
+    display:inline-block;
+    position:relative;
+    float:left;
+    width:50%;
+    box-sizing:border-box;
+    top:0;
+    left:0;
+}
+/* for slide nav and dot */
+.ez-slide-nav span {
+    display:inline-block;
+    box-sizing:border-box;
+    font-size:30px;
+    overflow:hidden;
+    color:rgba(255,255,255,0.5);
+    cursor:pointer;
+}
+.ez-slide-frame:hover .ez-slide-nav span {
+    color:rgba(255,255,255,1);
+    text-shadow:3px 3px 2px rgba(0,0,0,0.4);
+}
+.ez-slide-nav span.ez-slide-prev {
+    padding-left:5px;
+}
+.ez-slide-nav span.ez-slide-next {
+    padding-right:5px;
+    float:right;
+}
+.ez-slide-frame:hover .ez-slide-nav span{
+    opacity:1;
+}
+@media only screen and (min-width: 590px) {
+    .ez-slide-item{
+        width:25%;
+    }
+}
+@media only screen and (min-width: 960px) {
+    .ez-slide-item{
+        width:16.6%;
+    }
+}
+@media only screen and (min-width: 1232px) {
+    .ez-slide-item{
+        width:12.5%;
+    }
+}
