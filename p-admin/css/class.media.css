@@ -156,6 +156,10 @@ body.md-showing {
     box-shadow: 3px 2px 5px rgba(0,0,0,.3);
     padding:20px;
 }
+.md-dialog>div img {
+  max-height:60vh;
+  width:auto;
+}
 .md-dialog a {
     display:inline-block;
     position:absolute;
