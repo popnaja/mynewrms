@@ -276,9 +276,9 @@ END_OF_TEXT;
 SELECT 
 $edit
 CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' class='icon-print' target='_blank'></a>"),
-quote_no,
-name,
+CONCAT(quote_no,"<br/>",name),
 cus.customer_name,
+FORMAT(q_price,0),
 CONCAT(size_name,' (',size_height,'x',size_width,')') AS size,
 meta.meta_value AS pages,
 FORMAT(amount,0),

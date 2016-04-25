@@ -1086,7 +1086,7 @@ if($req == "login"){
     $db->update_data("pap_mat_po", "po_id", $poid, array("po_cost"=>round($tt,2)));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?action=print&poid=$poid");
+    header("Location:".$_POST['redirect']."?action=viewpo");
 } else if($req == "edit_mat_po"){
     $poid = filter_input(INPUT_POST,'poid',FILTER_SANITIZE_NUMBER_INT);
     $status = filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);

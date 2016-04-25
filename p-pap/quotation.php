@@ -258,7 +258,6 @@ if($action=="add"){
     }
     
     //ส่วนเปลี่ยนสถานะ
-    $status_name = $op_quote_status[$info['status']];
     $status_icon = $op_quote_status_icon[$info['status']];
     $md = new mymedia(PAP."request_ajax.php");
     $tpic = $md->media_view((isset($info['quote_sign_back'])?$info['quote_sign_back']:""),ROOTS,RDIR);
@@ -269,8 +268,17 @@ if($action=="add"){
         $pcost = 0;
         $mar = "*";
     }
+    $qstatus = $op_quote_status;
+    if($pauth>3){
+        $qprice = $form->show_num("q_price",$info['q_price'],1,"","ราคา (Margin = <span class='show-margin'>$mar</span>%)","","label-3070 ","min='1' ")
+            . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ","min='0' ");
+    } else {
+        unset($qstatus[2]);
+        $qprice = $form->show_hidden("q_price","q_price",$info['q_price'])
+                . $form->show_hidden("discount","discount",$info['discount']);
+    }
     $file = $md->file_view((isset($info['quote_sign'])?$info['quote_sign']:""),ROOTS,RDIR);
-    $ustatus = $form->show_select("status",$op_quote_status,"label-3070","สถานะ $status_icon",$info['status'])
+    $ustatus = $form->show_select("status",$qstatus,"label-3070","สถานะ $status_icon",$info['status'])
             . "<div class='sel-status-9'>"
             . "<div class='label-3070'>"
             . "<label for='sig'>เอกสารยืนยัน</label>"
@@ -279,9 +287,7 @@ if($action=="add"){
             . "</div>"
             . "</div><!-- .label-3070 -->"
             . "</div><!-- .sel-status-9 -->"
-            . $form->show_num("q_price",$info['q_price'],1,"","ราคา (Margin = <span class='show-margin'>$mar</span>%)","","label-3070 ".($pauth==4?"":"readonly"),"min='1' ".($pauth==4?"":"readonly"))
-            . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ".($pauth==4?"":"readonly"),"min='0' ".($pauth==4?"":"readonly"))
-            
+            . $qprice
             . $form->show_hidden("ttcost","ttcost",$pcost)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . "<input type='button' class='blue-but' value='Update' style='float:right' onClick='submit2();' />"
@@ -460,7 +466,7 @@ if($action=="add"){
     $iperpage = 20;
     
     //view
-    $head = array("พิมพ์","รหัส","ชื่อ","รหัสลูกค้า","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
+    $head = array("พิมพ์","งาน","ลูกค้า","ราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
     $rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm, ($pauth>3?$sid:$uid),$page, $iperpage);
     $all_rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm,($pauth>3?$sid:$uid));
     $sale = array("0"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");
@@ -471,10 +477,15 @@ if($action=="add"){
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
         array_unshift($head, "แก้ไข");
     }
-    $csv = "";
-    $fil_sale = "";
+    
     if($pauth>3){
-        $csv = "<a id='quote-csv' href='$root"."csv_download.php?req=quote_csv&month=$mm' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>";
+        $csvlink = $root."csv_download.php?req=quote_csv&month=$mm";
+    } else {
+        $csvlink = $root."csv_download.php?req=quote_csv&month=$mm&uid=$uid";
+    }
+    $csv = "<a id='quote-csv' href='$csvlink' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>";
+    $fil_sale = "";
+    if($pauth==4){
         $fil_sale = $tb->show_filter(current_url(), "sid", $sale, $sid,"--Sale--");
         array_push($head,"Sale");
     }
