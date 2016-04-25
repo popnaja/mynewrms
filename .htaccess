@@ -33,7 +33,7 @@ ExpiresActive On
 #</FilesMatch>
 
 #NEVER CACHE - notice the extra directives
-<FilesMatch "\.(html|htm|php|cgi|pl|css|js)$">
+<FilesMatch "\.(html|htm|php|cgi|pl|css|js|jpg|jpeg|png)$">
 Header set Cache-Control "max-age=0, private, no-store, no-cache, must-revalidate"
 </FilesMatch>
 

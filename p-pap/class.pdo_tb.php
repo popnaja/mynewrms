@@ -687,20 +687,24 @@ END_OF_TEXT;
                 $stmt->bindParam(":off",$off,PDO::PARAM_INT);
             }
             $stmt->execute();
-            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if($allrec){
-                return $res;
-            } else {
-                foreach($res as $k=>$v){
-                    $key = $v['up'].",".$v['name'].",".$v['due'].",".$op[$v['ostatus']];
-                    $status = "<a href='' class='edit-comp-status icon-page-edit' title='Update' oid='".$v['oid']."' compid='".$v['compid']."'></a>".$v['status'];
-                    if(isset($res1[$key])){
-                        array_push($res1[$key],array($v['comp'],$status));
-                    } else {
-                        $res1[$key] = array(array($v['comp'],$status));
+            if($stmt->rowCount()>0){
+                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                if($allrec){
+                    return $res;
+                } else {
+                    foreach($res as $k=>$v){
+                        $key = $v['up'].",".$v['name'].",".$v['due'].",".$op[$v['ostatus']];
+                        $status = "<a href='' class='edit-comp-status icon-page-edit' title='Update' oid='".$v['oid']."' compid='".$v['compid']."'></a>".$v['status'];
+                        if(isset($res1[$key])){
+                            array_push($res1[$key],array($v['comp'],$status));
+                        } else {
+                            $res1[$key] = array(array($v['comp'],$status));
+                        }
                     }
+                    return $res1;
                 }
-                return $res1;
+            } else {
+                return array();
             }
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
