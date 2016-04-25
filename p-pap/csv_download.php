@@ -11,8 +11,9 @@ $req = filter_input(INPUT_GET,'req',FILTER_SANITIZE_STRING);
 if($req == "quote_csv"){
     //prepare data
     $month = filter_input(INPUT_GET,'month',FILTER_UNSAFE_RAW);
-    $head[] = array("รหัส","ชื่อ","รหัสลูกค้า","ชื่อลูกค้า","ขนาด","หน้า","ยอดผลิต","ราคา","วันที่สร้าง","วันที่ตรวจ","วันที่สมบูรณ์","สถานะ");
-    $rec = $db->get_quote_csv($op_quote_status,$month);
+    $uid = filter_input(INPUT_GET,'uid',FILTER_SANITIZE_NUMBER_INT);
+    $head[] = array("รหัส","ชื่อ","รหัสลูกค้า","ชื่อลูกค้า","ขนาด","หน้า","ยอดผลิต","ราคา","วันที่สร้าง","วันที่ตรวจ","วันที่สมบูรณ์","สถานะ","Sale");
+    $rec = $db->get_quote_csv($op_quote_status,$month,$uid);
     $tt = array_merge($head,$rec);
     //var_dump($tt);
     $filename = "quote.csv";
@@ -35,7 +36,7 @@ if($req == "quote_csv"){
 if(isset($filename)){
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
-    header("Content-Disposition: attachment; filename='$filename';");
+    header("Content-Disposition: attachment; filename=$filename;");
     header('Content-Transfer-Encoding: binary');
     header('Expires: 0');
     header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -53,9 +54,11 @@ class csvPDO{
     public function __construct() {
         $this->conn = dbConnect(DB_PAP);
     }
-    public function get_quote_csv($op,$month=null){
+    public function get_quote_csv($op,$month=null,$uid=null){
         try {
-            $filter = (isset($month)&&$month!=""?"WHERE DATE_FORMAT(created,'%m%Y')='$month'":"");
+            $filter = "WHERE quo.quote_id>0";
+            $filter .= (isset($month)&&$month!=""?" AND DATE_FORMAT(created,'%m%Y')='$month'":"");
+            $filter .= (isset($uid)&&$uid>0?" AND sale.user_id=$uid":"");
             $sql = <<<END_OF_TEXT
 SELECT 
 quote_no,
@@ -64,12 +67,14 @@ cus.customer_code,
 cus.customer_name,
 CONCAT(size_name,' (',size_height,'x',size_width,')') AS size,
 meta.meta_value AS page,amount,q_price,
-created,approved,finished,status
+created,approved,finished,status,user.user_login
 FROM pap_quotation AS quo
 LEFT JOIN pap_option AS op ON op.op_id=cat_id
 LEFT JOIN pap_size ON size_id=job_size_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=quo.quote_id AND meta.meta_key='page_inside'
 LEFT JOIN pap_customer AS cus ON cus.customer_id=quo.customer_id
+LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=cus.customer_id
+LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 $filter
 ORDER BY created ASC
 END_OF_TEXT;
