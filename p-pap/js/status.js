@@ -24,6 +24,23 @@ $(document).ready(function(){
     });
 });
 }
+function comp_status(){
+$(document).ready(function(){
+  console.log("YO");
+    var edit = $(".edit-comp-status");
+    edit.on("click",function(e){
+        e.preventDefault();
+        $("#oid").val($(this).attr("oid"));
+        $("#compid").val($(this).attr("compid"));
+        //console.log($(this).attr("oid"));
+        my_float_box("status-box",true);
+        var data = {};
+        data['request'] = "get_sel_comp_status";
+        data['compid'] = $(this).attr("compid");
+        post_ajax(data,$("#ajax_req").val());
+    });
+})
+}
 function mach_sel(url){
 $(document).ready(function(){
     var sel = $("#mach");
@@ -44,4 +61,3 @@ $(document).ready(function(){
     });
 })
 }
-

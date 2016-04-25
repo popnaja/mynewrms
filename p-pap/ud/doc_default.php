@@ -15,7 +15,7 @@ function show_quote_df($qid){
     $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact_id']);
     $show_date = (is_null($info['approved'])?$info['created']:$info['approved']);
-    
+
     $head = "<div class='doc-info'>"
         . "<div class='doc-to'>"
         . "<div class='float-left doc-600'>ถึง/To : </div>"
@@ -38,7 +38,7 @@ function show_quote_df($qid){
     $x = 0;
     //list
     $process =  $db->get_keypair("pap_process", "process_id", "process_name");
-    
+
     if($info['cat_id']==10){
         $page = "<li>เนื้อใน ".$info['page_inside']. " หน้า</li>";
     } else {
@@ -68,7 +68,7 @@ function show_quote_df($qid){
                 $cname = "เนื้อใน ";
                 $cname .= (count($comps)>2?"($cno)":"");
                 $cno++;
-            } else { 
+            } else {
                 $cname = "ปก";
             }
         } else {
@@ -119,17 +119,17 @@ function show_quote_df($qid){
         }
         foreach($shipping as $v){
             if($v>0){
-                $bname .= "<li>$process[$v] (".$info['distance']." กิโลเมตร)</li>";
+                $bname .= "<li>$process[$v]</li>";
                 $x++;
             }
         }
         $bname .= "</ul>"
                 . "</div>";
     }
-    
+
     //$due = ($info['plan_delivery']>0?"<div class='print-list-title'>กำหนดส่งงาน : ".thai_date($info['plan_delivery'])."</div>":"");
     //multi quote
-    
+
     $extra = "";
     if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
         $dt = json_decode($info['multi_quote_info'],true);
@@ -170,7 +170,7 @@ function show_quote_df($qid){
     } else {
         array_push($recs,array(1,$bname,$amount,$peru,$tt));
     }
-    
+
     //check row
     if($x>29){
         $page1 = "หน้า 1/2";
@@ -189,7 +189,7 @@ function show_quote_df($qid){
     } else {
         $page1 = "";
         $page2 = $extra;
-        
+
     }
     $discount = (int)$info['discount'];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
@@ -199,10 +199,10 @@ function show_quote_df($qid){
             . "<div class='doc-dt'>"
             . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
             . "</div><!-- .doc-dt -->";
-            
 
-    
-    
+
+
+
     //sign
     $pay = ($info['credit']>0?"เครดิต ".$info['credit']." วัน":"ชำระเป็นเงินสด");
     $sign = "";
@@ -238,7 +238,7 @@ function show_quote_df($qid){
             . "<tr><td height='90'></td></tr>"
             . "<tr><td>ประทับตราบริษัท(ถ้ามี)<span class='float-right'>วันที่:____/_____/______</span></td></tr>"
             . "</table";
-    
+
     $content .= "</div><!-- .print-a4-fix -->";
     return $content;
 }
@@ -247,7 +247,7 @@ function show_order($oid,$edit=false){
     global $rpdb;
     $db = $rpdb;
     __autoload("pdo_report");
-    
+
     $rp = new reportPDO();
     $info = $rp->rp_order($oid);
     $comp = $rp->rp_order_comp($oid);
@@ -270,7 +270,7 @@ function show_order($oid,$edit=false){
                 . "<th colspan='2'>ขนส่ง</th>"
                 . "<td colspan='5'>".(isset($pack[12])?$pack[12]:"")."</td>"
                 . "</tr>";
-        
+
         $cname = $com['name'];
         $div = ($com['paper_cut']>1?" (".$op_paper_div[$com['paper_cut']].")":"");
         $paper_html .= "<tr>"
@@ -278,10 +278,10 @@ function show_order($oid,$edit=false){
                 . "<td colspan='4'>".$com['mat_name'].$div."</td>"
                 . "<td align='center' colspan='2'>".number_format($com['rim'],2)."</td>"
                 . "</tr>";
-        
+
         //plate
         $print = $rp->rp_order_cpro($com['id'], "(3)");
-        
+
         $set = explode(";",$print[3]);
         for($i=0;$i<count($set);$i++){
             $pinfo = explode(",",$set[$i]);
@@ -297,7 +297,7 @@ function show_order($oid,$edit=false){
                     . "<td>".number_format($tt,0)."</td>"
                     . "</tr>";
         }
-        
+
         // post-print
         $post = $rp->rp_order_cpro($com['id'], "(4,5)");
         $after .= "<tr align='center'>"
@@ -320,7 +320,7 @@ function show_order($oid,$edit=false){
     $content = "<div class='print-a4'>"
             . $header
             . "<h2>ใบสั่งงานพิมพ์</h2>";
-    
+
     $plate = compare_plan($info['plate_plan'], $info['plate_received']);
     $paper = compare_plan($info['paper_plan'], $info['paper_received']);
     $picdir = RDIR.$info['picture'];
@@ -358,9 +358,9 @@ function show_order($oid,$edit=false){
             . "<tr class='space'></tr>"
             . $packing;
 
-    
+
     $content .= "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->"
             . "</body>";
     return $content;
@@ -368,7 +368,7 @@ function show_order($oid,$edit=false){
 function show_mat_po($poid){
     global $rpdb;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -377,7 +377,7 @@ function show_mat_po($poid){
     $info = $db->get_info("pap_mat_po", "po_id", $poid);
     $content = "<div class='print-a4'>"
             . print_header("ใบสั่งซื้อ");
-    
+
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ร้านค้า : </div>"
@@ -389,13 +389,13 @@ function show_mat_po($poid){
             . "<div class='doc-600'> <span class='float-left'>กำหนดส่ง : </span>".  thai_date($info['po_delivery_plan'])."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_mat_po($poid);
     $content .= "<div class='doc-dt'>"
             . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0)
             . "</div><!-- .doc-dt -->";
-    
+
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
     if($info['po_status']>1){
         $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
@@ -410,14 +410,14 @@ function show_mat_po($poid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['po_remark']."</td><td class='doc-sign' height='100'>$sign</td></tr>"
             . "<tr><td>วันที่ : $date</td></tr>"
             . "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->";
     return $content;
 }
 function show_process_po($poid){
     global $rpdb;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -426,7 +426,7 @@ function show_process_po($poid){
     $info = $db->get_info("pap_process_po", "po_id", $poid);
     $content = "<div class='print-a4'>"
             . print_header("ใบสั่งผลิต");
-    
+
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ร้านค้า : </div>"
@@ -438,13 +438,13 @@ function show_process_po($poid){
             . "<div class='doc-600'> <span class='float-left'>กำหนดส่ง : </span>".  thai_date($info['po_delivery_plan'])."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_process_po($poid);
     $content .= "<div class='doc-dt'>"
             . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0)
             . "</div><!-- .doc-dt -->";
-    
+
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
     if($info['po_status']>1){
         $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
@@ -459,14 +459,14 @@ function show_process_po($poid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['po_remark']."</td><td class='doc-sign' height='100'>$sign</td></tr>"
             . "<tr><td>วันที่ : $date</td></tr>"
             . "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->";
     return $content;
 }
 function show_deli($did){
     global $rpdb;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -476,7 +476,7 @@ function show_deli($did){
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
     $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
     $aoid = explode(",",$info['aoid']);
-    
+
     $content = "<div class='print-a4'>"
             . print_header("ใบส่งของ/<br/>ใบแจ้งหนี้");
     $content .= "<div class='doc-info'>"
@@ -496,7 +496,7 @@ function show_deli($did){
             . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_deli_dt($did);
     $discount = $recs[1];
@@ -505,7 +505,7 @@ function show_deli($did){
             . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
-    
+
     $i = 0;
     $pay = "";
     foreach($aoid as $oid){
@@ -520,14 +520,14 @@ function show_deli($did){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
             . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->";
     return $content;
 }
 function show_tdeli($tdid){
     global $rpdb;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -538,7 +538,7 @@ function show_tdeli($tdid){
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
     $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
     $aoid = explode(",",$info['aoid']);
-    
+
     $content = "<div class='print-a4'>"
             . print_header("ใบส่งของชั่วคราว");
     $content .= "<div class='doc-info'>"
@@ -558,7 +558,7 @@ function show_tdeli($tdid){
             . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_tdeli_dt($tdid);
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
@@ -566,7 +566,7 @@ function show_tdeli($tdid){
             . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,0)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
-    
+
     $i = 0;
     $pay = "";
     foreach($aoid as $oid){
@@ -581,7 +581,7 @@ function show_tdeli($tdid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
             . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->";
     return $content;
 }
@@ -589,7 +589,7 @@ function show_pbill($bid){
     global $rpdb;
     global $op_type_unit;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -618,7 +618,7 @@ function show_pbill($bid){
             . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","เลขที่เอกสาร<br/>Document No","วันที่เอกสาร<br/>Date","ครบกำหนดชำระ<br/>Due Date","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_pbill_dt($bid,$op_type_unit);
     $content .= "<div class='doc-dt'>"
@@ -633,7 +633,7 @@ function show_pbill($bid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'>$msign</td></tr>"
             . "<tr><td>วันที่ : </td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
-    
+
     $content .= "</div><!-- .print-a4 -->";
     return $content;
 }
@@ -641,7 +641,7 @@ function show_invoice($ivid){
     global $rpdb;
     global $op_type_unit;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -672,7 +672,7 @@ function show_invoice($ivid){
             . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_invoice_dt($ivid,$op_type_unit);
     $discount = 0;
@@ -681,7 +681,7 @@ function show_invoice($ivid){
             . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
-    
+
     $user = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=".$info['user_id']);
     $usign = "<img src='".ROOTS.$user['signature']."' />";
     $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
@@ -693,7 +693,7 @@ function show_invoice($ivid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'>$usign</td><td class='doc-sign' height='100'>$msign</td></tr>"
             . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
-    
+
     $doc .= "</div><!-- .print-a4 -->";
     return $original.$doc.$copy.$doc;
 }
@@ -701,7 +701,7 @@ function show_receipt($rcid){
     global $rpdb;
     global $op_type_unit;
     $db = $rpdb;
-    
+
     __autoload("pdo_report");
     __autoloada("table");
     $rp = new reportPDO();
@@ -713,7 +713,7 @@ function show_receipt($rcid){
 
     $doc = "<div class='print-a4-fix'>"
             . print_header("ใบเสร็จรับเงิน");
-    
+
     $doc .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ลูกค้า : </div>"
@@ -732,7 +732,7 @@ function show_receipt($rcid){
             . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
-    
+
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_receipt_dt($rcid,$op_type_unit);
     $discount = 0;
@@ -763,7 +763,7 @@ function show_receipt($rcid){
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'>$usign</td><td class='doc-sign' height='100'>$msign</td></tr>"
             . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
-    
+
     $doc .= "</div><!-- .print-a4 -->";
     return $doc;
 }

@@ -118,7 +118,7 @@ if(isset($mid)){
             . "status_update();"
             . "</script>"
             . "</div><!-- .col-100 -->";
-    
+
 } else {
 /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
@@ -129,9 +129,9 @@ if(isset($mid)){
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
-    
+
     $arrdue = $db->get_job_due();
-    
+
     //view
     $head = array("Update","ชื่องาน","กำหนดส่ง","สภานะรวม","ชิ้นงาน","สถานะ");
     $rec = $tbpdo->view_job_status($pauth,$op_job_prod,$due,$status,$s, $page, $iperpage);
@@ -153,14 +153,14 @@ if(isset($mid)){
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table_keygroup($head,$rec,"tb-pstatus")
             . "</div><!-- .col-100 -->";
-    
+
     $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
             . "<script>"
             . "order_search();"
             . "mach_sel('$redirect');"
             . "</script>";
-    
+
     $box = "<h4>เปลียนสถานะชิ้นงาน</h4>"
             . "<div id='box-msg'></div>"
             . $form->show_st_form()
@@ -173,6 +173,7 @@ if(isset($mid)){
     $box .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "status_update();"
+            . "comp_status();"
             . "</script>";
 
     $content .= $form->show_float_box($box,"status-box");
