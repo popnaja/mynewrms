@@ -683,14 +683,14 @@ function show_invoice($ivid){
             . "</div><!-- .doc-dt -->";
 
     $user = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=".$info['user_id']);
-    $usign = "<img src='".ROOTS.$user['signature']."' />";
+    //$usign = "<img src='".ROOTS.$user['signature']."' />";
     $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
     $msign = "<img src='".ROOTS.$manager['signature']."' />";
     $pay = "";
 
     $doc .= "<table id='rp-2sign' class='doc-final'>"
             . "<tr><th width='110'>ชำระเงินโดย :</th><td>$pay</td><th width='180'>ผู้รับเงิน</th><th width='180'>ผู้จัดการ</th></tr>"
-            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'>$usign</td><td class='doc-sign' height='100'>$msign</td></tr>"
+            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'>$msign</td></tr>"
             . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
 
@@ -743,7 +743,7 @@ function show_receipt($rcid){
             . "</div><!-- .doc-dt -->";
     //signature
     $user = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=".$info['user_id']);
-    $usign = "<img src='".ROOTS.$user['signature']."' />";
+    //$usign = "<img src='".ROOTS.$user['signature']."' />";
     $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
     $msign = "<img src='".ROOTS.$manager['signature']."' />";
     //payment
@@ -760,7 +760,7 @@ function show_receipt($rcid){
     //show footer
     $doc .= "<table id='rp-2sign' class='doc-final'>"
             . "<tr><th width='110'>ชำระเงินโดย :</th><td>$pay</td><th width='180'>ผู้รับเงิน</th><th width='180'>ผู้จัดการ</th></tr>"
-            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'>$usign</td><td class='doc-sign' height='100'>$msign</td></tr>"
+            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'>$msign</td></tr>"
             . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
 

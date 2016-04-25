@@ -184,27 +184,24 @@ if(isset($oid)){
         //$arrmm = $db->get_quote_month();
         
         //view
-    $head = array("ชื่องาน","ลูกค้า","หน้า","ยอดผลิต","กำหนดส่ง","เพลต","กระดาษ","แผนผลิต");
+    $head = array("แก้ไข","ชื่องาน","ลูกค้า","หน้า","ยอดผลิต","กำหนดส่ง","เพลต","กระดาษ","แผนผลิต");
     $rec = $tbpdo->view_order($pauth,$op_plan_status_icon,$status, $s, $page, $iperpage);
-        if($pauth>1){
-            array_unshift($head, "แก้ไข");
-        }
-        $all_rec = $tbpdo->view_order($pauth,$op_plan_status_icon, $status, $s);
-        $max = ceil(count($all_rec)/$iperpage);
-        $content .= "<h1 class='page-title'>$pagename</h1>"
-                . "<div id='ez-msg'>".  showmsg() ."</div>"
-                . "<div class='col-100'>"
-                . $tb->show_search(current_url(), "scid", "s","ค้นหารหัสหรือชื่องาน",$s)
-                . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
-                . $form->show_hidden("redirect","redirect",$redirect)
-                . $tb->show_filter(current_url(), "fil_status", $op_job_status, $status,"สถานะ")
-                . $tb->show_pagenav(current_url(), $page, $max)
-                . $tb->show_table($head,$rec,"tb-order")
-                . "<div class='tb-legend'>"
-                . my_legend($op_plan_status,$op_plan_status_icon)
-                . "</div>"
-                . "</div><!-- .col-100 -->"
-                . "<script>order_search();</script>";
+    $all_rec = $tbpdo->view_order($pauth,$op_plan_status_icon, $status, $s);
+    $max = ceil(count($all_rec)/$iperpage);
+    $content .= "<h1 class='page-title'>$pagename</h1>"
+            . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . "<div class='col-100'>"
+            . $tb->show_search(current_url(), "scid", "s","ค้นหารหัสหรือชื่องาน",$s)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . $tb->show_filter(current_url(), "fil_status", $op_job_status, $status,"สถานะ")
+            . $tb->show_pagenav(current_url(), $page, $max)
+            . $tb->show_table($head,$rec,"tb-order")
+            . "<div class='tb-legend'>"
+            . my_legend($op_plan_status,$op_plan_status_icon)
+            . "</div>"
+            . "</div><!-- .col-100 -->"
+            . "<script>order_search();</script>";
     }
 }
 $content .= ($action=="print"?"":$menu->showfooter());

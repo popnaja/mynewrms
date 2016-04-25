@@ -24,46 +24,19 @@
 #tb-quote tr th:nth-child(2){
     width:35px;
 }
-#tb-quote tr td:nth-child(3),
-#tb-quote tr th:nth-child(3),
-#tb-quote tr td:nth-child(5),
-#tb-quote tr th:nth-child(5),
-#tb-quote tr td:nth-child(6),
-#tb-quote tr th:nth-child(6),
-#tb-quote tr td:nth-child(7),
-#tb-quote tr th:nth-child(7),
-#tb-quote tr td:nth-child(8),
-#tb-quote tr th:nth-child(8){
-    display:none;
-}
 @media only screen and (min-width: 320px) {
 
 }
 @media only screen and (min-width: 480px) {
-
-    #tb-quote tr td:nth-child(3),
-    #tb-quote tr th:nth-child(3),
-    #tb-quote tr td:nth-child(5),
-    #tb-quote tr th:nth-child(5){
-        display:table-cell;
-    }
+    
 }
 @media only screen and (min-width: 769px) {
     #tb-quote tr th:nth-child(3){
         width:105px;
     }
-    #tb-quote tr td:nth-child(7),
-    #tb-quote tr th:nth-child(7),
-    #tb-quote tr td:nth-child(8),
-    #tb-quote tr th:nth-child(8){
-        display:table-cell;
-    }
 }
 @media only screen and (min-width: 1024px) {
-    #tb-quote tr td:nth-child(6),
-    #tb-quote tr th:nth-child(6){
-        display:table-cell;
-    }
+
 }
 
 .tb-first-gp {
