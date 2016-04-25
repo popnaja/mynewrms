@@ -360,7 +360,12 @@ END_OF_TEXT;
                 $res[$k]['stc'] = $st_code[$v['stc']];
                 $res[$k]['status'] = "<a href='' title='เปลี่ยนสถานะ' oid='$oid' status='$status' class='icon-page-edit edit-status'></a>"
                         . $st_name[$status];
-                $res[$k]['order_id'] = "<a href='order.php?oid=$oid' title='Edit' class='icon-page-edit'></a>";
+                if($auth>1){
+                    $res[$k]['order_id'] = "<a href='order.php?oid=$oid' title='Edit' class='icon-page-edit'></a>";
+                } else {
+                    $res[$k]['order_id'] = "";
+                }
+                
             }
             return $res;
         } catch (Exception $ex) {
@@ -369,7 +374,6 @@ END_OF_TEXT;
     }
     public function view_order($auth,$op,$status=null,$s=null,$page=null,$perpage=null){
         try {
-            $edit = "";
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.quote_id>0";
@@ -378,22 +382,16 @@ END_OF_TEXT;
             if(is_null($s)&&is_null($status)){
                 $filter .= " AND prod_finished IS NULL = 1";
             }
-            if($auth>1){
-                $edit = <<<END_OF_TEXT
-                        CONCAT("<a href='order.php?oid=",po.order_id,"' title='Edit' class='icon-page-edit'></a>"),
-END_OF_TEXT;
-            }
             $sql = <<<END_OF_TEXT
 SELECT 
-$edit
+po.order_id,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,": <br/>",pq.name,"</a>"),
 cus.customer_name,
 meta.meta_value AS pages,FORMAT(amount,0),
 DATE_FORMAT(pq.plan_delivery,'%d-%b') AS due,
 IF(ISNULL(plate_plan),1,IF(ISNULL(plate_received),IF(now()>plate_plan,5,2),IF(plate_received>plate_plan,5,4))) AS plate,
 IF(ISNULL(paper_plan),1,IF(ISNULL(paper_received),IF(now()>paper_plan,5,2),IF(paper_received>paper_plan,5,4))) AS paper,
-po.prod_plan AS plan,
-po.order_id AS oid
+po.prod_plan AS plan
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
 LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id   
@@ -421,7 +419,7 @@ END_OF_TEXT;
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach($res as $k=>$v){
-                $oid = $v['oid'];
+                $oid = $v['order_id'];
                 $paper = $v['paper'];
                 if($v['paper']>1&&$v['paper']<>4){
                     $stmt1->execute();
@@ -437,7 +435,11 @@ END_OF_TEXT;
                 } else {
                     $res[$k]['plan'] = "<a href='production.php?action=addplan&oid=$oid' class='icon-page-edit' title='ปรับแผน'></a>";
                 }
-                unset($res[$k]['oid']);
+                if($auth>1){
+                    $res[$k]['order_id'] = "<a href='order.php?oid=$oid' title='Edit' class='icon-page-edit'></a>";
+                } else {
+                    $res[$k]['order_id'] = "";
+                }
             }
             return $res;
         } catch (Exception $ex) {

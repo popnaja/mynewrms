@@ -1286,7 +1286,7 @@ if($req == "login"){
     //check po vs delivery if deliveried all => change po status;
     $db->check_ppo_vs_delivery($_POST['poid']);
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="add_job_deli"){
     //check any oid in temp deli
     if($db->check_job_in_deli($_POST['oid'])){
