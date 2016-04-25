@@ -112,9 +112,9 @@ class mycalendar{
                         $info .= "<td>&nbsp;</td>";
                     }
                 } else if(isset($this->data[$dd])){
-                    $oid = explode(",",$this->data[$dd][1])[$j];
-                    $name = explode(",",$this->data[$dd][2])[$j];
-                    $info .= "<td class='mycd-rec' oid='$oid'>$name</td>";
+                    $oid = explode(",",$this->data[$dd][1]);
+                    $name = explode(",",$this->data[$dd][2]);
+                    $info .= (isset($oid[$j])?"<td class='mycd-rec' oid='$oid[$j]'>$name[$j]</td>":"");
                 } else {
                     $info .= "<td>&nbsp;</td>";
                 }
