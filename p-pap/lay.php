@@ -80,65 +80,19 @@ if($action=="add"){
             . "</div>"
             . "</div><!-- .col-50 -->"
             . "</div><!-- .cheight -->";
-
-    
     //lay guide
     $content .= "<div id='lay-guide' class='col-50'>"
             . "<h3>Lay Guide</h3>"
             . $form->show_num("cover_thick",1,0.01,"","สันปก+ปีก (cm)","","label-3070")
-            . "<div id='tb-lay' class='ez-table'><table>"
-            . "<tr class='tb-head'><th></th><th>ผ่าก่อนพิมพ์</th><th>ปก</th><th>เนื้อ</th></tr>"
-            . "<tr><th>ขนาดงาน</th><td></td><td class='size-cover'></td><td class='size-inside'></td></tr>"
-            . "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวตั้ง</th></tr>";
-
-    foreach($paper_info as $k=>$v){
-        $wh = json_decode($v,true);
-        $wcm = $wh['width']*2.54-$grip;
-        $hcm = $wh['length']*2.54;
-        $whcm = $wcm."x".$hcm;
-        $content .= "<tr class='tb-data'>"
-                . "<th>$k\"<br/>$whcm cm*</th>"
-                . "<td>".$form->show_select("pdiv", $op_paper_div, "label-inline pdiv", null, null,null,"pdiv[]")."</td>"
-                . "<td class='lay-box-c'>"
-                . "<span class='lay-cover'></span><br/>"
-                . "<span class='lay-c-rem'></span>"
-                . "</td>"
-                . "<td class='lay-box-i'>"
-                . "<span class='lay-inside'></span><br/>"
-                . "<span class='lay-i-rem'></span>"
-                . "</td>"
-                . "</tr>";
-    }
-    $content .= "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวนอน</th></tr>";
-    foreach($paper_info as $k=>$v){
-        $content .= "<tr class='tb-data'>"
-                . "<th>$k\"</th>"
-                . "<td></td>"
-                . "<td class='lay-box-cr'>"
-                . "<span class='lay-cover-r'></span><br/>"
-                . "<span class='lay-c-rem-r'></span>"
-                . "</td>"
-                . "<td class='lay-box-ir'>"
-                . "<span class='lay-inside-r'></span><br/>"
-                . "<span class='lay-i-rem-r'></span>"
-                . "</td>"
-                . "</tr>";
-    }
-    $content .= "</table></div><!-- .ez-table -->"
-            . "<div class='tb-remark'>"
-            . "<p>* = ขนาดกระดาษเป็น cm หัก Grip $grip cm</p>"
-            . "<p>** = % กระดาษเหลือ</p>"
-            . "</div>"
-            . "</div><!-- .col-50 -->"
-            . "<div class='col-50'>"
-            . "<div id='show-lay-cover'><div id='show-lay'></div></div>"
-            . "</div><!-- .col-50 -->"
-            . "<script>lay_guide($pinfo,$grip,$bleed);</script>";
-
+            //. $form->show_num("grip_size",$grip,0.01,"","ขนาดกริบ (cm)","","label-3070")
+            //. $form->show_select("grip_double",array("no"=>"No","yes"=>"Yes"),"label-3070","กริบสองด้าน",null)
+            . show_layguide($form,$paper_info,$grip);
+            
     $content .= $form->show_hidden("request","request","add_job_size")
             . $form->show_hidden("redirect","redirect",$redirect);
     $form->addformvalidate("ez-msg", array('name','height','width','cover_lay','inside_lay'));
-    $content .= $form->submitscript("$('#lay').submit();");
+    $content .= $form->submitscript("$('#lay').submit();")
+            . "<script>lay_guide($pinfo,$grip,$bleed);</script>";
 } else if(isset($sid)) {
     //check
     if($pauth<=1){
@@ -149,7 +103,7 @@ if($action=="add"){
     $info = $db->get_info("pap_size","size_id",$sid);
     //edit
     $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
-    $paper_info = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_size'");
+    $paper_info = $db->get_paper_size();
     $pinfo = json_encode(array_values($paper_info));
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
     $grip = (float)$cinfo['grip_size'];
@@ -183,52 +137,9 @@ if($action=="add"){
     $content .= "<div id='lay-guide' class='col-50'>"
             . "<h3>Lay Guide</h3>"
             . $form->show_num("cover_thick",$info['cover_thick'],0.01,"","สันปก+ปีก (cm)","","label-3070")
-            . "<div class='ez-table'><table>"
-            . "<tr class='tb-head'><th></th><th>ผ่าก่อนพิมพ์</th><th>ปก</th><th>เนื้อ</th></tr>"
-            . "<tr><th>ขนาดงาน</th><td></td><td class='size-cover'></td><td class='size-inside'></td></tr>"
-            . "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวตั้ง</th></tr>";
-    foreach($paper_info as $k=>$v){
-        $wh = json_decode($v,true);
-        $wcm = $wh['width']*2.54-$grip;
-        $hcm = $wh['length']*2.54;
-        $whcm = $wcm."x".$hcm;
-        $content .= "<tr class='tb-data'>"
-                . "<th>$k\"<br/>$whcm cm*</th>"
-                . "<td>".$form->show_select("pdiv", $op_paper_div, "label-inline", null, null,null,"pdiv[]")."</td>"
-                . "<td class='lay-box-c'>"
-                . "<span class='lay-cover'></span><br/>"
-                . "<span class='lay-c-rem'></span>"
-                . "</td>"
-                . "<td class='lay-box-i'>"
-                . "<span class='lay-inside'></span><br/>"
-                . "<span class='lay-i-rem'></span>"
-                . "</td>"
-                . "</tr>";
-    }
-    $content .= "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวนอน</th></tr>";
-    foreach($paper_info as $k=>$v){
-        $content .= "<tr class='tb-data'>"
-                . "<th>$k\"</th>"
-                . "<td></td>"
-                . "<td class='lay-box-cr'>"
-                . "<span class='lay-cover-r'></span><br/>"
-                . "<span class='lay-c-rem-r'></span>"
-                . "</td>"
-                . "<td class='lay-box-ir'>"
-                . "<span class='lay-inside-r'></span><br/>"
-                . "<span class='lay-i-rem-r'></span>"
-                . "</td>"
-                . "</tr>";
-    }
-    $content .= "</table></div><!-- .ez-table -->"
-            . "<div class='tb-remark'>"
-            . "<p>* = ขนาดกระดาษเป็น cm หัก Grip $grip cm</p>"
-            . "<p>** = % กระดาษเหลือ</p>"
-            . "</div>"
-            . "</div><!-- .col-50 -->"
-            . "<div class='col-50'>"
-            . "<div id='show-lay-cover'><div id='show-lay'></div></div>"
-            . "</div>";
+            //. $form->show_num("grip_size",$info['grip_size'],0.01,"","ขนาดกริบ (cm)","","label-3070")
+            //. $form->show_select("grip_double",array("no"=>"No","yes"=>"Yes"),"label-3070","กริบสองด้าน",$info['grip_double'])
+            . show_layguide($form,$paper_info);
     $content .= $form->show_hidden("request","request","edit_job_size")
             . $form->show_hidden("sid","sid",$sid)
             . $form->show_hidden("redirect","redirect",$redirect);
@@ -263,3 +174,57 @@ if($action=="add"){
 $content .= $menu->showfooter();
 echo $content;
 
+function show_layguide($form,$pinfo){
+    global $op_paper_div;
+    $html = "<div id='tb-lay' class='ez-table'><table>"
+            . "<tr class='tb-head'><th></th><th>ผ่าก่อนพิมพ์</th><th>ปก</th><th>เนื้อ</th></tr>"
+            . "<tr><th>ขนาดงาน</th><td></td><td class='size-cover'></td><td class='size-inside'></td></tr>"
+            . "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวตั้ง</th></tr>";
+
+    foreach($pinfo as $k=>$v){
+        $wh = json_decode($v['psize'],true);
+        $wcm = $wh['width']*2.54;
+        $hcm = $wh['length']*2.54;
+        $whcm = $wcm."x".$hcm;
+        $html .= "<tr class='tb-data'>"
+                . "<th>".$v['op_name']."\"<br/>$whcm cm</th>"
+                . "<td>".$form->show_select("pdiv", $op_paper_div, "label-inline pdiv", null, null,null,"pdiv[]")."</td>"
+                . "<td class='lay-box-c'>"
+                . "<span class='lay-cover'></span><br/>"
+                . "<span class='lay-c-rem'></span>"
+                . "</td>"
+                . "<td class='lay-box-i'>"
+                . "<span class='lay-inside'></span><br/>"
+                . "<span class='lay-i-rem'></span>"
+                . "</td>"
+                . "</tr>";
+    }
+    $html .= "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวนอน</th></tr>";
+    foreach($pinfo as $k=>$v){
+        $html .= "<tr class='tb-data'>"
+                . "<th>".$v['op_name']."\"</th>"
+                . "<td></td>"
+                . "<td class='lay-box-cr'>"
+                . "<span class='lay-cover-r'></span><br/>"
+                . "<span class='lay-c-rem-r'></span>"
+                . "</td>"
+                . "<td class='lay-box-ir'>"
+                . "<span class='lay-inside-r'></span><br/>"
+                . "<span class='lay-i-rem-r'></span>"
+                . "</td>"
+                . "</tr>";
+    }
+    $html .= "</table></div><!-- .ez-table -->"
+            . "<div class='tb-remark'>"
+            . "<p>** = % กระดาษเหลือ</p>"
+            . "</div><!-- .tb-remark -->"
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-50'>"
+            . "<div id='show-lay-cover'>"
+            . "<h4></h4>"
+            . "<div id='lay-sel'></div>"
+            . "<div id='show-lay'></div>"
+            . "</div><!-- #show-lay-cover -->"
+            . "</div><!-- .col-50 -->";
+    return $html;
+}

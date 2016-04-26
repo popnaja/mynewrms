@@ -1507,5 +1507,17 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_paper_size(){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT op_id,op_name,op_value AS psize FROM pap_option WHERE op_type='paper_size'
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
 }
 

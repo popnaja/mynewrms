@@ -1,7 +1,16 @@
+#tb-lay .label-inline {
+    margin-bottom:0;
+}
 #show-lay-cover {
     background-color:rgba(0,0,0,0.2);
     border:rgb(150,150,150) solid 1px;
     margin:20px auto;
+}
+#show-lay-cover h4 {
+    display:inline-block;
+    padding-top:10px;
+    padding-left:10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.02);
 }
 #show-lay{
     background-color:#0026AB;
@@ -28,8 +37,13 @@
 [class*='lay-box-'] {
     cursor:pointer;
 }
-[class*='lay-box-']:hover{
+[class*='lay-box-']:hover,
+.box-active {
     color:#FFF;
     font-weight:600;
     background-color:#0026AB;
+}
+#lay-sel {
+    display:inline-block;
+    margin-left:20px;
 }
