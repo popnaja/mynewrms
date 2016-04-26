@@ -24,6 +24,25 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function check_job_deli($oid){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT 
+job.order_no,pq.name,pq.amount,IFNULL(SUM(deli.qty),0) AS deli
+FROM pap_order AS job
+LEFT JOIN pap_quotation AS pq ON pq.quote_id=job.quote_id
+LEFT JOIN pap_temp_dt AS deli ON deli.order_id=job.order_id
+WHERE job.order_id=:oid
+GROUP BY job.order_id
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":oid",$oid);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function view_job_pbill($auth,$due=null,$status=null,$s=null,$s_cus=null,$page=null,$perpage=null){
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
@@ -40,7 +59,7 @@ END_OF_TEXT;
 SELECT 
 deli.no,deli.id AS did,
 GROUP_CONCAT(DISTINCT cus.customer_name),
-GROUP_CONCAT(dt.job_name SEPARATOR '<br/>'),
+GROUP_CONCAT(dt.order_id) AS aoid,
 DATE_FORMAT(deli.date,'%d-%b'),
 DATE_FORMAT(MIN(DATE_ADD(deli.date, INTERVAL dt.credit DAY)),'%d-%b'),
 bdt.pbill_id,bill.no AS bno,
@@ -98,6 +117,21 @@ END_OF_TEXT;
                     $cid = $v['customer_id'];
                     $res[$k]['bno'] = "<input type='checkbox' name='did[]' value='$did,$cid'/>";
                 }
+                //check delivery
+                $aoid = explode(",",$v['aoid']);
+                $jobwdeli = "";
+                foreach($aoid as $k=>$oid){
+                    $oinfo = $this->check_job_deli($oid);
+                    $rem = $oinfo['amount']-$oinfo['deli'];
+                    if($rem==0){
+                        $jobwdeli .= "<span class='ez-circle-green'></span>".substr($oinfo['name'],0,10)."<br/>";
+                    } else {
+                        $jobwdeli .= "<span class='icon-adjust ac-show-rm'><span class='ac-rm'>ค้างส่ง ".number_format($rem,0)."</span></span>"
+                                . substr($oinfo['name'],0,10)."</br>";
+                    }
+                }
+                $res[$k]['aoid'] = $jobwdeli;
+                
                 unset($res[$k]['did']);
                 unset($res[$k]['pbill_id']);
                 unset($res[$k]['customer_id']);

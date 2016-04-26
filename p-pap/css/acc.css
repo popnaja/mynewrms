@@ -35,3 +35,23 @@
     clear:left;
     float:left;
 }
+
+.ac-show-rm {
+    cursor:pointer;
+    position:relative;
+}
+.ac-rm {
+    display:none;
+    position:absolute;
+    top:0px;
+    right:25px;
+    background-color:#777;
+    color:#fff;
+    font-size:13px;
+    width:100px;
+    padding:3px;
+    border-radius:3px;
+}
+.ac-show-rm:hover .ac-rm{
+    display:block;
+}

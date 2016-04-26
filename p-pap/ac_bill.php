@@ -58,6 +58,7 @@ $menu->ascript[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.min.js";
 $menu->ascript[] = $root."js/order.js";
 $menu->ascript[] = $root."js/acc.js";
 $menu->astyle[] = $root."css/acc.css";
+$menu->astyle[] = $root."css/status.css";
 $menu->extrascript = <<<END_OF_TEXT
 END_OF_TEXT;
 
