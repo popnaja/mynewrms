@@ -86,8 +86,9 @@ class mycalendar{
     }
     private function my_calendar(){
         $html = "<div class='mycd-calendar'>";
-        for($i=0;$i<5;$i++){
-            $top = $i*20;
+        $w = $this->num_week($this->year, $this->month);
+        for($i=0;$i<$w;$i++){
+            $top = $i*(100/$w);
             $html .= "<div class='month-row' style='height:21%;top:$top%;'>"
                     . $this->mycd_rundate()
                     . "</div><!-- .month-row -->";
@@ -100,9 +101,10 @@ class mycalendar{
         $stdate->sub(new DateInterval("P6D"));
         for($j=0;$j<$max;$j++){
             $info .= "<tr>";
+            $st = new DateTime($stdate->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
             for($i=0;$i<7;$i++){
-                $date = $stdate->format("Ymd");
-                $dd = $stdate->format("d");
+                $date = $st->format("Ymd");
+                $dd = $st->format("d");
                 if(isset($this->data[$date])){
                     if(isset(explode(",",$this->data[$date][1])[$j])){
                         $oid = explode(",",$this->data[$date][1])[$j];
@@ -112,16 +114,22 @@ class mycalendar{
                         $info .= "<td>&nbsp;</td>";
                     }
                 } else if(isset($this->data[$dd])){
-                    $oid = explode(",",$this->data[$dd][1]);
-                    $name = explode(",",$this->data[$dd][2]);
-                    $info .= (isset($oid[$j])?"<td class='mycd-rec' oid='$oid[$j]'>$name[$j]</td>":"");
+                    if($st->format("m")!=$this->month){
+                        continue;
+                    }
+                    if(isset(explode(",",$this->data[$dd][1])[$j])){
+                        $oid = explode(",",$this->data[$dd][1]);
+                        $name = explode(",",$this->data[$dd][2]);
+                        $info .= (isset($oid[$j])?"<td class='mycd-rec' oid='$oid[$j]'>$name[$j]</td>":"");
+                    } else {
+                        $info .= "<td>&nbsp;</td>";
+                    }
                 } else {
                     $info .= "<td>&nbsp;</td>";
                 }
-                $stdate->add(new DateInterval("P1D"));
+                $st->add(new DateInterval("P1D"));
             }
             $info .= "</tr>";
-            $stdate->sub(new DateInterval("P7D"));
         }
         return $info;
     }
@@ -208,6 +216,14 @@ class mycalendar{
         }
         $html .="</div><!-- .mycd-schedule -->";
         return $html;
+    }
+    private function num_week($year,$month){
+        $first = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+        $wf = $first->format("w");
+        $t = $first->format("t")-1;
+        $first->add(new DateInterval("P".$t."D"));
+        $wl = $first->format("w");
+        return ceil(($t+$wf+(6-$wl))/7);
     }
 }
 

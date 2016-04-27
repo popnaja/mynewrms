@@ -86,6 +86,9 @@ if($action =="add"){
     $head = array("ลำดับ","ใบแจ้งหนี้","วันที่เอกสาร","การชำระ","กำหนดชำระ","ยอดเรียกเก็บ");
     $rec = $pdo_ac->get_bill_list(implode(",",$arr_did));
     $cus = $db->get_keypair("pap_customer", "customer_id", "customer_name", "WHERE customer_id IN ($str_cid)");
+    $cinfo = $db->get_info("pap_customer", "customer_id", $arr_cid[0])+$db->get_meta("pap_customer_meta", "customer_id", $arr_cid[0]);
+    $billg = find_date($cinfo,"bill");
+    $chequeg = find_date($cinfo,"cheque");
     $ct = $db->get_keypair("pap_contact", "contact_id", "contact_name", "WHERE customer_id IN ($str_cid)");
     $content .= "<h1 class='page-title'>ออกใบวางบิล</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"
@@ -93,8 +96,8 @@ if($action =="add"){
         . "<div class='col-50'>"
         . $form->show_select("cid", $cus, "label-inline", "ลูกค้า", null)
         . $form->show_select("pbill_ct", $ct, "label-inline", "ผู้ติดต่อ", null)
-        . $form->show_text("date","date","","yyyy-mm-dd","วันที่วางบิล","","label-inline")
-        . $form->show_text("paydate","paydate","","yyyy-mm-dd","วันนัดชำระ","","label-inline")
+        . $form->show_text("date","date",$billg,"yyyy-mm-dd","วันที่วางบิล","","label-inline")
+        . $form->show_text("paydate","paydate",$chequeg,"yyyy-mm-dd","วันนัดชำระ","","label-inline")
         . $form->show_select("payment", $op_bill_payment, "label-inline", "วิธีการชำระ", null)
         . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-inline");
     for($i=0;$i<count($arr_did);$i++){
@@ -426,3 +429,22 @@ if($action =="add"){
 }
 $content .= ($action=="print"?"":$menu->showfooter());
 echo $content;
+
+function find_date($info,$txt){
+    if($txt == "bill"){
+        $type = $info['customer_collect_cheque'];
+    } else {
+        $type = $info['customer_place_bill'];
+    }
+    $month = date_format(date_create(null,timezone_open("Asia/Bangkok")),"m");
+    $year = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y");
+    $today = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+    if($type=="day"){
+        $d = sprintf("%02s",$info[$txt."_day"]);
+    } else if($type=="dofw"){
+        $d = dofw_to_date($year, $month, $info[$txt.'_weekday'], $info[$txt.'_week']);
+    } else if($type=="eofm"){
+        $d = $today->format("t");
+    }
+    return "$year-$month-$d";
+}

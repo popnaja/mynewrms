@@ -28,7 +28,7 @@ $form = new myform("papform");
 $month = date_format(date_create(null,timezone_open("Asia/Bangkok")),"m");
 $year = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y");
 
-$bill = $pdo_ac->get_bill_check();
+$bill = $pdo_ac->get_bill_check($year,$month);
 $cd = new mycalendar($year,$month,150);
 $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . "<div id='mycd-div'>"
