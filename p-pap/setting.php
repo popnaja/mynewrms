@@ -52,8 +52,9 @@ $cominfo = "<h4>ข้อมูลบริษัท</h4>"
         . $form->show_text("address","address",(isset($info['address'])?$info['address']:""),"","ที่อยู่","","label-3070")
         . $form->show_text("email","email",(isset($info['email'])?$info['email']:""),"","Email","","label-3070")
         . $form->show_text("tel","tel",(isset($info['tel'])?$info['tel']:""),"","เบอร์โทร","","label-3070")
+        . $form->show_text("fax","fax",(isset($info['fax'])?$info['fax']:""),"","เบอร์แฟกซ์","","label-3070")
         . $form->show_text("tax_id","tax_id",(isset($info['tax_id'])?$info['tax_id']:""),"","เลขประจำตัวผู้เสียภาษี","","label-3070");
-        
+
 $doc = "<h4>การเรียงลำดับเอกสาร</h4>"
     . $form->show_select("cdigit",$op_digit,"label-3070","รหัสลูกค้า",(isset($info['c_digit'])?$info['c_digit']:null),"ตัวอย่าง 3 digits A001,A002 ")
     . $form->show_select("s_digit",$op_digit,"label-3070","รหัสผู้ผลิต",(isset($info['s_digit'])?$info['s_digit']:null),"")
@@ -91,6 +92,3 @@ $content .= $form->submitscript("$('#papform').submit();")
 
 $content .= $menu->showfooter();
 echo $content;
-
-
-
