@@ -29,7 +29,7 @@ body {
 }
 </style>
 END_OF_TEXT;
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . show_quote_df($qid)
             . "</body>";
     echo $content;
@@ -70,7 +70,7 @@ if($action=="add"||isset($qid)){
     $job_size = array("0"=>"--ขนาดชิ้นงาน--")+$db->get_keypair("pap_size", "size_id", "CONCAT(size_name,' (',size_height,'x',size_width,')')");
     $paper = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type");
     $gram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight");
-    
+
     $prepress = $process_keypair[1];
     $binding = array("0"=>"--ไม่มี--")+$process_keypair[9];
     $coating = array("0"=>"--ไม่มี--")+$process_keypair[4];
@@ -101,25 +101,25 @@ if($action=="add"){
             . $form->show_hidden("sid","sid",0)
             . $form->show_num("amount","",1,"","ยอดพิมพ์","","label-3070","min=1")
             . $form->show_hidden("status","status","1");
-    
+
     $detail = $form->show_checkbox("prepress","prepress",$prepress,"การจัดทำต้นฉบับ","label-3070")
             . $form->show_checkbox("exclude","exclude",$op_quote_ex,"อื่นๆ","label-3070")
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",null)
             . $form->show_text("due","due","","yyyy-mm-dd","กำหนดส่ง","","label-3070")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
-    
+
     $pack = $form->show_checkbox("pack","pack",$packing,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$shipping,"การขนส่ง","label-3070")
             . $form->show_num("distance","",0.01,"","ระยะทาง(กม)","","label-3070");
-    
+
     $multi = "";
     for($x=1;$x<11;$x++){
         $multi .= $form->show_num("m_amount_$x","",1,"","ยอด $x","","label-3070","min=0","m_amount[]");
     }
-    
+
     $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi))
             . "</div><!-- .col-50 -->";
-    
+
     $content .= "<div class='col-50'>"
             . "<div class='sel-type-10 sel-type-69'>"
             . "<div class='form-section'>"
@@ -199,13 +199,13 @@ if($action=="add"){
     __autoload("pdo_tb");
     include_once("quote_formular.php");
     $tb = new mytable();
-    
+
     $comps = $db->get_comp($qid);
     $layinfo = $db->get_layinfo($info['job_size_id']);
-    
+
     $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$info['customer_id']);
     $cover = $db->get_comp($qid,true);
-    $inside = $db->get_comp($qid,false); 
+    $inside = $db->get_comp($qid,false);
     if(isset($cover[0])){
         $cover_post = explode(",",$cover[0]['comp_postpress']);
         $sel_c_pgram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight",$layinfo['cover_paper'],$cover[0]['comp_paper_type']);
@@ -222,7 +222,7 @@ if($action=="add"){
     $ship_checked = $form->checked_array($shipping, (isset($info['shipping'])?explode(",",$info['shipping']):array()));
     $sel_c_ptype = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type",$layinfo['cover_paper']);
     $sel_i_ptype = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type",$layinfo['inside_paper']);
-    
+
     //show tb-cost
     if($pauth==4){
         $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
@@ -256,7 +256,7 @@ if($action=="add"){
         $cost_adj = "";
         $del = "";
     }
-    
+
     //ส่วนเปลี่ยนสถานะ
     $status_icon = $op_quote_status_icon[$info['status']];
     $md = new mymedia(PAP."request_ajax.php");
@@ -331,8 +331,8 @@ if($action=="add"){
         array_push($qrec,$row);
     }
     $mquote = $tb->show_table($qhead,$qrec,"tb-qshow");
-    
-    
+
+
     //output to html
     $print_q = "<a href='quotation.php?action=print&qid=$qid' title='Print' class='icon-print'></a>";
     $content .= "<h1 class='page-title'>แก้ไข$pagename".$print_q."</h1>"
@@ -349,9 +349,9 @@ if($action=="add"){
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",$info['cat_id'])
             . $form->show_text("search_size","search_size",$job_size[$info['job_size_id']],"","ขนาดชิ้นงาน","","label-3070 readonly",null,"readonly")
             . $form->show_hidden("sid","sid",$info['job_size_id'])
-            
+
             . $form->show_num("amount",$info['amount'],1,"","ยอดพิมพ์","","label-3070","min=1");
-    
+
     $detail = $form->show_checkbox("prepress","prepress",$prepress_checked,"การจัดทำต้นฉบับ","label-3070")
             . $form->show_checkbox("exclude","exclude",$ex_checked,"อื่นๆ","label-3070")
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",$info['binding_id'])
@@ -361,7 +361,7 @@ if($action=="add"){
     $pack = $form->show_checkbox("pack","pack",$pack_checked,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$ship_checked,"การขนส่ง","label-3070")
             . $form->show_num("distance",(isset($info['distance'])?$info['distance']:""),0.01,"","ระยะทาง(กม)","","label-3070");
-    
+
     $aamount = (isset($info['cal_amount'])?explode(",",$info['cal_amount']):"");
     $multi = "";
     for($x=1;$x<11;$x++){
@@ -370,7 +370,7 @@ if($action=="add"){
 
     $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi),0)
             . "</div><!-- .col-50 -->";
-    
+
     $content .= "<div class='col-50'>"
         . "<div class='sel-type-10 sel-type-69'>"
         . "<div class='form-section'>"
@@ -457,14 +457,14 @@ if($action=="add"){
     $tbpdo = new tbPDO();
     $tb = new mytable();
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $sid = (isset($_GET['sid'])&&$_GET['sid']>0?$_GET['sid']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $arrcat = $db->get_quote_kv("cat_id");
     $arrmm = $db->get_quote_month();
     $iperpage = 20;
-    
+
     //view
     $head = array("พิมพ์","งาน","ลูกค้า","ราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
     $rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm, ($pauth>3?$sid:$uid),$page, $iperpage);
@@ -477,7 +477,7 @@ if($action=="add"){
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
         array_unshift($head, "แก้ไข");
     }
-    
+
     if($pauth>3){
         $csvlink = $root."csv_download.php?req=quote_csv&month=$mm";
     } else {
@@ -489,7 +489,7 @@ if($action=="add"){
         $fil_sale = $tb->show_filter(current_url(), "sid", $sale, $sid,"--Sale--");
         array_push($head,"Sale");
     }
-    
+
     $content .= "<h1 class='page-title'>$pagename $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
@@ -497,7 +497,7 @@ if($action=="add"){
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
             . $tb->show_filter(current_url(), "fil_cat", $arrcat, $cat,"ชนิด")
-            . $tb->show_filter(current_url(), "fil_status", $op_quote_status, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_quote_status, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_mm", $arrmm, $mm,"เดือน")
             . $fil_sale
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"

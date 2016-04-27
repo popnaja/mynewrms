@@ -122,7 +122,7 @@ if(isset($mid)){
 } else {
 /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $due = (isset($_GET['fil_due'])&&$_GET['fil_due']>0?$_GET['fil_due']:null);
 
@@ -147,7 +147,7 @@ if(isset($mid)){
             . $form->show_select("mach", $mach, "label-inline", "", null)
             . "</div><!-- .tab-section -->"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน")
-            . $tb->show_filter(current_url(), "fil_status", $op_job_prod, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_prod, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดส่ง")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)

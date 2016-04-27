@@ -1185,7 +1185,7 @@ if($req == "login"){
     $arrinfo["status"] = $status;
     if($status=="2"){
         $arrinfo["plate_plan"] = $_POST['date'];
-    } else if($status =="5"){
+    } else if($status =="7"){
         $arrinfo["plate_received"] = $_POST['date'];
         //check paper received
         $info = $db->get_info("pap_order", "order_id", $_POST['oid']);
@@ -1424,12 +1424,15 @@ if($req == "login"){
     }
     header("Location:".$_POST['redirect']);
 } else if($req=="update_comp_status"){
-    //update comp status
-    $db->update_data("pap_order_comp", "id", $_POST['compid'], array("status"=>$_POST['status']));
-
-    //update job status
-    update_job_status($_POST['oid']);
-
+    if($_POST['compid']>0){
+      //update comp status
+      $db->update_data("pap_order_comp", "id", $_POST['compid'], array("status"=>$_POST['status']));
+      //update job status
+      update_job_status($_POST['oid']);
+    } else {
+      //update main status
+      $db->update_data("pap_order", "order_id", $_POST['oid'], array("status"=>$_POST['status']));
+    }
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="add_billed"){
