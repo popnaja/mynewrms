@@ -69,7 +69,7 @@ if($req == "login"){
             $_SESSION['error'] = "เกิดข้อผิดพลาด กรุณาติดต่อผู้ดูแลระบบ";
             header("Location:".$_POST['error_direct']."?f");
         }
-    } 
+    }
 } else if($req == "add_urole"){
     //check name
     if($db->check_optdup("role_auth",$_POST['name'])){
@@ -166,7 +166,7 @@ if($req == "login"){
         } else {
             $meta['signature'] = "";
         }
-        
+
         $db->update_meta("pap_usermeta", "user_id", $uid, $meta);
         $_SESSION['message'] = "แก้ไขผู้ใช้สำเร็จ";
         header("Location:".$_POST['redirect']);
@@ -177,6 +177,7 @@ if($req == "login"){
         "address" => $_POST['address'],
         "email" => $_POST['email'],
         "tel" => $_POST['tel'],
+        "fax" => $_POST['fax'],
         "tax_id" => $_POST['tax_id'],
         "c_digit" => $_POST['cdigit'],
         "s_digit" => $_POST['s_digit'],
@@ -251,7 +252,7 @@ if($req == "login"){
             "detail_mat" =>  json_encode($arrmat),
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
-        
+
         $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
         header("Location:".$_POST['redirect']);
     }
@@ -302,7 +303,7 @@ if($req == "login"){
             "detail_mat" =>  json_encode($arrmat),
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
-        
+
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
         header("Location:".$_POST['redirect']);
     }
@@ -429,10 +430,10 @@ if($req == "login"){
     //meta
     $meta["tax_exclude"] = $_POST['ntax'];
     $db->update_meta("pap_customer_meta", "customer_id", $cid, $meta);
-    
+
     //add cat
     $db->insert_data("pap_customer_cat", array($_POST['cat'],$cid));
-    
+
     //add contact
     $n = count($_POST['cname']);
     for($i=0;$i<$n;$i++){
@@ -440,12 +441,12 @@ if($req == "login"){
             $db->insert_data("pap_contact",array(null,$cid,1,$_POST['cname'][$i],$_POST['cemail'][$i],$_POST['ctel'][$i],$_POST['cetc'][$i]));
         }
     }
-    
+
     //add sale rep
     if(isset($_POST['sale'])&&$_POST['sale']>0){
         $db->insert_data("pap_sale_cus",array($_POST['sale'],$cid));
     }
-    
+
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="edit_customer"){
@@ -480,7 +481,7 @@ if($req == "login"){
     //update cat
     $db->delete_data("pap_customer_cat", "customer_id", $cid);
     $db->insert_data("pap_customer_cat", array($_POST['cat'],$cid));
-    
+
     //image
     $ori_media = explode(",",$_POST['ori_media']);
     $code = $_POST['code'];
@@ -501,17 +502,17 @@ if($req == "login"){
         }
     }
     $meta["picture"] = implode(",",$pic);
-    
+
     //meta
     $meta["tax_exclude"] = $_POST['ntax'];
     $db->update_meta("pap_customer_meta", "customer_id", $cid, $meta);
-    
+
     /*
     //update code
     if($_POST['ori_cat']<>$_POST['cat']){
         $arrinfo['customer_code'] = $db->check_cus_code($_POST['cat']);
     }
-     * 
+     *
      */
 
 
@@ -525,7 +526,7 @@ if($req == "login"){
             $db->delete_data("pap_sale_cus", "cus_id", $cid);
         }
     }
-    
+
     $db->update_data("pap_customer", "customer_id", $cid, $arrinfo);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
@@ -552,9 +553,9 @@ if($req == "login"){
         $credit, $_POST['due'],
         $_POST['status'], pap_now(),
         null, null);
-    
+
     $qid = $db->insert_data("pap_quotation",$data);
-    
+
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;
@@ -587,7 +588,7 @@ if($req == "login"){
             array_push($arramount,$amount);
         }
     }
-    
+
     //update meta
     $meta = array(
         "remark" => $_POST['remark'],
@@ -603,7 +604,7 @@ if($req == "login"){
         "cal_amount" => implode(",",$arramount)
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
-    
+
     //calculate cost and detail price
     include_once("quote_formular.php");
     $info = $db->get_quote_allinfo($qid);
@@ -611,7 +612,7 @@ if($req == "login"){
     $layinfo = $db->get_layinfo($info['job_size_id']);
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
     $margin = $cinfo['margin'];
-    
+
     $res = cal_quote($info, $comps, $layinfo);
     $total_cost = 0;
     $pricelist = array();
@@ -649,11 +650,11 @@ if($req == "login"){
         "print_cost" => $total_cost
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $exmeta);
-    
+
     //update quote price
     $price = round($total_cost*(100+$margin)/100);
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
-    
+
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
@@ -671,7 +672,7 @@ if($req == "login"){
         "q_price" => $_POST['q_price'],
         "credit" => $_POST['credit'],
         "plan_delivery" => $_POST['due'],
-        "status" => $status, 
+        "status" => $status,
     );
     // 39 == approved, 40=sent ,41=ok 42=reject
     if($status==1){
@@ -685,10 +686,10 @@ if($req == "login"){
         $arrinfo['finished'] = pap_now();
     }
     $db->update_data("pap_quotation", "quote_id", $qid, $arrinfo);
-    
+
     //del old comp
     $db->delete_data("pap_quote_comp", "quote_id", $qid);
-    
+
     //add new comp
     $n = count($_POST['page']);
     $page_cover = 0;
@@ -732,9 +733,9 @@ if($req == "login"){
           array_push($mquote,$arrinfo);
         }
     }
-    
+
     //แสดงราคาแยกส่วน
-    $detail_price = array(); 
+    $detail_price = array();
     for($i=0;$i<count($_POST['ptt']);$i++){
         if($_POST['ptt'][$i]>0){
           array_push($detail_price,array($_POST['pshow'][$i],$_POST['plist'][$i],$_POST['pqty'][$i],$_POST['pperu'][$i],$_POST['ptt'][$i]));
@@ -758,7 +759,7 @@ if($req == "login"){
         "multi_quote_info" => json_encode($mquote)
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
-    
+
     //calculate cost
     include_once("quote_formular.php");
     $info = $db->get_quote_allinfo($qid);
@@ -785,7 +786,7 @@ if($req == "login"){
         $exmeta['quote_sign'] = "/p-pap/image/quote_sign/$ono".".".pathinfo($file,PATHINFO_EXTENSION);
     }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $exmeta);
-    
+
     if($status==9){
         //ok create order
         include_once("prep_order.php");
@@ -871,14 +872,14 @@ if($req == "login"){
             "mat_std_leadtime" => $_POST['lt']
         );
         $db->update_data("pap_mat", "mat_id", $mid, $arrinfo);
-        
+
         //mat meta
         $meta = array(
             "paper_cost_base" => $_POST['pcost_t'],
             "paper_cost" => $_POST['pcost']
         );
         $db->update_meta("pap_matmeta", "mat_id", $mid, $meta);
-        
+
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
         header("Location:".$_POST['redirect']);
     }
@@ -965,10 +966,10 @@ if($req == "login"){
     $code = $db->check_supplier_code($_POST['cat']);
     //insert
     $sid = $db->insert_data("pap_supplier", array(null,$code,$_POST['name'],$_POST['taxid'],$_POST['address'],$_POST['url'],$_POST['email'],$_POST['tel'],$_POST['fax'],$_POST['pay'],$_POST['credit_day'],$_POST['credit'],pap_now()));
-    
+
     //add cat
     $db->insert_data("pap_supplier_cat", array($_POST['cat'],$sid));
-    
+
     //add contact
     $n = count($_POST['cname']);
     for($i=0;$i<$n;$i++){
@@ -976,7 +977,7 @@ if($req == "login"){
             $db->insert_data("pap_supplier_ct",array(null,$sid,$_POST['cname'][$i],$_POST['cemail'][$i],$_POST['ctel'][$i],$_POST['cetc'][$i]));
         }
     }
-    
+
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req == "edit_supplier"){
@@ -999,12 +1000,12 @@ if($req == "login"){
     if($_POST['ori_cat']<>$_POST['cat']){
         $arrinfo['code'] = $db->check_supplier_code($_POST['cat']);
     }
-     * 
+     *
      */
     //update cat
     $db->delete_data("pap_supplier_cat", "supplier_id", $sid);
     $db->insert_data("pap_supplier_cat", array($_POST['cat'],$sid));
-    
+
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req == "add_sup_ct"){
@@ -1071,14 +1072,14 @@ if($req == "login"){
         null
     );
     $poid = $db->insert_data("pap_mat_po", $data);
-    
+
     //add detail
     $tt = 0;
     for($i=0;$i<count($_POST['mid']);$i++){
         $tt += $_POST['cost'][$i]*$_POST['vol'][$i];
         $oid = $_POST['oid'][$i];
         $db->insert_data("pap_mat_po_detail", array(null,$poid,$_POST['mid'][$i],$_POST['cost'][$i],$_POST['vol'][$i],$oid));
-        
+
         //check order vs po if order all => put plan delivery
         $db->check_req_vs_po($oid);
     }
@@ -1101,7 +1102,7 @@ if($req == "login"){
         "po_remark" => $_POST['remark']
     );
     $db->update_data("pap_mat_po", "po_id", $poid, $arrdata);
-    
+
     //delete old po detail
     $db->delete_data("pap_mat_po_detail", "po_id", $poid);
     //add detail
@@ -1110,7 +1111,7 @@ if($req == "login"){
         $tt += $_POST['cost'][$i]*$_POST['vol'][$i];
         $oid = $_POST['oid'][$i];
         $db->insert_data("pap_mat_po_detail", array(null,$poid,$_POST['mid'][$i],$_POST['cost'][$i],$_POST['vol'][$i],$oid));
-        
+
         //check order vs po if order all => put plan delivery
         $db->check_req_vs_po($oid);
     }
@@ -1138,7 +1139,7 @@ if($req == "login"){
         null
     );
     $poid = $db->insert_data("pap_process_po", $data);
-    
+
     //add detail
     $tt = 0;
     for($i=0;$i<count($_POST['pid']);$i++){
@@ -1165,7 +1166,7 @@ if($req == "login"){
         "po_remark" => $_POST['remark']
     );
     $db->update_data("pap_process_po", "po_id", $poid, $arrdata);
-    
+
     //delete old po detail
     $db->delete_data("pap_pro_po_dt", "po_id", $poid);
     //add detail
@@ -1225,14 +1226,14 @@ if($req == "login"){
                 "allowance" => $_POST['allo'][$i]
             );
             $db->update_data("pap_order_comp", "id", $_POST['compid'][$i],$arrdata);
-            
+
             //update comp process
             include_once("prep_order.php");
             recal_process($_POST['compid'][$i]);
         }
     }
-    
-    
+
+
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="po_paper"){
@@ -1244,13 +1245,13 @@ if($req == "login"){
 } else if($req=="add_mat_received"){
     //add receive
     $did = $db->insert_data("pap_mat_delivery", array(null,$_POST['poid'],$_POST['uid'],$_POST['docref'],  pap_now(),$_POST['remark']));
-    
+
     //add receive detail
     for($i=0;$i<count($_POST['receive']);$i++){
         $oid = $_POST['oid'][$i];
         $dtid = $_POST['dtid'][$i];
         $db->insert_data("pap_mat_delivery_dt", array($did,$dtid,$_POST['receive'][$i],$_POST['loc'][$i]));
-        
+
         //check order vs delivery if order all deliveried => put delivery date
         $db->check_req_vs_delivery($oid);
     }
@@ -1261,12 +1262,12 @@ if($req == "login"){
 } else if($req=="add_process_rc"){
     //add receive
     $did = $db->insert_data("pap_wip_delivery", array(null,$_POST['poid'],$_POST['uid'],$_POST['docref'],  pap_now(),$_POST['remark']));
-    
+
     //add receive detail
     for($i=0;$i<count($_POST['receive']);$i++){
         $dtid = $_POST['dtid'][$i];
         $db->insert_data("pap_wip_delivery_dt", array($did,$dtid,$_POST['receive'][$i],$_POST['loc'][$i]));
-        
+
         //check if received = remain update comp status
         if($_POST['rem'][$i]==$_POST['receive'][$i]){
             $proinfo = $db->get_info("pap_process", "process_id", $_POST['pid'][$i]);
@@ -1326,7 +1327,7 @@ if($req == "login"){
         }
         //update deli total
         $db->update_data("pap_delivery", "id", $did, array("total"=>$tt));
-        
+
         //create temp deli
         // if amount = deli
         if(array_sum($_POST['amount'])==array_sum($_POST['deli'])){
@@ -1369,7 +1370,7 @@ if($req == "login"){
         "remark" => $_POST['remark']
     );
     $db->update_data("pap_temp_deli", "id", $_POST['tdid'],$arrdata);
-    
+
     //del old temp deli detail
     $db->delete_data("pap_temp_dt", "temp_deli_id", $_POST['tdid']);
     //add temp deli detail
@@ -1415,20 +1416,20 @@ if($req == "login"){
             "plan_end" => $end
         );
         $db->update_data("pap_comp_process", "id", $_POST['cpid'], $arrinfo);
-        
+
         //update job plan
         $db->update_data("pap_order", "order_id", $_POST['oid'], array("prod_plan"=>  pap_now()));
-        
+
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
     header("Location:".$_POST['redirect']);
 } else if($req=="update_comp_status"){
     //update comp status
     $db->update_data("pap_order_comp", "id", $_POST['compid'], array("status"=>$_POST['status']));
-    
+
     //update job status
     update_job_status($_POST['oid']);
-    
+
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="add_billed"){
@@ -1452,7 +1453,7 @@ if($req == "login"){
     for($i=0;$i<count($_POST['did']);$i++){
         //add pbill dt
         $db->insert_data("pap_pbill_dt", array($bid,$_POST['did'][$i],$_POST['price'][$i]));
-        
+
         //update job
         $db->update_data("pap_order", "delivery", $_POST['did'][$i], array("billed"=>$bid));
     }
@@ -1486,7 +1487,7 @@ if($req == "login"){
         } else {
             $db->update_data("pap_delivery", "id", $_POST['did'][$i], array("status"=>80)); //80 = มีใบแจ้งหนี้
         }
-        
+
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);

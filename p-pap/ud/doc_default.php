@@ -817,7 +817,7 @@ function print_header($docname,$page=null){
     $clogo = "<img src='".ROOTS.$cinfo['c_logo']."'/>";
     $header = "<span class='c-name'>".$cinfo['name']."</span><br/>"
             . $cinfo['address']."<br/>"
-            . "Tel: ".$cinfo['tel']."<br/>"
+            . "Tel: ".$cinfo['tel']." Fax: ".$cinfo['fax']."<br/>"
             . "<span class='c-tax'>Tax ID: ".$cinfo['tax_id']."</span>";
     $head = "<div class='c-head'>"
             . "<div class='c-logo'>$clogo</div>"
