@@ -33,7 +33,7 @@ body {
 }
 </style>
 END_OF_TEXT;
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . (isset($did)?show_deli($did):show_tdeli($tdid))
             . "</body>";
     echo $content;
@@ -76,20 +76,20 @@ if($action=="add"){
         array_push($rec,array($v,$info['order_no'].":".$info['name'],$info['amount'],$info['deli']));
         array_push($acid,$info['customer_id']);
     }
-    
+
     $str_cid = implode(",",$acid);
     $cinfo = $db->get_info("pap_customer", "customer_id", $acid[0]);
     $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
     $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id IN ($str_cid)");
     $ct = $db->get_keypair("pap_contact", "contact_id", "contact_name", "WHERE customer_id IN ($str_cid)");
-    
+
     $inside = $form->show_text("oref","oref","","","งานพิมพ์","","label-3070 readonly",null,"readonly")
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070 readonly","min='0' readonly")
             . $form->show_num("remain", "", 1, "", "ยอดค้างส่ง", "", "label-3070 readonly","min='0' readonly")
             . $form->show_num("deli", "", 1, "", "ยอดส่ง", "", "label-3070","min=1")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
-    
+
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
@@ -118,14 +118,14 @@ if($action=="add"){
 /*----------------------------------------------------- EDIT DELIVERY -------------------------------------------------------------------*/
     if(isset($did)){
         $info = $db->get_info("pap_delivery", "id", $did);
-        
+
         $st_cid = $db->get_acid_from_oid($oid);
         $acid = explode(",",$st_cid);
         $cinfo = $db->get_info("pap_customer", "customer_id", $acid[0]);
         $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
         $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id IN ($st_cid)");
         $ct = $db->get_keypair("pap_contact", "contact_id", "contact_name", "WHERE customer_id IN ($st_cid)");
-        
+
         $content .= "<h1 class='page-title'>แก้ไขใบแจ้งหนี้</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
@@ -158,15 +158,15 @@ if($action=="add"){
     } else if(isset($tdid)){
         $info = $db->get_info("pap_temp_deli", "id", $tdid);
         $ddt = $db->get_keypair("pap_temp_dt", "order_id", "qty", "WHERE temp_deli_id=$tdid");
-        
+
         $st_cid = $db->get_acid_from_oid($oid);
         $acid = explode(",",$st_cid);
         $cinfo = $db->get_info("pap_customer", "customer_id", $acid[0]);
         $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
         $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id IN ($st_cid)");
         $ct = $db->get_keypair("pap_contact", "contact_id", "contact_name", "WHERE customer_id IN ($st_cid)");
-        
-        
+
+
         $aoid = explode(",",$oid);
         $rec = [];
         foreach($aoid as $k=>$v){
@@ -179,7 +179,7 @@ if($action=="add"){
             . $form->show_num("deli", "", 1, "", "ยอดส่ง", "", "label-3070","min=1")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
-        
+
         $content .= "<h1 class='page-title'>แก้ไขใบส่งของ</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
@@ -215,16 +215,16 @@ if($action=="add"){
 } else {
     /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $due = (isset($_GET['fil_due'])&&$_GET['fil_due']>0?$_GET['fil_due']:null);
 
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
-    
+
     $arrdue = $db->get_job_due();
-    
+
     //view
     $head = array("ชื่องาน","ลูกค้า","กำหนดส่ง","ยอดผลิต","รวม","สร้าง","ใบแจ้งหนี้","ใบส่งของ");
     $rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$due,$status,$s, $page, $iperpage);
@@ -235,7 +235,7 @@ if($action=="add"){
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน",$s)
-            . $tb->show_filter(current_url(), "fil_status", $op_job_delivery, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_delivery, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดส่ง")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
@@ -245,7 +245,7 @@ if($action=="add"){
             . "</div>"
             . $form->show_button("mix-deli", "สร้างใบส่งของรวม", "float-right")
             . "</div><!-- .col-100 -->";
-    
+
     $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
             . "<script>"

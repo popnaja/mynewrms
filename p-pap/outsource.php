@@ -31,7 +31,7 @@ body {
 }
 </style>
 END_OF_TEXT;
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . show_process_po($poid)
             . "</body>";
     echo $content;
@@ -53,7 +53,7 @@ $menu->ascript[] = $root."js/mat_order.js";
 
 
 $menu->extrascript = <<<END_OF_TEXT
-        
+
 END_OF_TEXT;
 
 $tb = new mytable();
@@ -90,7 +90,7 @@ if($action=="add"){
     } else {
         $jpre = "out_function();";
     }
-    
+
     $supplier = array("0"=>"--ผู้ผลิต--")+$db->get_keypair("pap_supplier", "id", "CONCAT(code,':',name)");
     $mat = $db->get_keypair("pap_mat", "mat_id", "CONCAT(mat_name,' (ขนาดบรรจุ ',mat_order_lot_size,mat_unit,')')","ORDER BY mat_name ASC");
     $content .= "<h1 class='page-title'>เปิดใบจ้างผลิต</h1>"
@@ -138,7 +138,7 @@ if($action=="add"){
     }
     //load info
     $info = $db->get_info("pap_process_po", "po_id", $poid);
-    
+
     //prep order
     $dt = $db->get_infos("pap_pro_po_dt", "po_id", $poid);
     $pre = array();
@@ -150,14 +150,14 @@ if($action=="add"){
     }
     $jpre = "out_function(".json_encode($pre).");";
 
-    
+
     $supplier = array("0"=>"--ผู้ผลิต--")+$db->get_keypair("pap_supplier", "id", "CONCAT(code,':',name)");
     $ct = $db->get_keypair("pap_supplier_ct", "id", "name", "WHERE supplier_id='".$info['supplier_id']."'");
     $st = $op_ppo_status;
     unset($st[4]);
     unset($st[5]);
     unset($st[9]);
-    
+
     $content .= "<h1 class='page-title'>แก้ไข $pagename</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"
         . $form->show_st_form()
@@ -216,31 +216,31 @@ if($action=="add"){
             . "</script>";
 } else if($action=="viewpo") {
     /*----------------------------------------------------- VIEW PROCESS PO -----------------------------------------------------------*/
-     $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $iperpage = 20;
-    
+
     //view
     $head = array("รหัส","รหัส Supplier","วันที่สั่ง","สถานะ");
     $rec = $pdo_po->view_pro_po($pauth,$op_po_status_icon, $status, $mm, $s,$page, $iperpage);
     $all_rec = $pdo_po->view_pro_po($pauth,$op_po_status_icon, $status, $mm,$s);
     $max = ceil(count($all_rec)/$iperpage);
-    
+
     $arrmm = $db->get_keypair("pap_process_po", "DATE_FORMAT(po_created,'%m%Y')", "DATE_FORMAT(po_created,'%b-%Y')", "");
-    
+
     if($pauth>1){
         array_unshift($head, "แก้ไข");
     }
-    
+
     $content .= "<h1 class='page-title'>$pagename</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาจากรหัสใบจ้างผลิต",$s)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
-            . $tb->show_filter(current_url(), "fil_status", $op_ppo_status, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_ppo_status, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_mm", $arrmm, $mm,"เดือน")
             . "<div class='tb-clear-filter'><a href='$redirect?action=viewpo' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
@@ -255,14 +255,20 @@ if($action=="add"){
 } else {
     /*----------------------------------------------------- VIEW ORDER AND ORDER OUTSOURCE ----------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
-    
+
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 10;
-    
+
     //view
+    $postatus = array(
+      "8" => "พร้อมพิมพ์",
+      "9" => "พิมพ์",
+      "19" => "หลังพิมพ์",
+      "69" => "พร้อมส่ง"
+    );
     $head = array("ชื่องาน","ลูกค้า","ยอดผลิต","กำหนดส่ง","สถานะการผลิต","งานจ้างผลิต");
     $rec = $pdo_po->view_outsource($pauth, $op_job_status,$status,$s, $page, $iperpage);
     $addhtml = "";
@@ -274,7 +280,7 @@ if($action=="add"){
             . "<div class='col-100'>"
             . $form->show_st_form()
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัสหรือชื่อ",$s)
-            . $tb->show_filter(current_url(), "fil_status", $op_job_prod, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$postatus, $status,"สถานะ")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table_keygroup($head,$rec,"tb-outsource",";");

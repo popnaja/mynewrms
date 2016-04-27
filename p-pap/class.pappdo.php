@@ -61,7 +61,7 @@ class PAPdb extends myDB{
 SELECT pap_quote_comp.*,
 po.op_name AS weight,
 pm.meta_value AS coating
-FROM pap_quote_comp 
+FROM pap_quote_comp
 LEFT JOIN pap_option AS po ON po.op_id=comp_paper_weight
 LEFT JOIN pap_process_meta AS pm ON pm.process_id=comp_coating AND pm.meta_key='cost'
 WHERE quote_id=:qid $whsql
@@ -77,7 +77,7 @@ END_OF_TEXT;
     public function get_print_comp($qid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 comp_type,
 po1.op_name AS paper,
 po.op_name AS weight,
@@ -105,9 +105,9 @@ END_OF_TEXT;
             $type_sql = (isset($type)?" AND mat_type=$type":"");
             $order = ($field=="mat_weight"?"ORDER BY CAST(po.op_name AS UNSIGNED) ASC":"");
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $field, po.op_name
-                    FROM pap_mat 
+                    FROM pap_mat
                     LEFT JOIN pap_option AS po ON po.op_id=$field
                     WHERE mat_cat_id=8 $size_sql $type_sql
                     GROUP BY $field
@@ -123,7 +123,7 @@ END_OF_TEXT;
     public function get_type_weight($cid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 mat_type,GROUP_CONCAT(mat_weight)
 FROM pap_mat
 WHERE mat_cat_id=:cid
@@ -172,7 +172,7 @@ po1.op_name AS isize,
 po1.op_value AS pinside_size
 FROM pap_size
 LEFT JOIN pap_option as po ON po.op_id=cover_paper
-LEFT JOIN pap_option as po1 ON po1.op_id=inside_paper              
+LEFT JOIN pap_option as po1 ON po1.op_id=inside_paper
 WHERE size_id=:sid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -186,7 +186,7 @@ END_OF_TEXT;
     public function get_quote_kv($field){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
                     $field,po.op_name
                     FROM pap_quotation
                     LEFT JOIN pap_option AS po ON po.op_id=$field
@@ -202,7 +202,7 @@ END_OF_TEXT;
     public function get_quote_month($format="%m%Y"){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
                     DATE_FORMAT(created,'$format'),DATE_FORMAT(created,'%b-%Y')
                     FROM pap_quotation
                     GROUP BY DATE_FORMAT(created,'%b-%Y')
@@ -218,7 +218,7 @@ END_OF_TEXT;
     public function get_quote_info($qid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 pq.*,
 op.op_name AS cat,
 CONCAT(size_name,' (',size_height,'x',size_width,')') AS size,
@@ -242,7 +242,7 @@ END_OF_TEXT;
     public function get_quote_allinfo($qid){
         try {
 $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 pq.*,
 cus.customer_name
 FROM pap_quotation AS pq
@@ -259,12 +259,12 @@ END_OF_TEXT;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }
-        
+
     }
     public function check_cus_code($taxid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 pt.slug,CAST(REPLACE(customer_code,:slug,'') AS UNSIGNED)
 FROM pap_customer AS cus
 LEFT JOIN pap_customer_cat AS cat ON cat.customer_id=cus.customer_id
@@ -275,7 +275,7 @@ LIMIT 1
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":slug",$slug);
-            
+
             $digit = $this->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
             $term = $this->get_info("pap_term","id",$taxid);
             $slug = $term['slug'];
@@ -296,7 +296,7 @@ END_OF_TEXT;
         try {
             $cat_sql = (isset($cat)?"AND contact_cat=:ct_cat":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<span class='cus-ct' ctinfo='",contact_id,";",contact_name,";",contact_email,";",contact_tel,";",contact_remark,"'>",contact_name,"</span>")contact_name,
 contact_tel
 FROM pap_contact
@@ -314,7 +314,7 @@ END_OF_TEXT;
     public function get_sup_ct($sid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<span class='sup-ct' ctinfo='",id,";",name,";",email,";",tel,";",remark,"'>",name,"</span>"),
 tel
 FROM pap_supplier_ct
@@ -331,7 +331,7 @@ END_OF_TEXT;
     public function get_process_keypair(){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 process_cat_id,
 process_id,
 process_name
@@ -356,7 +356,7 @@ END_OF_TEXT;
     public function check_supplier_code($taxid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 pt.slug,CAST(REPLACE(sup.code,:slug,'') AS UNSIGNED)
 FROM pap_supplier AS sup
 LEFT JOIN pap_supplier_cat AS cat ON cat.supplier_id=sup.id
@@ -367,7 +367,7 @@ LIMIT 1
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":slug",$slug);
-            
+
             $digit = $this->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
             $term = $this->get_info("pap_term","id",$taxid);
             $slug = $term['slug'];
@@ -393,7 +393,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 no,DATE_FORMAT(date,"$date") AS date
 FROM pap_delivery
 WHERE DATE_FORMAT(date,"$date")=DATE_FORMAT('$ddate',"$date")
@@ -426,7 +426,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 no,DATE_FORMAT(date,"$date") AS date
 FROM pap_pbill
 WHERE DATE_FORMAT(date,"$date")=DATE_FORMAT('$ddate',"$date")
@@ -459,7 +459,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 no,DATE_FORMAT(date,"$date") AS date
 FROM pap_invoice
 WHERE DATE_FORMAT(date,"$date")=DATE_FORMAT('$ddate',"$date")
@@ -492,7 +492,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 no,DATE_FORMAT(date,"$date") AS date
 FROM pap_rc
 WHERE DATE_FORMAT(date,"$date")=DATE_FORMAT('$ddate',"$date")
@@ -525,7 +525,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
                     quote_no,DATE_FORMAT(created,"$date") AS date
                     FROM pap_quotation
                     WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
@@ -558,7 +558,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 po_code,DATE_FORMAT(po_created,"$date") AS date
 FROM pap_mat_po
 WHERE DATE_FORMAT(po_created,"$date")=DATE_FORMAT(now(),"$date")
@@ -591,7 +591,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 po_code,DATE_FORMAT(po_created,"$date") AS date
 FROM pap_process_po
 WHERE DATE_FORMAT(po_created,"$date")=DATE_FORMAT(now(),"$date")
@@ -624,7 +624,7 @@ END_OF_TEXT;
             $digit = $qr[2];
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
                     order_no,DATE_FORMAT(created,"$date") AS date
                     FROM pap_order
                     WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
@@ -654,8 +654,8 @@ END_OF_TEXT;
             $f = "%".$find."%";
             $user = (isset($uid)?" AND sale.user_id=$uid":"");
             $sql = <<<END_OF_TEXT
-SELECT 
-CONCAT(customer_code,'-',customer_name),customer_id 
+SELECT
+CONCAT(customer_code,'-',customer_name),customer_id
 FROM pap_customer AS cus
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=customer_id
 WHERE CONCAT(customer_code,'-',customer_name) like :find
@@ -673,7 +673,7 @@ END_OF_TEXT;
         try {
             $f = "%".$find."%";
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT(size_name,"(",size_height,"x",size_width,")"),size_id
 FROM pap_size
 WHERE CONCAT(size_name,"(",size_height,"x",size_width,")") like :find
@@ -746,7 +746,7 @@ END_OF_TEXT;
         try {
             $f = "%".$find."%";
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("(",comp.name,") ",cpro.name,";",job.order_no,":",quo.name),cpro.id
 FROM pap_comp_process AS cpro
 LEFT JOIN pap_order_comp AS comp ON comp.id=cpro.comp_id
@@ -768,7 +768,7 @@ END_OF_TEXT;
             __autoloada("form");
             $form = new myform();
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 cover_paper,po.op_name AS cover_size,
 inside_paper,po1.op_name AS inside_size
 FROM pap_size
@@ -785,7 +785,7 @@ END_OF_TEXT;
             //cover
             $c_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['cover_paper']);
             $res[1] = $form->show_select("paper_type",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
-            //inside 
+            //inside
             $i_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['inside_paper']);
             $res[2] = $form->show_select("paper_type_n",$i_ptype,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]");
             return $res;
@@ -858,7 +858,7 @@ END_OF_TEXT;
     public function porder_info($oid,$mid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT(po.order_no,":",quo.name)
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS quo ON quo.quote_id=po.quote_id
@@ -871,7 +871,7 @@ END_OF_TEXT;
                 $res['order'] = $row[0];
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 mat_name,mat_std_cost
 FROM pap_mat
 WHERE mat_id=:mid
@@ -906,7 +906,7 @@ END_OF_TEXT;
             if(array_sum($remain)==0){
                 //all paper deliveried  => update order paper_delivery date
                 $info = $this->get_info("pap_order", "order_id", $oid);
-                if($info['status']==5){
+                if($info['status']==7){
                     $this->update_data("pap_order", "order_id", $oid, array("paper_received"=>pap_now(),"status"=>8));
                 } else {
                     $this->update_data("pap_order", "order_id", $oid, array("paper_received"=>pap_now()));
@@ -965,7 +965,7 @@ END_OF_TEXT;
                 } else {
                     //partial deliveried
                     $this->update_data("pap_mat_po", "po_id", $poid, array("po_status"=>4,"po_deliveried"=>null));
-                } 
+                }
             }
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
@@ -1000,7 +1000,7 @@ END_OF_TEXT;
                 } else {
                     //partial deliveried
                     $this->update_data("pap_process_po", "po_id", $poid, array("po_status"=>4,"po_deliveried"=>null));
-                } 
+                }
             }
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
@@ -1027,7 +1027,7 @@ END_OF_TEXT;
         try {
             $exclude = (isset($tdid)?" AND deli.temp_deli_id<>$tdid":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 job.order_no,pq.name,pq.amount,IFNULL(SUM(deli.qty),0) AS deli,
 pq.customer_id
 FROM pap_order AS job
@@ -1048,10 +1048,10 @@ END_OF_TEXT;
         try {
             $oid = implode(",",$arroid);
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 deli_id
 FROM pap_delivery_dt
-WHERE order_id IN ($oid) 
+WHERE order_id IN ($oid)
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
@@ -1067,7 +1067,7 @@ END_OF_TEXT;
     public function check_next_tdeli_code($oid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 deli.no AS delino,tdeli.no AS tno,deli.id
 FROM pap_delivery_dt AS dt
 LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
@@ -1147,7 +1147,7 @@ IF(cpro.machine_id=0,"จ้างผลิต",IFNULL(mach.name,"")),
 start,end,
 result,remark,
 cpro.id AS cproid
-FROM pap_order_comp AS comp 
+FROM pap_order_comp AS comp
 LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
 LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
@@ -1189,7 +1189,7 @@ IF(cpro.machine_id IS NOT NULL,
     CONCAT("<a href='' title='ใส่แผน' class='myplan-edit icon-plus-square' type='",comp.type,"' pid='",cpro.process_id,"' source='",pro.process_source,"' info='",CONCAT_WS(";",cpro.name,cpro.volume,cpro.est_time_hour,cpro.id),"'></a>")
 ),
 plan_start,plan_end
-FROM pap_order_comp AS comp 
+FROM pap_order_comp AS comp
 LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
 LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
@@ -1224,7 +1224,7 @@ END_OF_TEXT;
         try {
             $filter = (isset($acat)?"WHERE cat.id IN ($acat)":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 mach.id,mach.name
 FROM pap_machine AS mach
 LEFT JOIN pap_process AS pro ON pro.process_id=mach.process_id
@@ -1249,7 +1249,7 @@ END_OF_TEXT;
             $en->add(new DateInterval("P3D"));
             $end = $en->format("Y-m-d H:i:s");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 cpro.machine_id AS mcid,com.order_id,cpro.id,
 IF(plan_start<:st,est_time_hour-ROUND(TIMESTAMPDIFF(MINUTE,plan_start,:st)/60,2),est_time_hour) AS est_time_hour,
 IF(plan_start<:st,:st,plan_start) AS plan_start,
@@ -1281,9 +1281,9 @@ END_OF_TEXT;
         try {
             $filter = (isset($cpid)?" AND id<>$cpid":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 id
-FROM pap_comp_process 
+FROM pap_comp_process
 WHERE machine_id=:mid $filter AND plan_end>:st AND plan_start<:en
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -1304,7 +1304,7 @@ END_OF_TEXT;
         try {
 
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 cpro.id,cpro1.id
 FROM pap_comp_process AS cpro
 LEFT JOIN pap_comp_process AS cpro1 ON cpro1.comp_id=cpro.comp_id
@@ -1333,7 +1333,7 @@ END_OF_TEXT;
                 $where = "WHERE com.order_id=:oid AND com.type=9 AND cpro.plan_end>:st AND cpro.plan_start<:en";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 cpro.id,com.id AS compid,com.type
 FROM pap_comp_process AS cpro
 LEFT JOIN pap_order_comp AS com ON com.id=cpro.comp_id
@@ -1356,7 +1356,7 @@ END_OF_TEXT;
     public function get_comps_recal($compid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 comp.*,quo.amount,quo.cat_id
 FROM pap_order_comp AS comp
 LEFT JOIN pap_order AS job ON job.order_id=comp.order_id
@@ -1374,7 +1374,7 @@ END_OF_TEXT;
     public function get_max_comps_status($oid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 MAX(comp.status)
 FROM pap_order_comp AS comp
 WHERE order_id=:oid
@@ -1391,7 +1391,7 @@ END_OF_TEXT;
     public function get_last_comps_status($oid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 MAX(pro.process_cat_id)
 FROM pap_order_comp AS comp
 LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
@@ -1520,4 +1520,3 @@ END_OF_TEXT;
         }
     }
 }
-

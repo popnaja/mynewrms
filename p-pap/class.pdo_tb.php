@@ -139,7 +139,7 @@ END_OF_TEXT;
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE cus.customer_id>0";
             $filter .= (isset($cat)?" AND lineage LIKE '$cat%'":"");
-            $filter .= (isset($status)?" AND customer_status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND customer_status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(customer_code,'-',customer_name) LIKE '%$s%'":"");
             switch ($sid){
                 case "0" :
@@ -566,9 +566,9 @@ END_OF_TEXT;
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = "WHERE po.quote_id>0";
+            $filter = "WHERE po.status BETWEEN 69 AND 79";
             $filter .= (isset($due)?" AND quo.plan_delivery='$due'":"");
-            $filter .= (isset($status)?" AND po.status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',quo.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($due)){
                 $filter .= " AND po.status IN (69,70)";
