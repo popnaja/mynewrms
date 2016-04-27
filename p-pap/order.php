@@ -127,7 +127,7 @@ if(isset($oid)){
     $tbpdo = new tbPDO();
     $tb = new mytable();
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $iperpage = 20;
@@ -139,14 +139,14 @@ if(isset($oid)){
         $max = ceil(count($all_rec)/$iperpage);
         $ga_plan = $op_plan_status;
         unset($ga_plan[3]);
-        
+
         $content .= "<h1 class='page-title'>$pagename</h1>"
                 . "<div id='ez-msg'>".  showmsg() ."</div>"
                 . "<div class='col-100'>"
                 . $tb->show_search(current_url(), "scid", "s","ค้นหารหัสหรือชื่องาน",$s)
                 . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
                 . $form->show_hidden("redirect","redirect",$redirect)
-                . $tb->show_filter(current_url(), "fil_status", $op_job_ga, $status,"สถานะ")
+                . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_ga, $status,"สถานะ")
                 . $tb->show_pagenav(current_url(), $page, $max)
                 . $tb->show_table($head,$rec,"tb-order")
                 . "<div class='tb-legend'>"
@@ -157,12 +157,12 @@ if(isset($oid)){
                 . "order_search();"
                 . "ga_function();"
                 . "</script>";
-        
+
         $box = "<h4>เปลียนสถานะงาน</h4>"
                 . "<div id='box-msg'></div>"
                 . $form->show_st_form()
                 . $form->show_select("status",$op_job_ga,"label-3070","สภานะงาน",null)
-                . "<div class='sel-status-2 sel-status-5'>"
+                . "<div class='sel-status-2 sel-status-7'>"
                 . $form->show_text("date", "date", "", "", "วันที่", "", "label-3070")
                 . "</div>"
                 . $form->show_hidden("oid","oid","0")
@@ -174,15 +174,15 @@ if(isset($oid)){
                 . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
                 . "select_option_byval('status');"
                 . "</script>";
-                
+
         $content .= $form->show_float_box($box,"date-box");
-        
+
     /* ------------------------------------------------- Production view -----------------------------------------------------------------*/
     } else {
         $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
         //$arrcat = $db->get_quote_kv("cat_id");
         //$arrmm = $db->get_quote_month();
-        
+
         //view
     $head = array("แก้ไข","ชื่องาน","ลูกค้า","หน้า","ยอดผลิต","กำหนดส่ง","เพลต","กระดาษ","แผนผลิต");
     $rec = $tbpdo->view_order($pauth,$op_plan_status_icon,$status, $s, $page, $iperpage);
@@ -194,7 +194,7 @@ if(isset($oid)){
             . $tb->show_search(current_url(), "scid", "s","ค้นหารหัสหรือชื่องาน",$s)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
-            . $tb->show_filter(current_url(), "fil_status", $op_job_status, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_status, $status,"สถานะ")
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec,"tb-order")
             . "<div class='tb-legend'>"

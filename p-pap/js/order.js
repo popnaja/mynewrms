@@ -13,7 +13,7 @@ function check_ga_status(e){
     $(document).ready(function(){
         var sel = $("#status");
         var date = $("#date");
-        if(sel.val()==="2"||sel.val()==="5"){
+        if(sel.val()==="2"||sel.val()==="7"){
             if(date.val()===""){
                 e.preventDefault();
                 pg_dialog("คำเตือน","กรุณาเลือกวันที่");

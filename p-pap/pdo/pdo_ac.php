@@ -27,7 +27,7 @@ END_OF_TEXT;
     public function check_job_deli($oid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 job.order_no,pq.name,pq.amount,IFNULL(SUM(deli.qty),0) AS deli
 FROM pap_order AS job
 LEFT JOIN pap_quotation AS pq ON pq.quote_id=job.quote_id
@@ -49,14 +49,14 @@ END_OF_TEXT;
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE deli.id>0";
             $filter .= (isset($due)?" AND DATE_FORMAT(DATE_ADD(deli.date, INTERVAL dt.credit DAY),'%Y-%m')='$due'":"");
-            $filter .= (isset($status)?" AND deli.status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND deli.status=$status":"");
             $filter .= (isset($s)?" AND dt.job_name LIKE '%$s%'":"");
             $filter .= (isset($s_cus)?" AND CONCAT(cus.customer_code,'-',cus.customer_name) LIKE '%$s_cus%'":"");
             if(is_null($s)&&is_null($status)&&is_null($due)&&is_null($s_cus)){
                 $filter .= " AND deli.status<99";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 deli.no,deli.id AS did,
 GROUP_CONCAT(DISTINCT cus.customer_name),
 GROUP_CONCAT(dt.order_id) AS aoid,
@@ -77,14 +77,14 @@ ORDER BY DATE_ADD(deli.date, INTERVAL dt.credit DAY) ASC
 $lim_sql
 END_OF_TEXT;
             $sql1 = <<<END_OF_TEXT
-SELECT 
+SELECT
 invoice_id,iv.no,ivdt.amount,iv.total
 FROM pap_invoice_dt AS ivdt
 LEFT JOIN pap_invoice AS iv ON iv.id=ivdt.invoice_id
 WHERE ivdt.deli_id=:did
 END_OF_TEXT;
             $sql2 = <<<END_OF_TEXT
-SELECT 
+SELECT
 rc.id,rc.no,rcdt.amount
 FROM pap_rc_dt AS rcdt
 LEFT JOIN pap_rc AS rc ON rc.id=rcdt.rc_id
@@ -111,8 +111,8 @@ END_OF_TEXT;
                 if(isset($v['pbill_id'])){
                     $bid = $v['pbill_id'];
                     $bno = $v['bno'];
-                    $res[$k]['bno'] = "<a href='ac_bill.php?bid=$bid' title='Edit' class='icon-page-edit'></a><a href='ac_bill.php?action=print&bid=$bid' title='View'>$bno</a>";
-                    
+                    $res[$k]['bno'] = "<a href='ac_bill.php?bid=$bid' title='Edit' class='icon-page-edit'></a><a href='ac_bill.php?action=print&bid=$bid' title='View' target='_blank'>$bno</a>";
+
                 } else {
                     $cid = $v['customer_id'];
                     $res[$k]['bno'] = "<input type='checkbox' name='did[]' value='$did,$cid'/>";
@@ -131,7 +131,7 @@ END_OF_TEXT;
                     }
                 }
                 $res[$k]['aoid'] = $jobwdeli;
-                
+
                 unset($res[$k]['did']);
                 unset($res[$k]['pbill_id']);
                 unset($res[$k]['customer_id']);
@@ -176,7 +176,7 @@ END_OF_TEXT;
                         }
                         $rc .= "</div>";
                         array_push($res1[implode(";",$res[$k])],array($inv,$rc));
-                    }    
+                    }
                     //check total invoice vs total ใบแจ้งหนี้
                     if($ttiv!=$v['total']){
                         array_push($res1[implode(";",$res[$k])],array($addinv,""));
@@ -193,7 +193,7 @@ END_OF_TEXT;
     public function get_bill_list($adid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 @no:=@no+1 AS no,
 deli.no AS delino,
 deli.date,
@@ -230,7 +230,7 @@ END_OF_TEXT;
     public function get_bill_check(){
         try{
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 customer_id,customer_code AS code,customer_name AS name,customer_place_bill AS bill,customer_collect_cheque AS cheque
 FROM pap_customer
 WHERE customer_place_bill>0
@@ -271,7 +271,7 @@ END_OF_TEXT;
         try {
             $exclude = (isset($inv)?" AND invoice_id<>$inv":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 deli.no,
 GROUP_CONCAT(DISTINCT dt.job_name) AS job,
 deli.total,
@@ -296,7 +296,7 @@ END_OF_TEXT;
         try {
             $exclude = (isset($rcid)?" AND rcdt.rc_id<>$rcid":"");
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 iv.no,iv.total,IFNULL(SUM(rcdt.amount),0) AS pay,meta_value
 FROM pap_invoice AS iv
 LEFT JOIN pap_rc_dt AS rcdt ON rcdt.invoice_id=iv.id $exclude
@@ -315,7 +315,7 @@ END_OF_TEXT;
     public function check_job_paid($did){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 ddt.order_id AS oid,
 ddt.price-ddt.discount AS price,
 deli.total,
@@ -324,7 +324,7 @@ meta_value AS tax_ex
 FROM pap_delivery AS deli
 LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=deli.id
 LEFT JOIN (
-	SELECT deli_id,SUM(rc.amount) AS amount FROM pap_invoice_dt AS dt 
+	SELECT deli_id,SUM(rc.amount) AS amount FROM pap_invoice_dt AS dt
     LEFT JOIN pap_rc_dt AS rc ON rc.invoice_id=dt.invoice_id WHERE deli_id=:did GROUP BY deli_id
 ) AS rc ON rc.deli_id=deli.id
 LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=ddt.customer_id AND meta_key='tax_exclude'
@@ -341,14 +341,14 @@ END_OF_TEXT;
     public function get_po_due(){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m') AS due,
-DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m') 
+DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m')
 FROM pap_mat_po WHERE po_deliveried IS NOT NULL
-UNION 
-SELECT 
+UNION
+SELECT
 DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m'),
-DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m') 
+DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m')
 FROM pap_process_po WHERE po_deliveried IS NOT NULL
 ORDER BY due DESC
 END_OF_TEXT;

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * Option for PAP
  */
 $op_type_unit = array(
@@ -208,15 +208,17 @@ $op_job_ga = array(
     "1" => "ออกใบสั่งผลิต",
     "2" => "กำหนดแผนส่งเพลต",
     "3" => "Proof on Demand",
-    "4" => "Proof Jet",
-    "5" => "Plate Ready"
+    "4" => "Proof Ink Jet",
+    "5" => "Proof Plate",
+    "7" => "Plate Ready"
 );
 $op_job_status = array(
     "1" => "ออกใบสั่งผลิต",
     "2" => "กำหนดแผนส่งเพลต",
     "3" => "Proof on Demand",
-    "4" => "Proof Jet",
-    "5" => "Plate Ready",
+    "4" => "Proof Ink Jet",
+    "5" => "Proof Plate",
+    "7" => "Plate Ready",
     "8" => "พร้อมพิมพ์",
     "9" => "พิมพ์",
     "19" => "หลังพิมพ์",
@@ -228,8 +230,9 @@ $op_job_prod = array(
     "1" => "ออกใบสั่งผลิต",
     "2" => "กำหนดแผนส่งเพลต",
     "3" => "Proof on Demand",
-    "4" => "Proof Jet",
-    "5" => "Plate Ready",
+    "4" => "Proof Ink Jet",
+    "5" => "Proof Plate",
+    "7" => "Plate Ready",
     "8" => "พร้อมพิมพ์",
     "9" => "พิมพ์",
     "19" => "หลังพิมพ์",

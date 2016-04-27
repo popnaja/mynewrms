@@ -16,7 +16,7 @@ class tbPDO{
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $edit
                     op_name
                     $value_sql
@@ -41,7 +41,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $edit
                     user_login,
                     po.op_name,
@@ -61,7 +61,7 @@ END_OF_TEXT;
     public function view_process_cat(){
         try {
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     CONCAT("<a href='process_cat.php?pcid=",id,"' title='Edit' class='icon-page-edit'></a>"),
                     name
                     FROM pap_process_cat
@@ -83,7 +83,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $edit
                     process_name,
                     pc.name,
@@ -112,7 +112,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $edit
                     size_name,
                     CONCAT(size_height,'x',size_width),
@@ -166,10 +166,10 @@ END_OF_TEXT;
 IFNULL(uu.user_login,"-") AS user,
 END_OF_TEXT;
             }
-             * 
+             *
              */
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='customer.php?action=view&cid=",cus.customer_id,"' title='View'>",customer_code,":<br/>",customer_name,"</a>"),
 CONCAT(REPEAT(' -  ',deep),tm.name),
@@ -218,7 +218,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     $edit
                     code,sup.name,CONCAT(REPEAT(' -  ',deep),tm.name),
                     CONCAT("<a href='mailto:",email,"' title'Email'>",email,"</a>"),
@@ -257,7 +257,7 @@ END_OF_TEXT;
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE quo.quote_id>0";
             $filter .= (isset($type)?" AND cat_id=$type":"");
-            $filter .= (isset($status)?" AND status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND status=$status":"");
             $filter .= (isset($mm)?" AND DATE_FORMAT(created,'%m%Y')='$mm'":"");
             $filter .= (isset($sid)?" AND sale.user_id=$sid":"");
             if(is_null($type)&&is_null($status)&&is_null($mm)){
@@ -273,7 +273,7 @@ END_OF_TEXT;
                 $sale = ",user.user_login";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' class='icon-print' target='_blank'></a>"),
 CONCAT(quote_no,"<br/>",name),
@@ -323,25 +323,25 @@ END_OF_TEXT;
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = "WHERE po.quote_id>0";
-            $filter .= (isset($status)?" AND po.status=$status":"");
+            $filter = "WHERE po.status<=7";
+            $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',pq.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)){
-                $filter .= " AND po.status<5";
+                $filter .= " AND po.status<7";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 po.order_id,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":<br/>",pq.name,"</a>"),
 cus.customer_name,
 FORMAT(amount,0),
 DATE_FORMAT(pq.plan_delivery,'%d-%b') AS due,
-IF(ISNULL(plate_plan),"",DATE_FORMAT(plate_plan,'%e-%b')),                
+IF(ISNULL(plate_plan),"",DATE_FORMAT(plate_plan,'%e-%b')),
 po.status,
 IF(ISNULL(plate_plan),1,IF(ISNULL(plate_received),IF(now()>plate_plan,5,2),IF(plate_received>plate_plan,5,4))) AS stc
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id   
+LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key ="page_inside"
 $filter
 ORDER BY pq.plan_delivery ASC
@@ -365,7 +365,7 @@ END_OF_TEXT;
                 } else {
                     $res[$k]['order_id'] = "";
                 }
-                
+
             }
             return $res;
         } catch (Exception $ex) {
@@ -377,13 +377,13 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.quote_id>0";
-            $filter .= (isset($status)?" AND po.status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',pq.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)){
                 $filter .= " AND prod_finished IS NULL = 1";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 po.order_id,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,": <br/>",pq.name,"</a>"),
 cus.customer_name,
@@ -394,7 +394,7 @@ IF(ISNULL(paper_plan),1,IF(ISNULL(paper_received),IF(now()>paper_plan,5,2),IF(pa
 po.prod_plan AS plan
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id   
+LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key ="page_inside"
 $filter
 ORDER BY pq.plan_delivery ASC
@@ -459,7 +459,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 op.op_name AS type,
 mat_name,mat_unit,mat_order_lot_size,
@@ -490,7 +490,7 @@ END_OF_TEXT;
                 $wh = "WHERE user_id=:uid AND customer_id=:cid";
             }
             $sql = <<<END_OF_TEXT
-                    SELECT 
+                    SELECT
                     CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
                     crm_detail
                     FROM pap_crm
@@ -519,7 +519,7 @@ END_OF_TEXT;
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 ma.name,
 pc.process_name,
@@ -574,7 +574,7 @@ END_OF_TEXT;
                 $filter .= " AND po.status IN (69,70)";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":",quo.name,"</a>"),
 CONCAT(cus.customer_code,":<br/>",cus.customer_name),
 DATE_FORMAT(quo.plan_delivery,'%d-%b') AS due,
@@ -658,15 +658,15 @@ END_OF_TEXT;
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = "WHERE po.quote_id>0";
+            $filter = "WHERE po.status BETWEEN 7 AND 69";
             $filter .= (isset($due)?" AND quo.plan_delivery='$due'":"");
-            $filter .= (isset($status)?" AND po.status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',quo.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($due)){
-                $filter .= " AND po.status BETWEEN 7 AND 70";
+                $filter .= " AND po.status < 69";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<a href='status.php?action=edit&oid=",po.order_id,"' title='Update' class='icon-page-edit'></a>") AS up,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":",quo.name,"</a>") AS name,
 DATE_FORMAT(quo.plan_delivery,'%d-%b') AS due,
@@ -695,8 +695,10 @@ END_OF_TEXT;
                     return $res;
                 } else {
                     foreach($res as $k=>$v){
-                        $key = $v['up'].",".$v['name'].",".$v['due'].",".$op[$v['ostatus']];
-                        $status = "<a href='' class='edit-comp-status icon-page-edit' title='Update' oid='".$v['oid']."' compid='".$v['compid']."'></a>".$v['status'];
+                        $oid = $v['oid'];
+                        $main_status = "<a href='' class='icon-page-edit edit-main-status' title='Update Status' oid='$oid'></a>";
+                        $key = $v['up'].",".$v['name'].",".$v['due'].",".$op[$v['ostatus']].$main_status;
+                        $status = "<a href='' class='edit-comp-status icon-page-edit' title='Update' oid='$oid' compid='".$v['compid']."'></a>".$v['status'];
                         if(isset($res1[$key])){
                             array_push($res1[$key],array($v['comp'],$status));
                         } else {
@@ -730,7 +732,7 @@ LEFT JOIN pap_quotation AS quo ON quo.customer_id=cus.customer_id
 LEFT JOIN pap_order AS job ON job.quote_id=quo.quote_id AND job.status<79
 LEFT JOIN pap_quotation AS quo1 ON quo1.quote_id=job.quote_id
 LEFT JOIN (
-	SELECT 
+	SELECT
 	quo.customer_id,SUM(quo.q_price) AS price,SUM(job.paid) AS paid
 	FROM pap_order AS job
 	LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id

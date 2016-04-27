@@ -148,7 +148,7 @@ if($req=="show_pic"){
     $adid = $db->get_mm_arr("pap_pbill_dt", "deli_id", "pbill_id", $_POST['bid']);
     //delete
     $db->delete_data("pap_pbill", "id", $_POST['bid']);
-    
+
     foreach($adid AS $did){
         //update job status and delivery
         $db->update_data("pap_order", "delivery", $did, array("billed"=>null));
@@ -251,7 +251,7 @@ if($req=="show_pic"){
     include_once(dirname(dirname(__FILE__))."/p-admin/email_function.php");
     __autoloada("table");
     __autoload("pdo_tb");
-    
+
     $tb = new mytable();
     $tbpdo = new tbPDO();
     $head = array("วันที่","บันทึก");
@@ -300,6 +300,17 @@ if($req=="show_pic"){
     $compstatus = $db->get_keypair("pap_comp_process AS cpro", "cat.id", "cat.name", "LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id WHERE cpro.comp_id=$compid AND cat.id<12 GROUP BY cat.id");
     $info = $db->get_info("pap_order_comp", "id", $compid);
     $html = $form->show_select("status", $compstatus, "label-3070", "สถานะชิ้นงาน", $info['status']);
+    echo json_encode(array("html_replace","sel-comp-status",$html));
+} else if($req == "get_sel_main_status"){
+    $mainst = array(
+      "7" => "Plate Ready",
+      "8" => "พร้อมพิมพ์",
+      "9" => "พิมพ์",
+      "19" => "หลังพิมพ์",
+      "69" => "พร้อมส่ง"
+    );
+    $info = $db->get_info("pap_order","order_id",$_POST['oid']);
+    $html = $form->show_select("status", $mainst, "label-3070", "สถานะงาน", $info['status']);
     echo json_encode(array("html_replace","sel-comp-status",$html));
 } else if($req == "get_start_status"){
     $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
@@ -359,4 +370,3 @@ function update_job_paid($adid){
         }
     }
 }
-

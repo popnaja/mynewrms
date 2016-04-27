@@ -40,7 +40,7 @@ END_OF_TEXT;
     } else if(isset($rcid)){
         $show = show_receipt($rcid);
     }
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . $show
             . "</body>";
     echo $content;
@@ -101,7 +101,7 @@ if($action =="add"){
         $content .= $form->show_hidden("did_$i","did[]",$arr_did[$i])
             . $form->show_hidden("price_$i","price[]",$rec[0][$i]);
     }
-    
+
     $content .= "</div><!-- .col-50 -->"
         . "<div class='col-100'>"
         . "<h4>รายการ</h4>"
@@ -147,7 +147,7 @@ if($action =="add"){
         . "<div class='col-100'>"
         . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
         . "<div id='deli-list'></div>";
-        
+
     $content .= $form->show_submit("submit","Add New","but-right")
         . $form->show_hidden("request","request","add_invoice")
         . $form->show_hidden("uid","uid",$uid)
@@ -197,7 +197,7 @@ if($action =="add"){
         . "<div class='col-100'>"
         . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
         . "<div id='deli-list'></div>";
-        
+
     $content .= $form->show_submit("submit","Add New","but-right")
         . $form->show_hidden("request","request","add_receipt")
         . $form->show_hidden("uid","uid",$uid)
@@ -314,13 +314,13 @@ if($action =="add"){
     $content .= $del
         . $form->show_submit("submit","Update","but-right")
         . $form->show_hidden("request","request","edit_invoice")
-        . $form->show_hidden("ivid","ivid",$ivid)  
+        . $form->show_hidden("ivid","ivid",$ivid)
         . $form->show_hidden("uid","uid",$uid)
         . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . $form->show_hidden("redirect","redirect",$redirect)
         . "</div><!-- .col-100 -->";
     $form->addformvalidate("ez-msg", array('date','due'));
-    
+
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#date,#due').datepicker({dateFormat: 'yy-mm-dd'});"
@@ -350,7 +350,7 @@ if($action =="add"){
         $content .= $form->show_hidden("did_$i","did[]",$adid[$i])
             . $form->show_hidden("price_$i","price[]",$rec[0][$i]);
     }
-    
+
     $content .= "</div><!-- .col-50 -->"
         . "<div class='col-100'>"
         . "<h4>รายการ</h4>"
@@ -365,7 +365,7 @@ if($action =="add"){
         . $form->show_submit("submit","Update","but-right")
         . $form->show_hidden("request","request","edit_p_bill")
         . $form->show_hidden("uid","uid",$uid)
-        . $form->show_hidden("bid","bid",$bid)    
+        . $form->show_hidden("bid","bid",$bid)
         . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . $form->show_hidden("redirect","redirect",$redirect)
         . "</div><!-- col-100 -->";
@@ -377,7 +377,7 @@ if($action =="add"){
 } else {
 /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $due = (isset($_GET['fil_due'])&&$_GET['fil_due']>0?$_GET['fil_due']:null);
     $s_cus = (isset($_GET['s_cus'])&&$_GET['s_cus']!=""?$_GET['s_cus']:null);
@@ -385,13 +385,13 @@ if($action =="add"){
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
-    
+
     $arrdue = $pdo_ac->get_job_pdue();
     $arrcid = $db->get_keypair("pap_order AS po", "quo.customer_id", "cus.customer_name", "LEFT JOIN pap_quotation AS quo ON quo.quote_id=po.quote_id LEFT JOIN pap_customer AS cus ON cus.customer_id=quo.customer_id");
-    
+
     //csv
     $csv = ($pauth>3?"<a href='$root"."csv_download.php?req=acc&due=$mm' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>":"");
-    
+
     //view
     $head = array("ใบส่งของ","ลูกค้า","งาน","วันที่ส่ง","กำหนดชำระ","ใบวางบิล","วันนัดชำระ","ใบกำกับ","ใบเสร็จ");
     $rec = $pdo_ac->view_job_pbill($pauth,$due,$status,$s,$s_cus,$page, $iperpage);
@@ -403,7 +403,7 @@ if($action =="add"){
             . $form->show_st_form()
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน",$s)
             . $tb->show_search(current_url(), "cusid", "s_cus","ค้นหาลูกค้า",$s_cus)
-            . $tb->show_filter(current_url(), "fil_status", $op_job_account, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_account, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดชำระ")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
@@ -412,7 +412,7 @@ if($action =="add"){
     if($pauth>1){
         $content .= $form->show_submit("submit","ออกใบวางบิล","but-right");
     }
-    
+
     $content .= $form->show_hidden("request","request","add_billed")
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect."?action=add")
