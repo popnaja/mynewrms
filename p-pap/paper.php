@@ -31,7 +31,7 @@ body {
 }
 </style>
 END_OF_TEXT;
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . show_mat_po($poid)
             . "</body>";
     echo $content;
@@ -53,7 +53,7 @@ $menu->astyle[] = $root."css/mat_order.css";
 $menu->astyle[] = $root."css/status.css";
 
 $menu->extrascript = <<<END_OF_TEXT
-        
+
 END_OF_TEXT;
 
 $pdo_po = new pdo_po();
@@ -89,7 +89,7 @@ if($action=="po"){
     } else {
         $jpre = "po_function();";
     }
-    
+
     $supplier = array("0"=>"--ผู้ผลิต--")+$db->get_keypair("pap_supplier", "id", "CONCAT(code,':',name)");
     $mat = $db->get_keypair("pap_mat", "mat_id", "CONCAT(mat_name,' (ขนาดบรรจุ ',mat_order_lot_size,mat_unit,')')","ORDER BY mat_name ASC");
     $content .= "<h1 class='page-title'>เปิดใบสั่งวัตถุดิบ</h1>"
@@ -139,7 +139,7 @@ if($action=="po"){
     }
     //load info
     $info = $db->get_info("pap_mat_po", "po_id", $poid);
-    
+
     //prep order
     $dt = $db->get_infos("pap_mat_po_detail", "po_id", $poid);
     $pre = array();
@@ -152,14 +152,14 @@ if($action=="po"){
     }
     $jpre = "po_function(".json_encode($pre).");";
 
-    
+
     $supplier = array("0"=>"--ผู้ผลิต--")+$db->get_keypair("pap_supplier", "id", "CONCAT(code,':',name)");
     $ct = $db->get_keypair("pap_supplier_ct", "id", "name", "WHERE supplier_id='".$info['supplier_id']."'");
     $st = $op_po_status;
     unset($st[4]);
     unset($st[5]);
     unset($st[9]);
-    
+
     $content .= "<h1 class='page-title'>แก้ไข $pagename</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"
         . "<div class='col-100'>"
@@ -219,32 +219,32 @@ if($action=="po"){
 } else if($action=="viewpo"){
     /* --------------------------------------------------------   VIEW PO --------------------------------------------------------------*/
     //GET
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $iperpage = 20;
-    
+
     //view
     $head = array("รหัส","รหัส Supplier","วันที่สั่ง","สถานะ");
     $rec = $pdo_po->view_po($pauth,$op_po_status_icon, $status, $mm, $s,$page, $iperpage);
     $all_rec = $pdo_po->view_po($pauth,$op_po_status_icon, $status, $mm,$s);
     $max = ceil(count($all_rec)/$iperpage);
-    
+
     $arrmm = $db->get_keypair("pap_mat_po", "DATE_FORMAT(po_created,'%m%Y')", "DATE_FORMAT(po_created,'%b-%Y')", "");
     $new = "";
     if($pauth>1){
         array_unshift($head, "แก้ไข");
         $new = "<a href='$redirect?action=po' title='Add new'>Add New</a>";
     }
-    
+
     $content .= "<h1 class='page-title'>$pagename $new</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาจากรหัสใบสั่งวัตถุดิบ",$s)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect)
-            . $tb->show_filter(current_url(), "fil_status", $op_po_status, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_po_status, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_mm", $arrmm, $mm,"เดือน")
             . "<div class='tb-clear-filter'><a href='$redirect?action=viewpo' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
@@ -259,13 +259,13 @@ if($action=="po"){
 } else {
     /*----------------------------------------------------- VIEW ORDER AND ORDER PAPER ----------------------------------------------*/
     $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
-    
+
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 10;
-    
+
     //view
     $head = array("รหัสงาน","ชื่อ","ยอดผลิต","กำหนดส่ง","สถานะงาน","กระดาษ");
     $rec = $pdo_po->view_purchase($pauth,$op_job_status,$status,$s, $page, $iperpage);
@@ -279,7 +279,7 @@ if($action=="po"){
             . "<div class='col-100'>"
             . $form->show_st_form()
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัสหรือชื่อ",$s)
-            . $tb->show_filter(current_url(), "fil_status", $op_job_prod, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_prod, $status,"สถานะ")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table_keygroup($head,$rec,"tb-matorder",";");

@@ -33,7 +33,7 @@ body {
 }
 </style>
 END_OF_TEXT;
-    $content = $menu->showhead() 
+    $content = $menu->showhead()
             . show_mat_po($poid)
             . "</body>";
     echo $content;
@@ -101,7 +101,7 @@ if(isset($poid)){
             . $form->show_select("all", array("yes"=>"ใช่","no"=>"มาบางส่วน"), "label-3070", "รับตามยอดใบสั่งซื้อ", null)
             . $tb->show_table($head, $rec, "tb-receive")
             . "</div><!-- .col-50 -->";
-    
+
     $content .= $form->show_submit("submit","รับของเข้า","but-right")
         . $form->show_hidden("request","request","add_mat_received")
         . $form->show_hidden("uid","uid",$uid)
@@ -119,7 +119,7 @@ if(isset($poid)){
     $dyinfo = $pdo_po->view_po_deli($dyid);
     $head = array("ลำดับ","รายการ","งาน","จำนวน","ที่เก็บ");
     $dt = $pdo_po->view_po_deli_dt($dyid);
-    
+
     if($pauth==4){
         $del = "<span id='del-mat-deli' class='red-but'>Delete</span>"
                     . $form->show_hidden("redirect","redirect",$redirect)
@@ -129,7 +129,7 @@ if(isset($poid)){
     } else {
         $del = "";
     }
-    
+
     $content .= "<h1 class='page-title'>รายละเอียด $pagename</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-50'>"
@@ -142,35 +142,35 @@ if(isset($poid)){
 } else {
     /* --------------------------------------------------   VIEW PO FOR WH ----------------------------------------------------------*/
     //GET
-    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']>0?$_GET['fil_status']:null);
+    $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $iperpage = 20;
-    
+
     //filter
     $rst = $op_po_status;
     unset($rst[1]);
     unset($rst[2]);
     unset($rst[9]);
-    
+
     //view
     $head = array("รหัส","รหัส Supplier","วันที่สั่ง","สถานะ","ใบรับเข้า");
     $rec = $pdo_po->view_po_rc($pauth,$op_po_status_icon, $status, $mm, $s,$page, $iperpage);
     $all_rec = $pdo_po->view_po_rc($pauth,$op_po_status_icon, $status, $mm,$s);
     $max = ceil(count($all_rec)/$iperpage);
-    
+
     $arrmm = $db->get_keypair("pap_mat_po", "DATE_FORMAT(po_created,'%m%Y')", "DATE_FORMAT(po_created,'%b-%Y')", "");
-    
+
     if($pauth>1){
         array_unshift($head, "รับเข้า");
     }
-    
+
     $content .= "<h1 class='page-title'>$pagename</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาจากรหัสใบสั่งซื้อวัตถุดิบ",$s)
-            . $tb->show_filter(current_url(), "fil_status", $rst, $status,"สถานะ")
+            . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$rst, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_mm", $arrmm, $mm,"เดือน")
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec,"tb-po")

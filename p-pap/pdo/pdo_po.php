@@ -92,7 +92,7 @@ END_OF_TEXT;
     public function outsource_info($cproid){
         try {
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("(",comp.name,") ",cpro.name) AS name,CONCAT(job.order_no,":",quo.name) AS jobname
 FROM pap_comp_process AS cpro
 LEFT JOIN pap_order_comp AS comp ON comp.id=cpro.comp_id
@@ -114,7 +114,7 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.po_id>0";
-            $filter .= (isset($status)?" AND po.po_status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.po_status=$status":"");
             $filter .= (isset($mm)?" AND DATE_FORMAT(po_created,'%m%Y')='$mm'":"");
             $filter .= (isset($s)?" AND po_code LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($mm)){
@@ -127,7 +127,7 @@ END_OF_TEXT;
             }
 
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='outsource.php?action=print&poid=",po.po_id,"' title='View' target='_blank'>",po.po_code,"</a>"),
 CONCAT(sup.code,":",sup.name),
@@ -160,13 +160,13 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.order_id>0";
-            $filter .= (isset($status)?" AND po.status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',pq.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)){
                 $filter .= " AND po.paper_plan IS NULL = 1";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":<br/>",pq.name,"</a>") AS jname,
 cus.customer_name,
 FORMAT(pq.amount,0) AS amount,
@@ -189,12 +189,12 @@ po.poid,po.pocode,po.tt
 FROM pap_order_comp AS com
 LEFT JOIN pap_mat AS mat ON mat_id=paper_id
 LEFT JOIN (
-	SELECT 
+	SELECT
 	mat_id,SUM(mat_qty) AS tt,GROUP_CONCAT(po.po_id) AS poid,GROUP_CONCAT(po_code) AS pocode
 	FROM pap_mat_po_detail AS dt
 	LEFT JOIN pap_mat_po AS po ON po.po_id=dt.po_id
 	WHERE order_ref=:oid
-	GROUP BY mat_id 
+	GROUP BY mat_id
 ) AS po ON po.mat_id=com.paper_id
 WHERE com.order_id=:oid AND paper_id IS NOT NULL
 GROUP BY com.paper_id
@@ -223,7 +223,7 @@ END_OF_TEXT;
                         $po .= ($i==0?"":" , ")."<a href='paper.php?poid=".$tpoid[$i]."' title='Edit'>".$tpo_code[$i]."</a>";
                     }
                     $po .= "</div>";
-                    
+
                     $remain = $row['rim']-$row['tt'];
                     if($remain > 0){
                         //show checkbox
@@ -257,14 +257,14 @@ END_OF_TEXT;
             $edit = "";
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = "WHERE job.order_id>0";
-            $filter .= (isset($status)?" AND job.status=$status":"");
+            $filter = "WHERE job.status BETWEEN 8 AND 69";
+            $filter .= (isset($status)&&$status>0?" AND job.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(job.order_no,':',pq.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)){
                 $filter .= " AND job.status<69";
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 CONCAT("<a href='order.php?action=print&oid=",job.order_id,"' title='View' target='_blank'>",order_no,":<br/>",pq.name,"</a>") AS jname,
 CONCAT_WS(":",order_no,pq.name) AS jobn,
 cus.customer_name,
@@ -280,7 +280,7 @@ ORDER BY pq.plan_delivery ASC
 $lim_sql
 END_OF_TEXT;
             $sql1 = <<<END_OF_TEXT
-SELECT 
+SELECT
 comp.order_id,
 cpro.id,cpro.name AS pname,cpro.volume,comp.name AS cname,cpro.process_id,pro.process_unit,
 GROUP_CONCAT(po.po_id) AS poid,
@@ -318,7 +318,7 @@ END_OF_TEXT;
                         $po .= ($i==0?"":" , ")."<a href='outsource.php?poid=".$tpoid[$i]."' title='Edit'>".$tpo_code[$i]."</a>";
                     }
                     $po .= "</div><!-- .current-po -->";
-                    
+
                     $pname = $row['pname'];
                     $cname = $row['cname'];
                     $val = array($row['id'],$row['process_id'],$row['process_unit'],$row['volume']);
@@ -434,7 +434,7 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.po_status IN (3,4,5)";
-            $filter .= (isset($status)?" AND po.po_status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.po_status=$status":"");
             $filter .= (isset($mm)?" AND DATE_FORMAT(po_created,'%m%Y')='$mm'":"");
             $filter .= (isset($s)?" AND po_code LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($mm)){
@@ -446,14 +446,14 @@ IF(po.po_status>=5,"",CONCAT("<a href='mat_received.php?poid=",po.po_id,"' title
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='mat_received.php?action=print&poid=",po.po_id,"' title='View' target='_blank'>",po.po_code,"</a>"),
 CONCAT(sup.code,":",sup.name),
 DATE_FORMAT(po_created,'%d-%b'),
 po.po_status AS status,
 GROUP_CONCAT(dy.id) AS dyid,
-GROUP_CONCAT(dy.ref) AS dyref   
+GROUP_CONCAT(dy.ref) AS dyref
 FROM pap_mat_po AS po
 LEFT JOIN pap_supplier AS sup ON sup.id=po.supplier_id
 LEFT JOIN pap_mat_delivery AS dy ON dy.po_id=po.po_id
@@ -478,7 +478,7 @@ END_OF_TEXT;
                 $dyinfo = "";
                 for($i=0;$i<count($dyid);$i++){
                     $dyinfo .= ($i>0?", ":"")
-                            . "<a href='mat_received.php?dyid=$dyid[$i]' title='View'>$dyref[$i]</a>";
+                            . "<a href='mat_received.php?dyid=$dyid[$i]' title='View' target='_blank'>$dyref[$i]</a>";
                 }
                 array_push($res[$k],$dyinfo);
                 unset($res[$k]['dyid']);
@@ -495,7 +495,7 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.po_status IN (3,4,5)";
-            $filter .= (isset($status)?" AND po.po_status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.po_status=$status":"");
             $filter .= (isset($mm)?" AND DATE_FORMAT(po_created,'%m%Y')='$mm'":"");
             $filter .= (isset($s)?" AND po_code LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($mm)){
@@ -507,14 +507,14 @@ IF(po.po_status=5,"",CONCAT("<a href='outsource_rc.php?poid=",po.po_id,"' title=
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='outsource_rc.php?action=print&poid=",po.po_id,"' title='View' target='_blank'>",po.po_code,"</a>"),
 CONCAT(sup.code,":",sup.name),
-DATE_FORMAT(po_created,'%d-%b'), 
+DATE_FORMAT(po_created,'%d-%b'),
 po.po_status AS status,
 GROUP_CONCAT(dy.id) AS dyid,
-GROUP_CONCAT(dy.ref) AS dyref                 
+GROUP_CONCAT(dy.ref) AS dyref
 FROM pap_process_po AS po
 LEFT JOIN pap_supplier AS sup ON sup.id=po.supplier_id
 LEFT JOIN pap_wip_delivery AS dy ON dy.po_id=po.po_id
@@ -538,7 +538,7 @@ END_OF_TEXT;
                 $dyinfo = "";
                 for($i=0;$i<count($dyid);$i++){
                     $dyinfo .= ($i>0?", ":"")
-                            . "<a href='outsource_rc.php?dyid=$dyid[$i]' title='View'>$dyref[$i]</a>";
+                            . "<a href='outsource_rc.php?dyid=$dyid[$i]' title='View' target='_blank'>$dyref[$i]</a>";
                 }
                 array_push($res[$k],$dyinfo);
                 unset($res[$k]['dyid']);
@@ -555,7 +555,7 @@ END_OF_TEXT;
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.po_id>0";
-            $filter .= (isset($status)?" AND po.po_status=$status":"");
+            $filter .= (isset($status)&&$status>0?" AND po.po_status=$status":"");
             $filter .= (isset($mm)?" AND DATE_FORMAT(po_created,'%m%Y')='$mm'":"");
             $filter .= (isset($s)?" AND po_code LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)&&is_null($mm)){
@@ -568,7 +568,7 @@ END_OF_TEXT;
             }
 
             $sql = <<<END_OF_TEXT
-SELECT 
+SELECT
 $edit
 CONCAT("<a href='paper.php?action=print&poid=",po.po_id,"' title='View' target='_blank'>",po.po_code,"</a>"),
 CONCAT(sup.code,":",sup.name),
@@ -596,4 +596,3 @@ END_OF_TEXT;
         }
     }
 }
-
