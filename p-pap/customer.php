@@ -72,8 +72,22 @@ if($action=="add"){
             . "<div class='sel-pay-1'>"
             . $form->show_num("credit_day","",1,"","Credit(วัน)","","label-3070")
             . $form->show_num("credit","",1,"","วงเงิน(บาท)","","label-3070")
-            . $form->show_text("bill","bill","","","วันวางบิล","","label-3070")
-            . $form->show_text("cheque","cheque","","","วันรับเช็ค","","label-3070")
+            . $form->show_select("bill",$op_date_type,"label-3070","วันวางบิล",null)
+            . "<div class='sel-bill-day'>"
+            . $form->show_num("bill_day","",1,"","วันที่","","label-3070","min='1' max='31'")
+            . "</div><!-- .sel-bill-day -->"
+            . "<div class='sel-bill-dofw'>"
+            . $form->show_select("bill_weekday",$op_weekday,"label-3070","วันของสัปดาห์",null)
+            . $form->show_num("bill_week","",1,"","สัปดาห์ที่","","label-3070","min='1' max='4'")
+            . "</div><!-- .sel-bill-dofw -->"
+            . $form->show_select("cheque",$op_date_type,"label-3070","วันรับเช็ค",null)
+            . "<div class='sel-cheque-day'>"
+            . $form->show_num("cheque_day","",1,"","วันที่","","label-3070","min='1' max='31'")
+            . "</div><!-- .sel-cheque-day -->"
+            . "<div class='sel-cheque-dofw'>"
+            . $form->show_select("cheque_weekday",$op_weekday,"label-3070","วันของสัปดาห์",null)
+            . $form->show_num("cheque_week","",1,"","สัปดาห์ที่","","label-3070","min='1' max='4'")
+            . "</div><!-- .sel-cheque-dofw -->"
             . "</div><!-- .sel-pay-1 -->"
             . "</div><!-- .col-50 -->"
             . "<div class='col-50'>";
@@ -107,6 +121,8 @@ if($action=="add"){
             . $form->show_hidden("redirect","redirect",$redirect)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . "<script>select_option_byval('pay');"
+            . "select_option_byval('bill');"
+            . "select_option_byval('cheque');"
             . "format_id('taxid');"
             . "view_more_section('cus_ct');"
             . "</script>";
@@ -269,8 +285,22 @@ if($action=="add"){
                 . "<div class='sel-pay-1'>"
                 . $form->show_num("credit_day",$info['customer_credit_day'],1,"","Credit(วัน)","","label-3070")
                 . $form->show_num("credit",$info['customer_credit_amount'],1,"","วงเงิน(บาท)","","label-3070")
-                . $form->show_text("bill","bill",$info['customer_place_bill'],"","วันวางบิล","","label-3070")
-                . $form->show_text("cheque","cheque",$info['customer_collect_cheque'],"","วันรับเช็ค","","label-3070")
+                . $form->show_select("bill",$op_date_type,"label-3070","วันวางบิล",$info['customer_place_bill'])
+                . "<div class='sel-bill-day'>"
+                . $form->show_num("bill_day",(isset($info['bill_day'])?$info['bill_day']:""),1,"","วันที่","","label-3070","min='1' max='31'")
+                . "</div><!-- .sel-bill-day -->"
+                . "<div class='sel-bill-dofw'>"
+                . $form->show_select("bill_weekday",$op_weekday,"label-3070","วันของสัปดาห์",(isset($info['bill_weekday'])?$info['bill_weekday']:""))
+                . $form->show_num("bill_week",(isset($info['bill_week'])?$info['bill_week']:""),1,"","สัปดาห์ที่","","label-3070","min='1' max='4'")
+                . "</div><!-- .sel-bill-dofw -->"
+                . $form->show_select("cheque",$op_date_type,"label-3070","วันรับเช็ค",$info['customer_collect_cheque'])
+                . "<div class='sel-cheque-day'>"
+                . $form->show_num("cheque_day",(isset($info['cheque_day'])?$info['cheque_day']:""),1,"","วันที่","","label-3070","min='1' max='31'")
+                . "</div><!-- .sel-cheque-day -->"
+                . "<div class='sel-cheque-dofw'>"
+                . $form->show_select("cheque_weekday",$op_weekday,"label-3070","วันของสัปดาห์",(isset($info['cheque_weekday'])?$info['cheque_weekday']:""))
+                . $form->show_num("cheque_week",(isset($info['cheque_week'])?$info['cheque_week']:""),1,"","สัปดาห์ที่","","label-3070","min='1' max='4'")
+                . "</div><!-- .sel-cheque-dofw -->"
                 . "</div><!-- .sel-pay-1 -->"
                 . "</div><!-- .col-50 -->"
                 . "<div class='col-50'>";
@@ -322,6 +352,8 @@ if($action=="add"){
                 . "select_option_byval('pay');"
                 . "format_id('taxid');"
                 . "add_contact($arrname);"
+                . "select_option_byval('bill');"
+                . "select_option_byval('cheque');"
                 . "</script>";
         $form->addformvalidate("ez-msg", array('name','address','email','tel'),null,null,array("cat"));
         $content .= $form->submitscript("$('#papform').submit();");

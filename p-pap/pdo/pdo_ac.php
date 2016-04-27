@@ -227,42 +227,64 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function get_bill_check(){
+    public function get_bill_check($year,$month){
         try{
             $sql = <<<END_OF_TEXT
 SELECT
-customer_id,customer_code AS code,customer_name AS name,customer_place_bill AS bill,customer_collect_cheque AS cheque
-FROM pap_customer
-WHERE customer_place_bill>0
+cus.customer_id,customer_code AS code,customer_name AS name,customer_place_bill AS bill,customer_collect_cheque AS cheque,
+meta.meta_value AS bill_day,
+meta1.meta_value AS bill_weekday,
+meta2.meta_value AS bill_week,
+meta3.meta_value AS cheque_day,
+meta4.meta_value AS cheque_weekday,
+meta5.meta_value AS cheque_week
+FROM pap_customer AS cus
+LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=cus.customer_id AND meta.meta_key='bill_day'
+LEFT JOIN pap_customer_meta AS meta1 ON meta1.customer_id=cus.customer_id AND meta1.meta_key='bill_weekday'
+LEFT JOIN pap_customer_meta AS meta2 ON meta2.customer_id=cus.customer_id AND meta2.meta_key='bill_week'
+LEFT JOIN pap_customer_meta AS meta3 ON meta3.customer_id=cus.customer_id AND meta3.meta_key='cheque_day'
+LEFT JOIN pap_customer_meta AS meta4 ON meta4.customer_id=cus.customer_id AND meta4.meta_key='cheque_weekday'
+LEFT JOIN pap_customer_meta AS meta5 ON meta5.customer_id=cus.customer_id AND meta5.meta_key='cheque_week'
+WHERE customer_pay>0
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
-            $res = array();
-            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-                $keyb = sprintf("%02s",$row['bill']);
-                $keyc = sprintf("%02s",$row['cheque']);
-                if(isset($res[$keyb])){
-                    $res[$keyb][0]++;
-                    $res[$keyb][1] .= ",".$row['customer_id'];
-                    $res[$keyb][2] .= ",<span class='cd-icon icon-file-text-o'></span>".$row['name'];
-                } else {
-                    $res[$keyb] = array();
-                    $res[$keyb][0] = 1;
-                    $res[$keyb][1] = $row['customer_id'];
-                    $res[$keyb][2] = "<span class='cd-icon icon-file-text-o'></span>".$row['name'];
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $res1 = array();
+            foreach($res as $k=>$v){
+                //bill
+                if($v['bill']=="day"){
+                    $day = sprintf("%02s",$v['bill_day']);
+                } else if($v['bill']=="dofw"){
+                    $day = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
+                } else if($v['bill']=="eofm"){
+                    $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+                    $day = $st->format("t");
                 }
-                if(isset($res[$keyc])){
-                    $res[$keyc][0]++;
-                    $res[$keyc][1] .= ",".$row['customer_id'];
-                    $res[$keyc][2] .= ",<span class='cd-icon icon-banknote'></span>".$row['name'];
-                } else {
-                    $res[$keyc] = array();
-                    $res[$keyc][0] = 1;
-                    $res[$keyc][1] = $row['customer_id'];
-                    $res[$keyc][2] = "<span class='cd-icon icon-banknote'></span>".$row['name'];
+                if(!isset($res1[$day])){
+                    $res1[$day] = array(0,"","");
                 }
+                $res1[$day][0]++;
+                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
+                $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='cd-icon icon-file-text-o'></span>".$v['name'];
+
+                //cheque
+                if($v['cheque']=="day"){
+                    $day = sprintf("%02s",$v['cheque_day']);
+                } else if($v['cheque']=="dofw"){
+                    $day = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
+                } else if($v['cheque']=="eofm"){
+                    $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+                    $day = $st->format("t");
+                }
+                if(!isset($res1[$day])){
+                    $res1[$day] = array(0,"","");
+                }
+                $res1[$day][0]++;
+                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
+                $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='cd-icon icon-banknote'></span>".$v['name'];
             }
-            return $res;
+            return $res1;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }

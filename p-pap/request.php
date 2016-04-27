@@ -425,10 +425,26 @@ if($req == "login"){
             $md->move_file(RDIR.$file, $des);
             array_push($pic,"/p-pap/image/customer/$code-$fname");
         }
+        $meta["picture"] = implode(",",$pic);
+    } else {
+        $meta['picture'] = "";
     }
-    $meta["picture"] = implode(",",$pic);
     //meta
-    $meta["tax_exclude"] = $_POST['ntax'];
+    $meta = array(
+        "tax_exclude" => $_POST['ntax']
+    );
+    if($_POST['bill']=="day"){
+        $meta['bill_day'] = $_POST['bill_day'];
+    } else if($_POST['bill']=="dofw"){
+        $meta['bill_week'] = $_POST['bill_week'];
+        $meta['bill_weekday']  = $_POST['bill_weekday'];
+    }
+    if($_POST['cheque']=="day"){
+        $meta['cheque_day'] = $_POST['cheque_day'];
+    } else if($_POST['cheque']=="dofw"){
+        $meta['cheque_week'] = $_POST['cheque_week'];
+        $meta['cheque_weekday']  = $_POST['cheque_weekday'];
+    }
     $db->update_meta("pap_customer_meta", "customer_id", $cid, $meta);
 
     //add cat
@@ -500,13 +516,26 @@ if($req == "login"){
                 array_push($pic,$file);
             }
         }
+        $meta["picture"] = implode(",",$pic);
+    } else {
+        $meta['picture'] = "";
     }
-    $meta["picture"] = implode(",",$pic);
-
     //meta
     $meta["tax_exclude"] = $_POST['ntax'];
+    
+    if($_POST['bill']=="day"){
+        $meta['bill_day'] = $_POST['bill_day'];
+    } else if($_POST['bill']=="dofw"){
+        $meta['bill_week'] = $_POST['bill_week'];
+        $meta['bill_weekday']  = $_POST['bill_weekday'];
+    }
+    if($_POST['cheque']=="day"){
+        $meta['cheque_day'] = $_POST['cheque_day'];
+    } else if($_POST['cheque']=="dofw"){
+        $meta['cheque_week'] = $_POST['cheque_week'];
+        $meta['cheque_weekday']  = $_POST['cheque_weekday'];
+    }
     $db->update_meta("pap_customer_meta", "customer_id", $cid, $meta);
-
     /*
     //update code
     if($_POST['ori_cat']<>$_POST['cat']){
@@ -514,7 +543,6 @@ if($req == "login"){
     }
      *
      */
-
 
     //update sale rep
     if(isset($_POST['sale'])){
@@ -526,7 +554,6 @@ if($req == "login"){
             $db->delete_data("pap_sale_cus", "cus_id", $cid);
         }
     }
-
     $db->update_data("pap_customer", "customer_id", $cid, $arrinfo);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);

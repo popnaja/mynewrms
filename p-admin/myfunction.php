@@ -228,3 +228,18 @@ function time_min(){
     }
     return $hour;
 }
+function dofw_to_date($year,$month,$weekday,$week){
+    $first = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+    $t = $first->format("t");
+    for($j=0;$j<7;$j++){
+        $wcount[$j] = 0;
+    }
+    for($i=0;$i<$t;$i++){
+        $wd = $first->format("w");
+        $wcount[$wd]++;
+        if($wcount[$wd]==$week&&$weekday==$wd){
+            return $first->format("d");
+        }
+        $first->add(new DateInterval("P1D"));
+    }
+}
