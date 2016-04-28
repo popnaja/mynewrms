@@ -11,7 +11,6 @@ function cal_quote($info,$comps,$layinfo){
     //calculate
 
     $units = unit_cal($info, $layinfo, $comps);
-    var_dump($units);
     //var_dump($units);
     $res['ออกแบบ'] = array();
     $res['ทำเพลต'] = array();
@@ -120,7 +119,11 @@ function cal_quote($info,$comps,$layinfo){
         }
     }
     //folding
-    $folding_id = 8;
+    if($info['cat_id']==11){
+        $folding_id = $info['folding'];
+    } else {
+        $folding_id = 8;
+    }
     //ถ้า เป็นหนังสือ cat_id=10 แผ่นพับ cat_id=11 มีการพับ
     if(in_array($info['cat_id'],array(10,11,69))){
         $pcost = new_pcost($folding_id, $overall);
