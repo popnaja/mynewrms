@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2016 at 11:37 AM
+-- Generation Time: Apr 28, 2016 at 05:51 AM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -59,7 +59,26 @@ CREATE TABLE IF NOT EXISTS `pap_comp_process` (
   PRIMARY KEY (`id`),
   KEY `fk_pap_comp_process_pap_order_comp1_idx` (`comp_id`),
   KEY `fk_pap_comp_process_pap_process1_idx` (`process_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+--
+-- Dumping data for table `pap_comp_process`
+--
+
+INSERT INTO `pap_comp_process` (`id`, `comp_id`, `process_id`, `name`, `volume`, `est_time_hour`, `machine_id`, `result`, `plan_start`, `plan_end`, `start`, `end`, `remark`) VALUES
+(1, 1, 13, 'ตัดเจียน', 1125, '0.16', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 1, 10, '0.5,กลับใน,4/4,1050', 2100, '0.76', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 1, 5, 'PVC ด้าน', 1125, '24.00', NULL, 1125, NULL, NULL, '2016-04-26 00:14:22', '2016-04-26 00:14:53', NULL),
+(4, 1, 24, 'ตัดแบ่ง', 3300, '0.30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 2, 13, 'ตัดเจียน', 13000, '0.95', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 2, 10, '6,กลับนอก,4/4,3300', 19800, '5.48', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 2, 10, '1,กลับใน,4/4,1800', 3600, '0.95', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(8, 2, 10, '0.5,กลับใน,4/4,1050', 2100, '0.76', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(9, 2, 24, 'ตัดแบ่ง', 6600, '0.52', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(10, 2, 8, 'พับ', 16500, '1.90', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 3, 9, 'เก็บเล่ม', 16500, '0.69', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, 3, 1, 'ไสกาว', 3000, '1.33', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, 3, 22, 'ตัดสันสามด้าน', 3000, '1.83', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -77,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `pap_contact` (
   `contact_remark` text,
   PRIMARY KEY (`contact_id`),
   KEY `fk_pap_contact_pap_customer1_idx` (`customer_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 --
 -- Dumping data for table `pap_contact`
@@ -94,7 +113,8 @@ INSERT INTO `pap_contact` (`contact_id`, `customer_id`, `contact_cat`, `contact_
 (8, 11, 1, 'คุณสวย ', 'beauty@gmail.com', '061-888-7777', ''),
 (11, 11, 1, 'คุณสวยมาก', 'beauty@gmail.com', '024564568', ''),
 (12, 12, 1, 'คุณ เขียว', 'kGreen@gmail.com', '081-777-7535', ''),
-(13, 12, 1, 'คุณ รัก', 'lov@gmail.com', '081-777-5324', '');
+(13, 12, 1, 'คุณ รัก', 'lov@gmail.com', '081-777-5324', ''),
+(14, 13, 1, 'นายวัน', 'one@gmail.com', '01', '');
 
 -- --------------------------------------------------------
 
@@ -148,20 +168,21 @@ CREATE TABLE IF NOT EXISTS `pap_customer` (
   `customer_added` datetime NOT NULL,
   `customer_status` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
 
 --
 -- Dumping data for table `pap_customer`
 --
 
 INSERT INTO `pap_customer` (`customer_id`, `customer_code`, `customer_name`, `customer_taxid`, `customer_address`, `customer_url`, `customer_email`, `customer_tel`, `customer_fax`, `customer_pay`, `customer_credit_day`, `customer_credit_amount`, `customer_place_bill`, `customer_collect_cheque`, `customer_added`, `customer_status`) VALUES
-(1, 'A00001', 'บริษัท ใหม่', '1-2312-31231-23-1', '1234 บ้านใหม่', '', 'test@gmail.com', '02-222-2222', '02-333-3333', 0, 0, 0, '', '', '2016-01-26 20:44:33', 1),
-(2, 'A00002', 'บริษัท สอง', '1-1111-11111-11-1', '2/22 หมู่บ้าน สอง เขต สองสาม 12121', 'www.twocoltd.com', 'two@gmail.com', '02-222-2222', '', 1, 30, 300000, '5', '25', '2016-02-03 17:31:58', 1),
+(1, 'A00001', 'บริษัท ใหม่', '1-2312-31231-23-1', '1234 บ้านใหม่', '', 'test@gmail.com', '02-222-2222', '02-333-3333', 1, 30, 300000, 'day', 'day', '2016-01-26 20:44:33', 1),
+(2, 'A00002', 'บริษัท สอง', '1-1111-11111-11-1', '2/22 หมู่บ้าน สอง เขต สองสาม 12121', 'www.twocoltd.com', 'two@gmail.com', '02-222-2222', '', 1, 30, 300000, 'dofw', 'dofw', '2016-02-03 17:31:58', 1),
 (8, 'A00003', 'บจก. สามสหาย', '3-3333-33333-33-3', '33 หมู่บ้านสาม', '', 'threeg@gmail.com', '02-333-3333', '', 0, 0, 0, '', '', '2016-02-06 12:18:44', 1),
-(9, 'D00001', 'บจก สี่', '', '44/4', '', 'four@gmail.com', '444-4444', '', 1, 30, 300000, '5', '15', '2016-02-06 12:22:31', 1),
+(9, 'D00001', 'บจก สี่', '', '44/4', '', 'four@gmail.com', '444-4444', '', 1, 30, 300000, 'eofm', 'eofm', '2016-02-06 12:22:31', 1),
 (10, 'D00002', 'บจก. พยาไท', '1-2312-31231-23-1', '12/55 กทม', 'ีpt.com', 'pt@gmail.com', '01-222-4444', '01-223-3333', 0, 0, 0, '', '', '2016-02-20 12:08:05', 2),
-(11, 'A00004', 'บริษัท นิตยสารสวย จำกัด', '1-2312-31231-23-1', '12/23 กรุงเทพฯ', '', 'bbook@gmail.com', '02-444-2525', '', 1, 30, 100000, '15', '25', '2016-03-08 11:54:40', 2),
-(12, 'A00005', 'บจก เขียวรักโลก จำกัด', '1-2312-31231-23-1', '12/34 หมู่บ้านเขียว กรุงเทพฯ 10110', 'www.green.com', 'green@gmail.com', '01-223-3332', '01-223-3333', 1, 30, 200000, '5', '9', '2016-04-18 08:42:10', 2);
+(11, 'A00004', 'บริษัท นิตยสารสวย จำกัด', '1-2312-31231-23-1', '12/23 กรุงเทพฯ', '', 'bbook@gmail.com', '02-444-2525', '', 1, 30, 100000, 'eofm', 'eofm', '2016-03-08 11:54:40', 2),
+(12, 'A00005', 'บจก เขียวรักโลก จำกัด', '1-2312-31231-23-1', '12/34 หมู่บ้านเขียว กรุงเทพฯ 10110', 'www.green.com', 'green@gmail.com', '01-223-3332', '01-223-3333', 1, 30, 200000, 'day', 'day', '2016-04-18 08:42:10', 2),
+(13, 'C00001', 'บจก. วันวางบิล', '1-2345-67894-56-2', '35', '', '35@gmail.com', '02', '02', 1, 30, 100000, 'day', 'dofw', '2016-04-27 20:04:05', 2);
 
 -- --------------------------------------------------------
 
@@ -184,11 +205,12 @@ CREATE TABLE IF NOT EXISTS `pap_customer_cat` (
 INSERT INTO `pap_customer_cat` (`tax_id`, `customer_id`) VALUES
 (5, 1),
 (5, 12),
-(6, 2),
-(6, 11),
 (7, 8),
 (8, 9),
-(8, 10);
+(8, 10),
+(12, 2),
+(12, 11),
+(12, 13);
 
 -- --------------------------------------------------------
 
@@ -203,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `pap_customer_meta` (
   `meta_value` text,
   PRIMARY KEY (`id`),
   KEY `fk_pap_customer_meta_pap_customer1_idx` (`customer_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=27 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=41 ;
 
 --
 -- Dumping data for table `pap_customer_meta`
@@ -218,10 +240,24 @@ INSERT INTO `pap_customer_meta` (`id`, `customer_id`, `meta_key`, `meta_value`) 
 (6, 11, 'tax_exclude', 'yes'),
 (17, 1, 'picture', '/p-pap/image/customer/A00001-FGC85HDP3QBVEY5_s.jpg,/p-pap/image/customer/A00001-colbus_s.jpg,/p-pap/image/customer/A00001-room41_s.jpg'),
 (18, 10, 'picture', NULL),
-(19, 2, 'picture', NULL),
-(24, 11, 'picture', NULL),
+(19, 2, 'picture', ''),
+(24, 11, 'picture', ''),
 (25, 12, 'picture', '/p-pap/image/customer/A00005-12608_1054791597900964_1477366911948896117_n_s.jpg'),
-(26, 12, 'tax_exclude', 'no');
+(26, 12, 'tax_exclude', 'no'),
+(27, 13, 'picture', ''),
+(28, 13, 'tax_exclude', 'no'),
+(29, 13, 'bill_day', '5'),
+(30, 13, 'cheque_week', '2'),
+(31, 13, 'cheque_weekday', '1'),
+(32, 12, 'bill_day', '5'),
+(33, 12, 'cheque_day', '10'),
+(34, 9, 'picture', ''),
+(35, 2, 'bill_week', '1'),
+(36, 2, 'bill_weekday', '1'),
+(37, 2, 'cheque_week', '2'),
+(38, 2, 'cheque_weekday', '1'),
+(39, 1, 'bill_day', '7'),
+(40, 1, 'cheque_day', '14');
 
 -- --------------------------------------------------------
 
@@ -264,7 +300,14 @@ CREATE TABLE IF NOT EXISTS `pap_delivery` (
   `total` decimal(10,2) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_pap_delivery_pap_contact1_idx` (`contact`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_delivery`
+--
+
+INSERT INTO `pap_delivery` (`id`, `no`, `contact`, `address`, `remark`, `date`, `status`, `total`) VALUES
+(1, 'DN16040001', 4, 0, '', '2016-04-27', 80, '86353.00');
 
 -- --------------------------------------------------------
 
@@ -286,6 +329,13 @@ CREATE TABLE IF NOT EXISTS `pap_delivery_dt` (
   KEY `fk_pap_delivery_has_pap_order_pap_order1_idx` (`order_id`),
   KEY `fk_pap_delivery_has_pap_order_pap_delivery1_idx` (`deli_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pap_delivery_dt`
+--
+
+INSERT INTO `pap_delivery_dt` (`deli_id`, `order_id`, `qty`, `price`, `discount`, `job_name`, `credit`, `customer_id`, `type`) VALUES
+(1, 1, 3000, '86353.00', '0.00', 'QT160400001:test', 0, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -704,7 +754,7 @@ INSERT INTO `pap_option` (`op_id`, `op_type`, `op_name`, `op_value`) VALUES
 (67, 'cinfo', 's_digit', '3'),
 (68, 'role_auth', 'ฝ่ายผลิต', '{"customer.php":"0","term.php?tax=customer":"0","shipping_address.php":"2","quotation.php":"0","lay.php":"0","ac_schedule.php":"0","ac_bill.php":"0","ac_buy.php":"0","ac_credit.php":"0","order.php?d=ga":"2","order.php":"2","production.php":"2","status.php":"2","outsource.php":"2","outsource.php?action=viewpo":"2","index.php":"2","delivery.php":"2","process.php":"2","machine.php":"2","paper.php":"0","paper.php?action=viewpo":"0","mat.php":"0","supplier.php":"0","term.php?tax=supplier":"0","mat_received.php":"0","outsource_rc.php":"2","userinfo.php":"2","user.php":"0","role.php":"0","pap_option.php?type=product_cat":"0","pap_option.php?type=mat_cat":"0","process_cat.php":"0","pap_option.php?type=paper_allo":"0","pap_option.php?type=paper_type":"0","pap_option.php?type=paper_size":"0","pap_option.php?type=paper_weight":"0","setting.php":"0","upload.php":"0"}'),
 (69, 'product_cat', 'สมุด', '1,2,3,4,5,6,7,8,9,10,11,12'),
-(70, 'cinfo', 'c_logo', '/p-pap/image/company_logo.jpg'),
+(70, 'cinfo', 'c_logo', '/p-pap/image/company_logo.png'),
 (71, 'cinfo', 'rno_deli', 'DN,%y%m,4,'),
 (72, 'cinfo', 'rno_bill', 'B,%y%m,4,'),
 (73, 'cinfo', 'rno_invoice', 'IV,%y%m,4,'),
@@ -739,7 +789,14 @@ CREATE TABLE IF NOT EXISTS `pap_order` (
   `remark` text,
   PRIMARY KEY (`order_id`),
   KEY `fk_pap_order_pap_quotation1_idx` (`quote_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_order`
+--
+
+INSERT INTO `pap_order` (`order_id`, `order_no`, `quote_id`, `status`, `created`, `plate_plan`, `plate_received`, `paper_plan`, `paper_received`, `prod_plan`, `prod_start`, `prod_finished`, `delivery`, `billed`, `paid`, `invoiced`, `picture`, `remark`) VALUES
+(1, 'QT160400001', 1, 70, '2016-04-26 00:07:01', NULL, NULL, NULL, NULL, NULL, NULL, '2016-04-26 20:37:37', 1, NULL, NULL, NULL, '', '');
 
 -- --------------------------------------------------------
 
@@ -763,7 +820,16 @@ CREATE TABLE IF NOT EXISTS `pap_order_comp` (
   PRIMARY KEY (`id`),
   KEY `fk_pap_order_comp_pap_order1_idx` (`order_id`),
   KEY `fk_pap_order_comp_pap_mat1_idx` (`paper_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `pap_order_comp`
+--
+
+INSERT INTO `pap_order_comp` (`id`, `type`, `name`, `order_id`, `paper_id`, `paper_use`, `paper_lay`, `paper_cut`, `print_size`, `page`, `allowance`, `status`) VALUES
+(1, 0, 'ปก', 1, 8, '2.25', 4, 1, '25x36', 2, 300, 4),
+(2, 1, 'เนื้อใน', 1, 10, '26.00', 8, 1, '24x35', 60, 300, 0),
+(3, 9, 'ชิ้นงาน', 1, NULL, '0.00', 0, 0, '', 0, 0, 10);
 
 -- --------------------------------------------------------
 
@@ -825,45 +891,45 @@ CREATE TABLE IF NOT EXISTS `pap_process` (
 --
 
 INSERT INTO `pap_process` (`process_id`, `process_name`, `process_cat_id`, `process_unit`, `process_source`, `process_setup_min`, `process_cap`, `process_std_leadtime_hour`) VALUES
-(1, 'ไสกาว', 9, 'piece', 0, 20, 3000, 0),
-(2, 'เย็บลวดมุงหลังคา', 9, 'piece', 0, 20, 2000, 0),
-(3, 'เย็บกี่', 9, 'piece', 1, 0, 0, 24),
-(4, 'PVC เงา', 4, 'sheet', 1, 0, 0, 24),
-(5, 'PVC ด้าน', 4, 'sheet', 1, 0, 0, 24),
-(6, 'เคลือบ UV', 4, 'sheet', 1, 0, 0, 24),
-(7, 'Spot UV', 4, 'sheet', 1, 0, 0, 24),
-(8, 'พับ', 7, 'set', 0, 15, 10000, 0),
-(9, 'เก็บเล่ม', 8, 'set', 0, 0, 24000, 0),
-(10, 'พิมพ์ 4 สี', 3, 'round', 0, 30, 8000, 0),
-(11, 'ปั้มนูน', 5, 'sheet', 1, 0, 0, 24),
-(12, 'PVC ด้าน + Spot UV', 4, 'sheet', 1, 0, 0, 48),
-(13, 'ตัดเจียน', 2, 'sheet', 0, 5, 15000, 0),
-(14, 'เย็บลวดหุ้มสัน', 9, 'piece', 1, 0, 0, 24),
-(15, 'เย็บเชือก', 9, 'piece', 1, 0, 0, 24),
-(16, 'ริมห่วง', 9, 'piece', 1, 0, 0, 24),
-(17, 'ปั้มทอง', 5, 'sheet', 1, 0, 0, 24),
-(18, 'ปั้มเงิน', 5, 'sheet', 1, 0, 0, 24),
-(19, 'ปั้มแบบ', 5, 'sheet', 1, 0, 0, 24),
-(20, 'เจาะหน้าต่าง', 5, 'sheet', 1, 0, 0, 24),
-(21, 'ปั้มฟอยด์', 5, 'sheet', 1, 0, 0, 24),
-(22, 'ตัดสันสามด้าน', 10, 'piece', 0, 20, 2000, 0),
-(23, 'ติด Label', 11, 'piece', 0, 0, 1200, 0),
-(24, 'ตัดแบ่ง', 6, 'set', 0, 5, 15000, 0),
-(25, 'ออกแบบ Artwork ใหม่', 1, 'allpage', 0, 0, 1, 0),
-(26, 'ทำเพลต 4 สี', 1, 'frame', 1, 0, 0, 120),
-(27, 'Digital Proof', 1, 'allpage', 0, 0, 1000, 0),
-(28, 'Plate Proof', 1, 'frame', 0, 0, 1000, 0),
-(29, 'พิมพ์ 1 สี', 3, 'round', 0, 15, 7000, 0),
-(30, 'พิมพ์ 2 สี', 3, 'round', 0, 20, 8000, 0),
-(31, 'พิมพ์ 5 สี', 3, 'round', 0, 30, 8000, 0),
-(32, 'ขนส่งด้วยรถกระบะ', 12, 'km', 0, 20, 60, 0),
-(33, 'ขนส่งด้วยรถบรรทุก 6 ล้อ', 12, 'km', 0, 20, 50, 0),
-(34, 'แทรกแผ่น', 11, 'piece', 0, 0, 5000, 0),
-(35, 'ห่อกระดาษ', 11, 'piece', 0, 0, 1000, 0),
-(36, 'shrink film อ่อน', 11, 'piece', 0, 0, 0, 0),
-(37, 'ทำเพลต 1 สี', 1, 'frame', 1, 0, 0, 120),
-(38, 'ทำเพลต 2 สี', 1, 'frame', 1, 0, 0, 120),
-(39, 'ทำเพลต 5 สี', 1, 'frame', 1, 0, 0, 120);
+(1, 'ไสกาว', 9, 'piece', 1, 20, 3000, 0),
+(2, 'เย็บลวดมุงหลังคา', 9, 'piece', 1, 20, 2000, 0),
+(3, 'เย็บกี่', 9, 'piece', 2, 0, 0, 24),
+(4, 'PVC เงา', 4, 'sheet', 2, 0, 0, 24),
+(5, 'PVC ด้าน', 4, 'sheet', 2, 0, 0, 24),
+(6, 'เคลือบ UV', 4, 'sheet', 2, 0, 0, 24),
+(7, 'Spot UV', 4, 'sheet', 2, 0, 0, 24),
+(8, 'พับ', 7, 'set', 1, 15, 10000, 0),
+(9, 'เก็บเล่ม', 8, 'set', 1, 0, 24000, 0),
+(10, 'พิมพ์ 4 สี', 3, 'round', 1, 30, 8000, 0),
+(11, 'ปั้มนูน', 5, 'sheet', 2, 0, 0, 24),
+(12, 'PVC ด้าน + Spot UV', 4, 'sheet', 2, 0, 0, 48),
+(13, 'ตัดเจียน', 2, 'sheet', 1, 5, 15000, 0),
+(14, 'เย็บลวดหุ้มสัน', 9, 'piece', 2, 0, 0, 24),
+(15, 'เย็บเชือก', 9, 'piece', 2, 0, 0, 24),
+(16, 'ริมห่วง', 9, 'piece', 2, 0, 0, 24),
+(17, 'ปั้มทอง', 5, 'sheet', 2, 0, 0, 24),
+(18, 'ปั้มเงิน', 5, 'sheet', 2, 0, 0, 24),
+(19, 'ปั้มแบบ', 5, 'sheet', 2, 0, 0, 24),
+(20, 'เจาะหน้าต่าง', 5, 'sheet', 2, 0, 0, 24),
+(21, 'ปั้มฟอยด์', 5, 'sheet', 2, 0, 0, 24),
+(22, 'ตัดสันสามด้าน', 10, 'piece', 1, 20, 2000, 0),
+(23, 'ติด Label', 11, 'piece', 1, 0, 1200, 0),
+(24, 'ตัดแบ่ง', 6, 'set', 1, 5, 15000, 0),
+(25, 'ออกแบบ Artwork ใหม่', 1, 'allpage', 1, 0, 1, 0),
+(26, 'ทำเพลต 4 สี', 1, 'frame', 2, 0, 0, 120),
+(27, 'Digital Proof', 1, 'allpage', 1, 0, 0, 0),
+(28, 'Plate Proof', 1, 'frame', 1, 0, 0, 0),
+(29, 'พิมพ์ 1 สี', 3, 'round', 1, 15, 7000, 0),
+(30, 'พิมพ์ 2 สี', 3, 'round', 1, 20, 8000, 0),
+(31, 'พิมพ์ 5 สี', 3, 'round', 1, 30, 8000, 0),
+(32, 'ขนส่งด้วยรถกระบะ', 12, 'km', 1, 20, 60, 0),
+(33, 'ขนส่งด้วยรถบรรทุก 6 ล้อ', 12, 'km', 1, 20, 50, 0),
+(34, 'แทรกแผ่น', 11, 'piece', 1, 0, 5000, 0),
+(35, 'ห่อกระดาษ', 11, 'piece', 1, 0, 1000, 0),
+(36, 'shrink film อ่อน', 11, 'piece', 1, 0, 0, 0),
+(37, 'ทำเพลต 1 สี', 1, 'frame', 2, 0, 0, 120),
+(38, 'ทำเพลต 2 สี', 1, 'frame', 2, 0, 0, 120),
+(39, 'ทำเพลต 5 สี', 1, 'frame', 2, 0, 0, 120);
 
 -- --------------------------------------------------------
 
@@ -909,7 +975,7 @@ CREATE TABLE IF NOT EXISTS `pap_process_meta` (
   `meta_value` text,
   PRIMARY KEY (`id`),
   KEY `fk_pap_process_meta_pap_process1_idx` (`process_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=157 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=196 ;
 
 --
 -- Dumping data for table `pap_process_meta`
@@ -995,13 +1061,13 @@ INSERT INTO `pap_process_meta` (`id`, `process_id`, `meta_key`, `meta_value`) VA
 (77, 25, 'detail_cost', '0'),
 (78, 25, 'detail_labor', ''),
 (79, 25, 'detail_mat', '[]'),
-(80, 27, 'cost', '[{"cost":"2","min":"","cond":"area","btw":"","to":""}]'),
-(81, 27, 'detail_cost', '0'),
-(82, 27, 'detail_labor', ''),
+(80, 27, 'cost', '[{"cost":"2","min":"","cond":"0","btw":"","to":""}]'),
+(81, 27, 'detail_cost', NULL),
+(82, 27, 'detail_labor', NULL),
 (83, 27, 'detail_mat', '[]'),
 (84, 28, 'cost', '[{"cost":"300","min":"","cond":"0","btw":"","to":""}]'),
-(85, 28, 'detail_cost', '0'),
-(86, 28, 'detail_labor', ''),
+(85, 28, 'detail_cost', NULL),
+(86, 28, 'detail_labor', NULL),
 (87, 28, 'detail_mat', '[]'),
 (88, 26, 'cost', '[{"cost":"2500","min":"","cond":"0","btw":"","to":""}]'),
 (89, 26, 'detail_cost', '0'),
@@ -1071,7 +1137,46 @@ INSERT INTO `pap_process_meta` (`id`, `process_id`, `meta_key`, `meta_value`) VA
 (153, 5, 'detail_mat', '[]'),
 (154, 4, 'detail_cost', '0'),
 (155, 4, 'detail_labor', ''),
-(156, 4, 'detail_mat', '[]');
+(156, 4, 'detail_mat', '[]'),
+(157, 27, 'pc_show', '2'),
+(158, 25, 'pc_show', '1'),
+(159, 26, 'pc_show', '1'),
+(160, 28, 'pc_show', '1'),
+(161, 37, 'pc_show', '1'),
+(162, 38, 'pc_show', '1'),
+(163, 39, 'pc_show', '1'),
+(164, 13, 'pc_show', '1'),
+(165, 10, 'pc_show', '1'),
+(166, 29, 'pc_show', '1'),
+(167, 30, 'pc_show', '1'),
+(168, 31, 'pc_show', '1'),
+(169, 4, 'pc_show', '1'),
+(170, 5, 'pc_show', '1'),
+(171, 6, 'pc_show', '1'),
+(172, 7, 'pc_show', '1'),
+(173, 12, 'pc_show', '1'),
+(174, 11, 'pc_show', '1'),
+(175, 17, 'pc_show', '1'),
+(176, 18, 'pc_show', '1'),
+(177, 19, 'pc_show', '1'),
+(178, 20, 'pc_show', '1'),
+(179, 21, 'pc_show', '1'),
+(180, 24, 'pc_show', '1'),
+(181, 8, 'pc_show', '1'),
+(182, 9, 'pc_show', '1'),
+(183, 1, 'pc_show', '1'),
+(184, 2, 'pc_show', '1'),
+(185, 3, 'pc_show', '1'),
+(186, 14, 'pc_show', '1'),
+(187, 15, 'pc_show', '1'),
+(188, 16, 'pc_show', '1'),
+(189, 22, 'pc_show', '1'),
+(190, 23, 'pc_show', '1'),
+(191, 34, 'pc_show', '1'),
+(192, 35, 'pc_show', '1'),
+(193, 36, 'pc_show', '1'),
+(194, 32, 'pc_show', '1'),
+(195, 33, 'pc_show', '1');
 
 -- --------------------------------------------------------
 
@@ -1097,7 +1202,14 @@ CREATE TABLE IF NOT EXISTS `pap_process_po` (
   PRIMARY KEY (`po_id`),
   KEY `fk_pap_mat_po_pap_user1_idx` (`user_id`),
   KEY `fk_pap_process_po_pap_supplier1_idx` (`supplier_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_process_po`
+--
+
+INSERT INTO `pap_process_po` (`po_id`, `po_code`, `user_id`, `supplier_id`, `ct_id`, `po_cost`, `po_delivery_plan`, `po_status`, `po_payment`, `po_remark`, `po_created`, `po_deliveried`, `po_paid`, `po_paid_ref`) VALUES
+(1, 'OS1604001', 1, 2, 3, '0.00', '2016-04-28', 5, 60, '', '2016-04-26 00:14:22', '2016-04-26 00:14:53', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1116,7 +1228,14 @@ CREATE TABLE IF NOT EXISTS `pap_pro_po_dt` (
   PRIMARY KEY (`id`),
   KEY `fk_pap_pro_po_dt_pap_process_po1_idx` (`po_id`),
   KEY `fk_pap_pro_po_dt_pap_process1_idx` (`process_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `pap_pro_po_dt`
+--
+
+INSERT INTO `pap_pro_po_dt` (`id`, `po_id`, `process_id`, `unit`, `cost_per_u`, `qty`, `cpro_id`) VALUES
+(2, 1, 5, 'แผ่น', '0.00', '1125.00', 3);
 
 -- --------------------------------------------------------
 
@@ -1146,7 +1265,14 @@ CREATE TABLE IF NOT EXISTS `pap_quotation` (
   KEY `fk_pap_quotation_pap_user1_idx` (`user_id`),
   KEY `fk_pap_quotation_pap_customer1_idx` (`customer_id`),
   KEY `fk_pap_quotation_pap_size1_idx` (`job_size_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_quotation`
+--
+
+INSERT INTO `pap_quotation` (`quote_id`, `quote_no`, `user_id`, `customer_id`, `cat_id`, `name`, `job_size_id`, `prepress`, `binding_id`, `amount`, `q_price`, `credit`, `plan_delivery`, `status`, `created`, `approved`, `finished`) VALUES
+(1, 'QT160400001', 1, 1, 10, 'test', 1, '', 1, 3000, 86353, 0, '2016-04-27', 9, '2016-04-25 23:16:03', NULL, '2016-04-26 00:07:01');
 
 -- --------------------------------------------------------
 
@@ -1169,6 +1295,14 @@ CREATE TABLE IF NOT EXISTS `pap_quote_comp` (
   KEY `fk_pap_quote_comp_pap_process1_idx` (`comp_print_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `pap_quote_comp`
+--
+
+INSERT INTO `pap_quote_comp` (`quote_id`, `comp_type`, `comp_page`, `comp_paper_type`, `comp_paper_weight`, `comp_paper_allowance`, `comp_coating`, `comp_print_id`, `comp_print2`, `comp_postpress`) VALUES
+(1, 0, 2, 44, 48, 300, 5, 10, 10, ''),
+(1, 1, 60, 43, 52, 300, 0, 10, 0, '');
+
 -- --------------------------------------------------------
 
 --
@@ -1182,7 +1316,27 @@ CREATE TABLE IF NOT EXISTS `pap_quote_meta` (
   `meta_value` text,
   PRIMARY KEY (`id`),
   KEY `fk_pap_quote_meta_pap_quotation1_idx` (`quote_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+
+--
+-- Dumping data for table `pap_quote_meta`
+--
+
+INSERT INTO `pap_quote_meta` (`id`, `quote_id`, `meta_key`, `meta_value`) VALUES
+(1, 1, 'remark', ''),
+(2, 1, 'exclude', ''),
+(3, 1, 'packing', ''),
+(4, 1, 'shipping', ''),
+(5, 1, 'distance', ''),
+(6, 1, 'discount', '0'),
+(7, 1, 'adj_margin', NULL),
+(8, 1, 'contact_id', '4'),
+(9, 1, 'page_cover', '2'),
+(10, 1, 'page_inside', '60'),
+(11, 1, 'cal_amount', ''),
+(12, 1, 'multi_quote_info', '[]'),
+(13, 1, 'detail_price', '[["0","Plate \\u0e1b\\u0e01","1","2500","2500"],["0","Plate \\u0e40\\u0e19\\u0e37\\u0e49\\u0e2d\\u0e43\\u0e19","8","2500","20000"],["0","\\u0e01\\u0e23\\u0e30\\u0e14\\u0e32\\u0e29 \\u0e1b\\u0e01","2.25","1936.45","4357.0125"],["0","\\u0e01\\u0e23\\u0e30\\u0e14\\u0e32\\u0e29 \\u0e40\\u0e19\\u0e37\\u0e49\\u0e2d\\u0e43\\u0e19","26","589.36","15323.36"]]'),
+(14, 1, 'print_cost', '73180.3725');
 
 -- --------------------------------------------------------
 
@@ -1280,7 +1434,8 @@ INSERT INTO `pap_sale_cus` (`user_id`, `cus_id`) VALUES
 (5, 9),
 (5, 10),
 (3, 11),
-(3, 12);
+(3, 12),
+(5, 13);
 
 -- --------------------------------------------------------
 
@@ -1417,7 +1572,14 @@ CREATE TABLE IF NOT EXISTS `pap_temp_deli` (
   PRIMARY KEY (`id`),
   KEY `fk_pap_temp_deli_pap_delivery1_idx` (`deli_id`),
   KEY `fk_pap_temp_deli_pap_contact1_idx` (`contact`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_temp_deli`
+--
+
+INSERT INTO `pap_temp_deli` (`id`, `deli_id`, `no`, `contact`, `address`, `remark`, `date`) VALUES
+(1, 1, 'DN16040001-1', 4, 0, '', '2016-04-27');
 
 -- --------------------------------------------------------
 
@@ -1431,6 +1593,13 @@ CREATE TABLE IF NOT EXISTS `pap_temp_dt` (
   `qty` int(10) unsigned NOT NULL,
   KEY `fk_pap_temp_dt_pap_temp_deli1_idx` (`temp_deli_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pap_temp_dt`
+--
+
+INSERT INTO `pap_temp_dt` (`temp_deli_id`, `order_id`, `qty`) VALUES
+(1, 1, 1000);
 
 -- --------------------------------------------------------
 
@@ -1619,7 +1788,14 @@ CREATE TABLE IF NOT EXISTS `pap_wip_delivery` (
   PRIMARY KEY (`id`),
   KEY `fk_pap_wip_delivery_pap_process_po1_idx` (`po_id`),
   KEY `fk_pap_wip_delivery_pap_user1_idx` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pap_wip_delivery`
+--
+
+INSERT INTO `pap_wip_delivery` (`id`, `po_id`, `user_id`, `ref`, `deliveried`, `remark`) VALUES
+(1, 1, 1, '001', '2016-04-26 00:14:53', '');
 
 -- --------------------------------------------------------
 
@@ -1636,6 +1812,13 @@ CREATE TABLE IF NOT EXISTS `pap_wip_delivery_dt` (
   KEY `fk_pap_wip_delivery_dt_pap_wip_delivery1_idx` (`delivery_id`),
   KEY `fk_pap_wip_delivery_dt_pap_pro_po_dt1_idx` (`dt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pap_wip_delivery_dt`
+--
+
+INSERT INTO `pap_wip_delivery_dt` (`delivery_id`, `dt_id`, `qty`, `stk_location`) VALUES
+(1, 2, '1125.00', '');
 
 --
 -- Constraints for dumped tables
