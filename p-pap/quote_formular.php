@@ -11,6 +11,7 @@ function cal_quote($info,$comps,$layinfo){
     //calculate
 
     $units = unit_cal($info, $layinfo, $comps);
+    var_dump($units);
     //var_dump($units);
     $res['ออกแบบ'] = array();
     $res['ทำเพลต'] = array();

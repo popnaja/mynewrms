@@ -78,6 +78,7 @@ if($action=="add"||isset($qid)){
     $after =  $process_keypair[5];
     $packing = $process_keypair[11];
     $shipping = $process_keypair[12];
+    $fold = $process_keypair[7];
 }
 
 if($action=="add"){
@@ -104,7 +105,9 @@ if($action=="add"){
 
     $detail = $form->show_checkbox("prepress","prepress",$prepress,"การจัดทำต้นฉบับ","label-3070")
             . $form->show_checkbox("exclude","exclude",$op_quote_ex,"อื่นๆ","label-3070")
+            . "<div id='bind-sec'>"
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",null)
+            . "</div><!-- #bind-sec -->"
             . $form->show_text("due","due","","yyyy-mm-dd","กำหนดส่ง","","label-3070")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
 
@@ -125,9 +128,9 @@ if($action=="add"){
             . "<div class='form-section'>"
             . "<h4>ปก</h4>"
             . $form->show_hidden("comp_type","comp_type[]","0")
-            . $form->show_text("csize","csize","","","ขนาด","","label-3070 readonly",null,"readonly")
+            . $form->show_text("csize","csize","","","กระดาษ","","label-3070 readonly",null,"readonly")
             . "<div class='tg_c_ptype'>"
-                . $form->show_select("paper_type",$paper,"label-3070","กระดาษ",null,"","paper_type[]")
+                . $form->show_select("paper_type",$paper,"label-3070","ชนิด",null,"","paper_type[]")
             . "</div>"
             . "<div class='tg_c_pgram'>"
                 . $form->show_select("paper_gram",$gram,"label-3070","แกรม",null,"","paper_gram[]")
@@ -138,19 +141,28 @@ if($action=="add"){
             . $form->show_select("other",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
             . "<div class='sel-other-1'>"
             . $form->show_checkbox("post","post",$after,"ไดคัท และอื่นๆ","label-3070")
-            . "</div>"
+            . "</div><!-- .sel-other-1 -->"
+            . $form->show_select("cwing",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",null,"","cwing")
+            . "<div class='sel-cwing-1'>"
+            . $form->show_num("fwing","",0.01,"","ปีกปกหน้า(cm)","","label-3070")
+            . $form->show_num("bwing","",0.01,"","ปีกปกหลัง(cm)","","label-3070")
+            . "</div><!-- .sel-cwing-1 -->"
+            . $form->show_select("folding",$fold,"label-3070 pc-folding form-hide","พับ",null,"","folding")
             . $form->show_hidden("page","page[]",1)
             . "</div><!-- .form-section -->"
             . "</div><!-- .sel-type-10 -->"
-            . "<script>select_option('other');</script>";
+            . "<script>"
+            . "select_option('other');"
+            . "select_option('cwing');"
+            . "</script>";
     for($i=0;$i<5;$i++){
         $hid = ($i==0?"":"form-hide");
         $content .= "<div class='form-section quote-comp $hid'>"
             . "<h4 id='sel-name'>เนื้อใน</h4>"
             . $form->show_hidden("comp_type_$i","comp_type[]","1")
-            . $form->show_text("isize_$i","isize[]","","","ขนาด","","label-3070 readonly",null,"readonly")
+            . $form->show_text("isize_$i","isize[]","","","กระดาษ","","label-3070 readonly",null,"readonly")
             . "<div class='tg_i_ptype'>"
-                . $form->show_select("paper_type_$i",$paper,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]")
+                . $form->show_select("paper_type_$i",$paper,"label-3070 in_ptype","ชนิด",null,"","paper_type[]")
             . "</div>"
             . "<div class='tg_i_pgram'>"
                 . $form->show_select("paper_gram_$i",$gram,"label-3070 in_pgram","แกรม",null,"","paper_gram[]")
@@ -334,7 +346,7 @@ if($action=="add"){
 
 
     //output to html
-    $print_q = "<a href='quotation.php?action=print&qid=$qid' title='Print' class='icon-print'></a>";
+    $print_q = "<a href='quotation.php?action=print&qid=$qid' title='Print' class='icon-print' target='_blank'></a>";
     $content .= "<h1 class='page-title'>แก้ไข$pagename".$print_q."</h1>"
             . "<div id='ez-msg'>".  showmsg()."</div>"
             . "<div class='col-100'>"
@@ -354,7 +366,9 @@ if($action=="add"){
 
     $detail = $form->show_checkbox("prepress","prepress",$prepress_checked,"การจัดทำต้นฉบับ","label-3070")
             . $form->show_checkbox("exclude","exclude",$ex_checked,"อื่นๆ","label-3070")
+            . "<div id='bind-sec'>"
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",$info['binding_id'])
+            . "</div><!-- #bind-sec -->"
             . $form->show_text("due","due",$info['plan_delivery'],"yyyy-mm-dd","กำหนดส่ง","","label-3070")
             . $form->show_num("credit",$info['credit'],1,"","เครดิต(วัน)","","label-3070")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
@@ -376,9 +390,9 @@ if($action=="add"){
         . "<div class='form-section'>"
         . "<h4>ปก</h4>"
         . $form->show_hidden("comp_type","comp_type[]","0")
-        . $form->show_text("csize","csize",$layinfo['csize'],"","ขนาด","","label-3070 readonly",null,"readonly")
+        . $form->show_text("csize","csize",$layinfo['csize'],"","กระดาษ","","label-3070 readonly",null,"readonly")
         . "<div class='tg_c_ptype'>"
-        . $form->show_select("paper_type",$sel_c_ptype,"label-3070","กระดาษ",(isset($cover[0])?$cover[0]['comp_paper_type']:null),"","paper_type[]")
+        . $form->show_select("paper_type",$sel_c_ptype,"label-3070","ชนิด",(isset($cover[0])?$cover[0]['comp_paper_type']:null),"","paper_type[]")
         . "</div>"
         . "<div class='tg_c_pgram'>"
         . $form->show_select("paper_gram",$sel_c_pgram,"label-3070","แกรม",(isset($cover[0])?$cover[0]['comp_paper_weight']:null),"","paper_gram[]")
@@ -391,6 +405,11 @@ if($action=="add"){
         . "<div class='sel-other-1'>"
         . $form->show_checkbox("post","post",$post_checked,"ไดคัท และอื่นๆ","label-3070")
         . "</div>"
+        . $form->show_select("cwing",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",$info['cwing'],"","cwing")
+        . "<div class='sel-cwing-1'>"
+        . $form->show_num("fwing",(isset($info['fwing'])?$info['fwing']:""),0.01,"","ปีกปกหน้า(cm)","","label-3070")
+        . $form->show_num("bwing",(isset($info['bwing'])?$info['bwing']:""),0.01,"","ปีกปกหลัง(cm)","","label-3070")
+        . "</div><!-- .sel-cwing-1 -->"
         . $form->show_hidden("page","page[]",(isset($cover[0])?$cover[0]['comp_page']:1))
         . "</div><!-- .form-section -->"
         . "</div><!-- .sel-type-10 -->"
@@ -416,9 +435,9 @@ if($action=="add"){
         $content .= "<div class='form-section quote-comp $hid'>"
         . "<h4 id='sel-name'>เนื้อใน</h4>"
         . $form->show_hidden("comp_type_$i","comp_type[]","1")
-        . $form->show_text("isize_$i","isize[]",$layinfo['isize'],"","ขนาด","","label-3070 readonly",null,"readonly")
+        . $form->show_text("isize_$i","isize[]",$layinfo['isize'],"","กระดาษ","","label-3070 readonly",null,"readonly")
         . "<div class='tg_i_ptype'>"
-            . $form->show_select("paper_type_$i",$sel_i_ptype,"label-3070 in_ptype","กระดาษ",(isset($inside[$i])?$inside[$i]['comp_paper_type']:null),"","paper_type[]")
+            . $form->show_select("paper_type_$i",$sel_i_ptype,"label-3070 in_ptype","ชนิด",(isset($inside[$i])?$inside[$i]['comp_paper_type']:null),"","paper_type[]")
         . "</div>"
         . "<div class='tg_i_pgram'>"
         . $form->show_select("paper_gram_$i",$sel_i_pgram,"label-3070 in_pgram","แกรม",(isset($inside[$i])?$inside[$i]['comp_paper_weight']:null),"","paper_gram[]")

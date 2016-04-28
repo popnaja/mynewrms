@@ -74,13 +74,20 @@ function show_quote_df($qid){
         } else {
             $cname = "ลักษณะชิ้นงาน";
         }
+        //cwing
+        $cwing = "";
+        if($info['cwing']==1&&$v['comp_type']==0){
+            $cwing = "<li>ปีกปกหน้า ".$info['fwing']." cm</li>"
+                    . "<li>ปีกปกหลัง ".$info['bwing']." cm</li>";
+        }
         $bname .= "<div class='print-box'>"
                 . "<div class='print-list-title'>$cname</div>"
                 . "<ul class='print-list'>"
                 . "<li>".$v['paper']."</li>"
                 . "<li>".$v['weight']." แกรม</li>"
                 . "<li>".$v['color']."</li>"
-                . (isset($v['coating'])?"<li>".$v['coating']."</li>":"");
+                . (isset($v['coating'])?"<li>".$v['coating']."</li>":"")
+                . $cwing;
         $x +=4;
         foreach($post as $p){
             if($p>0){

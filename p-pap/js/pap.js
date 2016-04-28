@@ -308,15 +308,21 @@ $(document).ready(function(){
        hid_cover();
     });
     function hid_cover(){
-        if(parseInt($("#type").val())===10||parseInt($("#type").val())===69){
+        var type = parseInt($("#type").val());
+        var bind = $("#bind-sec");
+        var page = $("#page_0").parent();
+        if(type===10||type===69){
             title.html("เนื้อใน");
             post.show();
             but.show();
+            bind.show();
        } else {
             $("#paper_type").val("0");
             title.html("ชิ้นงาน");
             post.hide();
             but.hide();
+            $("#binding").val("0");
+            bind.hide();
        }
     }
 

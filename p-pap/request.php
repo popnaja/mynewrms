@@ -630,8 +630,18 @@ if($req == "login"){
         "contact_id" => $_POST['cusct'],
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
-        "cal_amount" => implode(",",$arramount)
+        "cal_amount" => implode(",",$arramount),
+        "cwing" => $_POST['cwing']
     );
+    //cover wing
+    if($_POST['cwing']=="1"){
+        $meta['fwing'] = $_POST['fwing'];
+        $meta['bwing'] = $_POST['bwing'];
+    }
+    //แผ่นพับ
+    if($_POST['type']==11){
+        $meta['folding'] = $_POST['folding'][0];
+    }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
     //calculate cost and detail price
@@ -785,8 +795,18 @@ if($req == "login"){
         "page_inside" => $page_inside,
         "cal_amount" => implode(",",$arramount),
         "detail_price" => json_encode($detail_price),
-        "multi_quote_info" => json_encode($mquote)
+        "multi_quote_info" => json_encode($mquote),
+        "cwing" => $_POST['cwing']
     );
+    //cover wing
+    if($_POST['cwing']=="1"){
+        $meta['fwing'] = $_POST['fwing'];
+        $meta['bwing'] = $_POST['bwing'];
+    }
+    //แผ่นพับ
+    if($_POST['type']==11){
+        $meta['folding'] = $_POST['folding'][0];
+    }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
     //calculate cost
