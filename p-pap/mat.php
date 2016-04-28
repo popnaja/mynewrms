@@ -141,25 +141,30 @@ if($action=="add"){
     $tb = new mytable();
     
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+    $cat = (isset($_GET['cat'])&&$_GET['cat']>0?$_GET['cat']:null);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $iperpage = 15;
     
+    //list
+    $cats = $db->get_keypair("pap_option", "op_id", "op_name", "WHERE op_type='mat_cat'");
+    
     //view
-    $head = array("กลุ่ม","ชื่อ","หน่วย","ปริมาณสั่งขั้นต่ำ","ต้นทุนต่อหน่วย","ระยะเวลาสั่งซื้อ(วัน)");
-    $rec = $tbpdo->view_mat($pauth,$s,$page, $iperpage);
-    $all_rec = $tbpdo->view_mat($pauth,$s);
+    $head = array("แก้ไข","กลุ่ม","ชื่อ","หน่วย","ปริมาณสั่งขั้นต่ำ","ต้นทุนต่อหน่วย","ระยะเวลาสั่งซื้อ(วัน)");
+    $rec = $tbpdo->view_mat($pauth,$cat,$s,$page, $iperpage);
+    $all_rec = $tbpdo->view_mat($pauth,$cat,$s);
     $max = ceil(count($all_rec)/$iperpage);
     $addhtml = "";
     if($pauth>1){
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
-        array_unshift($head, "แก้ไข");
     }
     
     $content .= "<h1 class='page-title'>$pagename $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาจากชื่อวัตถุดิบ",$s)
+            . $tb->show_filter(current_url(), "cat", $cats, $cat,"--กลุ่มวัตถุดิบ--")
+            . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec)
             . "</div>";

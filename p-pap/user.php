@@ -116,37 +116,35 @@ if($action=="add"){
     $tb = new mytable();
     $tbpdo = new tbPDO();
     
+    $cat = (isset($_GET['cat'])&&$_GET['cat']>0?$_GET['cat']:null);
+    $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+    $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+    $iperpage = 20;
+    
+    $head = array("แก้ไข","ผู้ใช้","กลุ่มผู้ใช้","วันที่ลงทะเบียน");
+    $all_rec = $tbpdo->view_user($pauth,$cat,$s);
+    $rec = $tbpdo->view_user($pauth,$cat,$s,$page,$iperpage);
+    $max = ceil(count($all_rec)/$iperpage);
+    
+    //list
+    $cats = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='role_auth'");
     
     //view
-    if($pauth==1){
-        $content .= "<h1 class='page-title'>รายการผู้ใช้</h1>"
-            . "<div id='ez-msg'>".  showmsg() ."</div>";
-        $head = array("ผู้ใช้","กลุ่มผู้ใช้","วันที่ลงทะเบียน");
-        $rec = $tbpdo->view_user(1);
-    } else {
-        $add = $root."user.php?action=add";
+    $addhtml = "";
+    if($pauth>1){
+        $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
-        $content .= "<h1 class='page-title'>รายการผู้ใช้ $addhtml</h1>"
-            . "<div id='ez-msg'>".  showmsg() ."</div>";
-        $head = array("แก้ไข","ผู้ใช้","กลุ่มผู้ใช้","วันที่ลงทะเบียน");
-        $rec = $tbpdo->view_user();
     }
-    //pagination
-    $item_per_page = 20;
-    $items = sizeof($rec,0);
-    $max = ceil($items/$item_per_page);
-    $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_NUMBER_INT):1);
-    $url = current_url();
     
-    //filter
-    $group = filter_input(INPUT_GET,'role',FILTER_SANITIZE_STRING);
-    $agroup = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='role_auth'");
-    
-    $content .= "<div class='col-100'>"
-                . $tb->show_pagenav($url, $page, $max)
-                . $tb->show_table($head,$rec)
-                . "</div>";
-    
+    $content .= "<h1 class='page-title'>รายการผู้ใช้ $addhtml</h1>"
+            . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . "<div class='col-100'>"
+            . $tb->show_search(current_url(), "cusid", "s","ค้นหา",$s)
+            . $tb->show_filter(current_url(), "cat", $cats, $cat,"--กลุ่มผู้ใช้--")
+            . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
+            . $tb->show_pagenav(current_url(), $page, $max)
+            . $tb->show_table($head,$rec)
+            . "</div>";
 }
     
 $content .= $menu->showfooter();

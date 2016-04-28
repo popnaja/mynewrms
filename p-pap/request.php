@@ -250,6 +250,7 @@ if($req == "login"){
             "detail_cost" => $_POST['usedetail'],
             "detail_labor" => $_POST['labor'],
             "detail_mat" =>  json_encode($arrmat),
+            "pc_show" => $_POST['show']
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
 
@@ -301,6 +302,7 @@ if($req == "login"){
             "detail_cost" => $_POST['usedetail'],
             "detail_labor" => $_POST['labor'],
             "detail_mat" =>  json_encode($arrmat),
+            "pc_show" => $_POST['show']
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
 

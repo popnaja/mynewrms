@@ -32,26 +32,40 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_user($auth=3){
+    public function view_user($auth,$cat=null,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
+            $filter = "WHERE pap_user.user_id>0";
+            $filter .= (isset($cat)?" AND um.meta_value=$cat":"");
+            $filter .= (isset($s)?" AND user_login LIKE '%$s%'":"");
             if($auth>1){
-                $edit = <<<END_OF_TEXT
+                $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='user.php?uid=",pap_user.user_id,"' title='Edit' class='icon-page-edit'></a>"),
+END_OF_TEXT;
+            } else {
+                $edit .= <<<END_OF_TEXT
+                        CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
-                    SELECT
-                    $edit
-                    user_login,
-                    po.op_name,
-                    user_added
-                    FROM pap_user
-                    LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth'
-                    LEFT JOIN pap_option AS po ON po.op_id=meta_value
-                    ORDER BY po.op_name ASC , user_login ASC
+SELECT
+$edit
+user_login,
+po.op_name,
+user_added
+FROM pap_user
+LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth'
+LEFT JOIN pap_option AS po ON po.op_id=meta_value
+$filter
+ORDER BY po.op_name ASC , user_login ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $ex) {
@@ -74,12 +88,22 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_process($auth=3){
+    public function view_process($auth=3,$cat=null,$source=null,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
+            $filter = "WHERE process_id>0";
+            $filter .= (isset($cat)?" AND process_cat_id=$cat":"");
+            $filter .= (isset($source)?" AND process_source=$source":"");
+            $filter .= (isset($s)?" AND process_name LIKE '%$s%'":"");
             if($auth>1){
                 $edit = <<<END_OF_TEXT
-                        CONCAT("<a href='process.php?pid=",process_id,"' title='Edit' class='icon-page-edit'></a>"),
+CONCAT("<a href='process.php?pid=",process_id,"' title='Edit' class='icon-page-edit'></a>"),
+END_OF_TEXT;
+            } else {
+                $edit .= <<<END_OF_TEXT
+                        CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
@@ -88,15 +112,20 @@ END_OF_TEXT;
                     process_name,
                     pc.name,
                     process_unit,
-                    IF(process_source='0','ผลิตเอง','สั่งผลิต'),
+                    IF(process_source='1','ผลิตเอง','สั่งผลิต'),
                     process_setup_min,
                     process_cap,
                     process_std_leadtime_hour
                     FROM pap_process
                     LEFT JOIN pap_process_cat AS pc ON pc.id=process_cat_id
+                    $filter
                     ORDER BY pc.id ASC , process_name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $ex) {
@@ -201,22 +230,24 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_supplier($auth,$cat=null,$page=null,$perpage=null){
+    public function view_supplier($auth,$cat=null,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE sup.id>0";
             $filter .= (isset($cat)?" AND lineage LIKE :lineage":"");
+            $filter .= (isset($s)?" AND CONCAT(code,'-',sup.name) LIKE '%$s%'":"");
             if($auth>1){
-                $edit = <<<END_OF_TEXT
+                $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='supplier.php?sid=",sup.id,"' title='Edit' class='icon-page-edit'></a>"),
 END_OF_TEXT;
-            }
-            if($auth>2){
+            } else {
                 $edit .= <<<END_OF_TEXT
+                        CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
+            
             $sql = <<<END_OF_TEXT
                     SELECT
                     $edit
@@ -446,16 +477,21 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_mat($auth,$s=null,$page=null,$perpage=null){
+    public function view_mat($auth,$cat=null,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE mat_id>0";
+            $filter .= (isset($cat)?" AND mat_cat_id=$cat":"");
             $filter .= (isset($s)?" AND mat_name LIKE '%$s%'":"");
             if($auth>1){
-                $edit = <<<END_OF_TEXT
+                $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='mat.php?mid=",mat_id,"' title='Edit' class='icon-page-edit'></a>"),
+END_OF_TEXT;
+            } else {
+                $edit .= <<<END_OF_TEXT
+                        CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT

@@ -33,6 +33,10 @@ $op_yesno = array(
     "0" => "--ไม่ใช้งาน--",
     "1" => "ใช้งาน"
 );
+$show = array(
+    "1"=>"Show",
+    "2"=>"Hide"
+);
 if($action=="add"){
     //check
     if($pauth<=1){
@@ -47,6 +51,7 @@ if($action=="add"){
             . "<div class='col-100'>"
             . "<div class='col-50'>"
             . $form->show_text("name","name","","","ชื่อกระบวนการ","","label-3070")
+            . $form->show_select("show",$show,"label-3070","แสดง",null)
             . $form->show_select("cat",$process_cat,"label-3070","กลุ่มกระบวนการ",null)
             . $form->show_select("unit",$op_unit,"label-3070","หน่วย",null,"")
             . $form->show_select("source",$op_process_source,"label-3070","แหล่งผลิต",null,"")
@@ -77,6 +82,7 @@ if($action=="add"){
     }
     $costt .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขต้นทุน' style='width:100%'/>";
     //detail variable cost
+    /*
     $mat = array("0"=>"--วัตถุดิบ--") + $db->get_keypair("pap_mat", "mat_id", "CONCAT(mat_name,'(',mat_unit,')')", "WHERE mat_cat_id NOT IN (8,9)");
     $dtcost = "<div class='tab-section'>"
             . $form->show_select("usedetail",$op_yesno,"label-inline","คำนวณต้นทุนตามปริมาณการใช้วัตถุดิบ","0")
@@ -86,9 +92,11 @@ if($action=="add"){
         $dtcost .= $form->show_select("mat_$i",$mat,"left-50 label-inline",($i==0?"วัตถุดิบ":null),null,"","mat[]")
                 . $form->show_num("usage_$i","","any","",($i==0?"ประมาณการใช้/หน่วยผลิต":null),"","right-50 label-inline",null,"usage[]");
     }
+     * 
+     */
             
     $content .= "<div class='col-50'>"
-            . $form->show_tabs("cost-tab",["ต้นทุน","ต้นทุนละเอียด"],[$costt,$dtcost],0)
+            . $form->show_tabs("cost-tab",["ต้นทุน"],[$costt],0)
             . "</div><!-- .col-50 -->";
 
     $content .= $form->show_submit("submit","Add New","but-right")
@@ -118,6 +126,7 @@ if($action=="add"){
             . "<div class='col-100'>"
             . "<div class='col-50'>"
             . $form->show_text("name","name",$info['process_name'],"","ชื่อกระบวนการ","","label-3070")
+            . $form->show_select("show",$show,"label-3070","แสดง",$meta['pc_show'],"")
             . $form->show_select("cat",$process_cat,"label-3070","กลุ่มกระบวนการ",$info['process_cat_id'])
             . $form->show_select("unit",$op_unit,"label-3070","หน่วย",$info['process_unit'],"")
             . $form->show_select("source",$op_process_source,"label-3070","แหล่งผลิต",$info['process_source'],"")
@@ -149,6 +158,7 @@ if($action=="add"){
     $costt .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขต้นทุน' style='width:100%'/>";
     
     //detail variable cost
+    /*
     $mat = array("0"=>"--วัตถุดิบ--") + $db->get_keypair("pap_mat", "mat_id", "CONCAT(mat_name,'(',mat_unit,')')", "WHERE mat_cat_id NOT IN (8,9)");
     if(isset($meta['detail_cost'])){
         $dcost = json_decode($meta['detail_mat'],true);
@@ -166,9 +176,11 @@ if($action=="add"){
         $dtcost .= $form->show_select("mat_$i",$mat,"left-50 label-inline",($i==0?"วัตถุดิบ":null),$mid,"","mat[]")
                 . $form->show_num("usage_$i",$usage,"any","",($i==0?"ประมาณการใช้/หน่วยผลิต":null),"","right-50 label-inline","min=0","usage[]");
     }
+     * 
+     */
     
     $content .= "<div class='col-50'>"
-            . $form->show_tabs("cost-tab",["ต้นทุน","ต้นทุนละเอียด"],[$costt,$dtcost],0)
+            . $form->show_tabs("cost-tab",["ต้นทุน"],[$costt],0)
             . "</div><!-- .col-50 -->";
     
     $content .= $form->show_submit("submit","Update","but-right")
@@ -186,21 +198,36 @@ if($action=="add"){
     __autoload("pdo_tb");
     $tbpdo = new tbPDO();
     $tb = new mytable();
+    
+    $cat = (isset($_GET['cat'])&&$_GET['cat']!=0?$_GET['cat']:null);
+    $source = (isset($_GET['source'])&&$_GET['source']!=0?$_GET['source']:null);
+    $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+    $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+    $iperpage = 20;
+    
+    //list
+    $cats = $db->get_keypair("pap_process_cat", "id", "name");
+
     //view
-    $head = array("กระบวนการผลิต","กลุ่ม","หน่วย","แหล่งผลิต","เวลาตั้งเครื่อง<br/>(นาที)","กำลังการผลิต<br/>(หน่วย/ชม)","ระยะเวลาสั่งผลิต<br/>(ชั่วโมง)");
-    $rec = $tbpdo->view_process($pauth);
+    $head = array("แก้ไข","กระบวนการผลิต","กลุ่ม","หน่วย","แหล่งผลิต","เวลาตั้งเครื่อง<br/>(นาที)","กำลังการผลิต<br/>(หน่วย/ชม)","ระยะเวลาสั่งผลิต<br/>(ชั่วโมง)");
+    $all_rec = $tbpdo->view_process($pauth,$cat,$source,$s);
+    $rec = $tbpdo->view_process($pauth,$cat,$source,$s,$page,$iperpage);
+    $max = ceil(count($all_rec)/$iperpage);
     $addhtml = "";
     if($pauth==1){
     } else {
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
-        array_unshift($head, "แก้ไข");
     }
-    
     $content .= "<h1 class='page-title'>กระบวนการผลิต $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
-            . $tb->show_table($head,$rec)
+            . $tb->show_search(current_url(), "cusid", "s","ค้นหา",$s)
+            . $tb->show_filter(current_url(), "cat", $cats, $cat,"--กลุ่มการผลิต--")
+            . $tb->show_filter(current_url(), "source", $op_process_source, $source,"--แหล่งผลิต--")
+            . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
+            . $tb->show_pagenav(current_url(), $page, $max)
+            . $tb->show_table($head,$rec,"tb-process")
             . "</div>";
 }
     

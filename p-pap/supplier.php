@@ -151,26 +151,26 @@ if($action=="add"){
     $tbpdo = new tbPDO();
     $tb = new mytable();
     $cat = (isset($_GET['cat'])&&$_GET['cat']>0?$_GET['cat']:null);
-
-
+    $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
-    $all_rec = $tbpdo->view_supplier(1, $cat);
+    $all_rec = $tbpdo->view_supplier($pauth, $cat,$s);
     $max = ceil(count($all_rec)/$iperpage);
     
     //view
-    $head = array("รหัส","บริษัท","กลุ่ม","อีเมล","โทร");
+    $head = array("แก้ไข","รหัส","บริษัท","กลุ่ม","อีเมล","โทร");
     $addhtml = "";
     if($pauth>1){
-        array_unshift($head, "แก้ไข");
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
     }
-    $rec = $tbpdo->view_supplier($pauth,$cat,$page,$iperpage);
+    $rec = $tbpdo->view_supplier($pauth,$cat,$s,$page,$iperpage);
     $content .= "<h1 class='page-title'>ฐานข้อมูล $pagename $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
+            . $tb->show_search(current_url(), "cusid", "s","ค้นหา",$s)
             . $tb->show_filter(current_url(), "cat", $cats, $cat,"--กลุ่มผู้ผลิต--")
+            . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec,"tb-supplier")
             . "</div><!-- .col-100 -->";

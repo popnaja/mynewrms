@@ -31,8 +31,8 @@ $op_criteria = $op_unit+array(
     "area" => "พื้นที่(cm2)"
 );
 $op_process_source = array(
-    "0" => "ผลิตเอง",
-    "1" => "สั่งผลิต"
+    "1" => "ผลิตเอง",
+    "2" => "สั่งผลิต"
 );
 $op_payment = array(
     "0" => "เงินสด",

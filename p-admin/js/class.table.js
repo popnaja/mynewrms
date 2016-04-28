@@ -76,12 +76,12 @@ function del_fn(){
     });
 }
 function tb_filter(name,base){
-    $(document).ready(function(){
-        var sel = $("select[name="+name+"]");
-        sel.on("change",function(){
-            window.location.replace(base+$(this).val());
-        });
+$(document).ready(function(){
+    var sel = $("select[name="+name+"]");
+    sel.on("change",function(){
+        window.location.replace(base+$(this).val());
     });
+});
 }
 function tb_search(id,base){
     $(document).ready(function(){

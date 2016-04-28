@@ -333,10 +333,11 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 process_cat_id,
-process_id,
+pro.process_id,
 process_name
-FROM pap_process
-WHERE process_id NOT IN (26,37,38,39)
+FROM pap_process AS pro
+LEFT JOIN pap_process_meta AS meta ON meta.process_id=pro.process_id AND meta.meta_key='pc_show'
+WHERE pro.process_id NOT IN (26,37,38,39) AND meta.meta_value=1
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();

@@ -306,8 +306,9 @@ class mytable {
         __autoloada("form");
         $base = $this->prep_get_url($url, $name);
         $form = new myform();
+        $list = (isset($arr["0"])?array("none"=>"$show")+$arr:array("0"=>"$show")+$arr);
         $html = "<div class='tb-filter'>"
-                . $form->show_select($name,array("0"=>"$show")+$arr,"label-inline",null,$current)
+                . $form->show_select($name,$list,"label-inline",null,$current)
                 . "</div><!-- .tb-filter -->"
                 . "<script>"
                 . "tb_filter('$name','$base')"
