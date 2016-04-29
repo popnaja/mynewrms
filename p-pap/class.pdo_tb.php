@@ -132,12 +132,19 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_jobsize($auth=3){
+    public function view_jobsize($auth,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
+            $filter = (isset($s)?"WHERE CONCAT(size_name,'(',size_height,'x',size_width,')') LIKE '%$s%'":"");
             if($auth>1){
-                $edit = <<<END_OF_TEXT
+                $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='lay.php?sid=",size_id,"' title='Edit' class='icon-page-edit'></a>"),
+END_OF_TEXT;
+            } else {
+                $edit .= <<<END_OF_TEXT
+                        CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
@@ -152,9 +159,14 @@ END_OF_TEXT;
                     FROM pap_size
                     LEFT JOIN pap_option AS op ON op.op_id=cover_paper
                     LEFT JOIN pap_option AS op1 ON op1.op_id=inside_paper
+                    $filter
                     ORDER BY size_name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $ex) {

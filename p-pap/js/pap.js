@@ -302,7 +302,6 @@ $(document).ready(function(){
     //hide cover
     var title = $("#sel-name");
     var but = $("#view-more-but");
-    var post = $("#postpress");
     hid_cover();
     $("#type").on("change",function(){
        hid_cover();
@@ -310,19 +309,23 @@ $(document).ready(function(){
     function hid_cover(){
         var type = parseInt($("#type").val());
         var bind = $("#bind-sec");
-        var page = $("#page_0").parent();
+        var fold = $("#folding_0");
         if(type===10||type===69){
             title.html("เนื้อใน");
-            post.show();
             but.show();
             bind.show();
+            fold.parent().addClass("form-hide");
        } else {
             $("#paper_type").val("0");
             title.html("ชิ้นงาน");
-            post.hide();
             but.hide();
             $("#binding").val("0");
             bind.hide();
+            if(type===11){
+                fold.parent().removeClass("form-hide");
+            } else {
+                fold.parent().addClass("form-hide");
+            }
        }
     }
 
@@ -389,11 +392,22 @@ $(document).ready(function(){
 
     //show margin
     var qprice = $("#q_price");
-    qprice.on("blur",function(){
+    qprice.on("change",function(){
         var ttc = $("#ttcost").val();
         var margin = ttc > 0 ? ($(this).val()-ttc)*100/ttc : "*";
         $(".show-margin").text(numformat(margin,2));
     });
+    
+    //adjust price
+    var peru = $("#peru");
+    var price = $("#q_price");
+    peru.on("change",function(){
+        price.val($(this).val()*$("#amount").val());
+        price.trigger("change");
+    });
+    price.on("change",function(){
+        peru.val($(this).val()/$("#amount").val());
+    })
 });
 }
 function filter_paper(sid){

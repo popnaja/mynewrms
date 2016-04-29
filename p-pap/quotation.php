@@ -147,7 +147,6 @@ if($action=="add"){
             . $form->show_num("fwing","",0.01,"","ปีกปกหน้า(cm)","","label-3070")
             . $form->show_num("bwing","",0.01,"","ปีกปกหลัง(cm)","","label-3070")
             . "</div><!-- .sel-cwing-1 -->"
-            . $form->show_select("folding",$fold,"label-3070 pc-folding form-hide","พับ",null,"","folding")
             . $form->show_hidden("page","page[]",1)
             . "</div><!-- .form-section -->"
             . "</div><!-- .sel-type-10 -->"
@@ -173,6 +172,7 @@ if($action=="add"){
             . "<div class='sel-other_$i-1'>"
             . $form->show_checkbox("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
             . "</div>"
+            . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",null,"","folding[]")
             . $form->show_num("page_$i","",1,"","จำนวนหน้า","","label-3070","min=0","page[]")
             . "</div><!-- .form-section -->"
             . "<script>select_option('other_$i');</script>";
@@ -185,7 +185,7 @@ if($action=="add"){
             . $form->show_hidden("redirect","redirect",$redirect)
             . $form->show_hidden("pauth","pauth",$pauth)
             . $form->show_hidden("uid","uid",$uid);
-    $form->addformvalidate("ez-msg", array('name',"cusct",'amount','page_0'),null,null,array('cid','type','sid'));
+    $form->addformvalidate("ez-msg", array('name',"cusct",'amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
@@ -240,7 +240,7 @@ if($action=="add"){
         $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
         $margin = $cinfo['margin'];
         $head = array("กลุ่มรายการ","รายการต้นทุน","จำนวน","ต้นทุนต่อหน่วย","ต้นทุนรวม","%margin","ราคารวม");
-        $aamount = (isset($info['cal_amount'])?explode(",",$info['cal_amount']):array());
+        $aamount = (isset($info['cal_amount'])&&$info['cal_amount']!=""?explode(",",$info['cal_amount']):array());
         array_unshift($aamount,$info['amount']);
         $tinfo = $info;
         $adata = array();
@@ -282,8 +282,10 @@ if($action=="add"){
     }
     $qstatus = $op_quote_status;
     if($pauth>3){
-        $qprice = $form->show_num("q_price",$info['q_price'],1,"","ราคา (Margin = <span class='show-margin'>$mar</span>%)","","label-3070 ","min='1' ")
-            . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ","min='0' ");
+        $qprice = ""
+        . $form->show_num("q_price",$info['q_price'],1,"","ราคา (Margin = <span class='show-margin'>$mar</span>%)","","label-3070 ","min='1' ")
+        . $form->show_num("peru",$info['q_price']/$info['amount'],0.01,"","ราคาค่อหน่วย","","label-3070 ","min='0'")
+        . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ","min='0' ");
     } else {
         unset($qstatus[2]);
         $qprice = $form->show_hidden("q_price","q_price",$info['q_price'])
@@ -449,6 +451,7 @@ if($action=="add"){
         . "<div class='sel-other_$i-1'>"
         . $form->show_checkbox("post_$i","post_$i",$pi_checked,"ไดคัท และอื่นๆ","label-3070")
         . "</div>"
+        . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",$info['folding'],"","folding[]")
         . $form->show_num("page_$i",(isset($inside[$i])?$inside[$i]['comp_page']:""),1,"","จำนวนหน้า","","label-3070","min=0","page[]")
         . "</div><!-- .form-section -->"
         . "<script>select_option('other_$i');</script>";
@@ -461,7 +464,7 @@ if($action=="add"){
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)
             . $form->show_hidden("redirect","redirect",$redirect);
-    $form->addformvalidate("ez-msg", array('name',"cusct",'amount','page_0'),null,null,array('cid','type','sid'));
+    $form->addformvalidate("ez-msg", array('name',"cusct",'amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"

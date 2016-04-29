@@ -51,7 +51,7 @@ if($action=="add"){
     }
     //add
     $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
-    $paper_info = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_size'");
+    $paper_info = $db->get_paper_size();
     $pinfo = json_encode(array_values($paper_info));
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
     $grip = (float)$cinfo['grip_size'];
@@ -152,22 +152,28 @@ if($action=="add"){
     __autoload("pdo_tb");
     $tbpdo = new tbPDO();
     $tb = new mytable();
+    
+    $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+    $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+    $iperpage = 20;
+    
     //view
-    $head = array("ชื่อ","ขนาด","กระดาษปก","ปกเลย์","กระดาษเนื้อ","เนื้อเลย์");
+    $head = array("แก้ไข","ชื่อ","ขนาด","กระดาษปก","ปกเลย์","กระดาษเนื้อ","เนื้อเลย์");
+    $all_rec = $tbpdo->view_jobsize($pauth,$s);
+    $rec = $tbpdo->view_jobsize($pauth,$s,$page,$iperpage);
+    $max = ceil(count($all_rec)/$iperpage);
     $addhtml = "";
-    if($pauth==1){
-        $rec = $tbpdo->view_jobsize(1);
-    } else {
+    if($pauth>1){
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
-        array_unshift($head, "แก้ไข");
-        $rec = $tbpdo->view_jobsize();
     }
-    
+   
     $content .= "<h1 class='page-title'>ขนาดชิ้นงาน $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
-            . $tb->show_table($head,$rec)
+            . $tb->show_search(current_url(), "cusid", "s","ค้นหา",$s)
+            . $tb->show_pagenav(current_url(), $page, $max)
+            . $tb->show_table($head,$rec,"tb-layguide")
             . "</div><!-- .col-100 -->";
 }
     
@@ -180,7 +186,6 @@ function show_layguide($form,$pinfo){
             . "<tr class='tb-head'><th></th><th>ผ่าก่อนพิมพ์</th><th>ปก</th><th>เนื้อ</th></tr>"
             . "<tr><th>ขนาดงาน</th><td></td><td class='size-cover'></td><td class='size-inside'></td></tr>"
             . "<tr class='tb-guide-row'><th>กระดาษ</th><th colspan='3'>เลย์แนวตั้ง</th></tr>";
-
     foreach($pinfo as $k=>$v){
         $wh = json_decode($v['psize'],true);
         $wcm = $wh['width']*2.54;
