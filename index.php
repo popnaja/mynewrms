@@ -21,7 +21,7 @@ $paplogo = PAP."image/pap_logo.jpg";
 $greenlogo = AROOTS."image/greeny_logo.png";
 $content .= $menu->contact
         . "<div class='banner'>"
-        . "<img src='".AROOTS."image/resoluteMS_logo.jpg' alt='Resolute Management Services'/>"
+        . "<img src='".LOGO."' alt='".SITE."'/>"
         . "<div>"
         . "<a class='app-logo' href='$link1' title='PAP'><img src='$paplogo' alt='PAP Logo' /></a>"
         . "<a class='app-logo' href='$link2' title='Smart Greeny'><img src='$greenlogo' alt='PAP Logo' /></a>"

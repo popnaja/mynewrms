@@ -1,9 +1,9 @@
 <?php
 define("SITE","ResoluteMS.com");
-
 define("ROOTS","http://localhost/resolutems/");
 define("PAP","http://localhost/resolutems/p-pap/");
 define("AROOTS","http://localhost/resolutems/p-admin/");
+define("LOGO",AROOTS."image/resoluteMS_logo.jpg");
 $root_dir = dirname(dirname(__FILE__));
 define("RDIR",$root_dir);
 
