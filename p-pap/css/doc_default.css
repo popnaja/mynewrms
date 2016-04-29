@@ -10,8 +10,9 @@
 }
 .print-a4-fix {
     box-sizing:border-box;
-    width:8.27in;
-    height:11.69in;
+    width:8.2in;
+    height:11.6in;
+    padding:0.2in;
     margin-left:auto;
     margin-right:auto;
     color:#222;
@@ -211,6 +212,21 @@
 }
 #tb-multi-q {
     padding:0;
+}
+#tb-multi-q table {
+    border: rgb(150,150,150) solid 1px;
+}
+#tb-multi-q th:first-child{
+    width:0.5in;
+}
+#tb-multi-q th:nth-child(2){
+    width:4in;
+}
+#tb-multi-q td{
+    border-right: rgb(150,150,150) solid 1px;
+}
+#tb-multi-q tr td:last-child{
+    border-right: none;
 }
 /*------------------------------------------------------------------- DOC REMARK ---------------------------------------------------------*/
 .doc-final {

@@ -48,14 +48,14 @@ function show_quote_df($qid){
             $page = "<li>พิพม์ 1 ด้าน</li>";
         }
     }
-    $bind = ($info['binding_id']>0?$process[$info['binding_id']]:"ไม่มี");
+    $bind = ($info['binding_id']>0?"<li>เข้าเล่ม : ".$process[$info['binding_id']]."</li>":"");
     $bname = "<div class='print-box'>"
             . "<div class='print-list-title'>บริการงานพิมพ์</div>"
             . "<ul class='print-list'>"
             . "<li>ชื่องาน : ".$info['name']."</li>"
             . "<li>ประเภท : ".$product_type[$info['cat_id']]."</li>"
             . "<li>ขนาด : ".$info['size']. "</li>"
-            . "<li>เข้าเล่ม : $bind</li>"
+            . $bind
             . $page
             . "</ul>"
             . "</div>";
@@ -80,6 +80,11 @@ function show_quote_df($qid){
             $cwing = "<li>ปีกปกหน้า ".$info['fwing']." cm</li>"
                     . "<li>ปีกปกหลัง ".$info['bwing']." cm</li>";
         }
+        //แผ่นพับ show พับกี่ส่วน
+        $fold = "";
+        if($info['cat_id']==11){
+            $fold = "<li>".$process[$info['folding']]."</li>";
+        }
         $bname .= "<div class='print-box'>"
                 . "<div class='print-list-title'>$cname</div>"
                 . "<ul class='print-list'>"
@@ -87,7 +92,8 @@ function show_quote_df($qid){
                 . "<li>".$v['weight']." แกรม</li>"
                 . "<li>".$v['color']."</li>"
                 . (isset($v['coating'])?"<li>".$v['coating']."</li>":"")
-                . $cwing;
+                . $cwing
+                . $fold;
         $x +=4;
         foreach($post as $p){
             if($p>0){
@@ -141,11 +147,13 @@ function show_quote_df($qid){
     if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
         $dt = json_decode($info['multi_quote_info'],true);
         $x += count($dt)+2;
-        $qhead = array("ยอดพิมพ์","ราคาหน่วยละ","จำนวนเงิน","หมายเหตุ");
+        $qhead = array("ลำดับ","หมายเหตุ","ยอดพิมพ์","ราคาหน่วยละ","จำนวนเงิน");
         $qrec = array();
+        $i = 1;
         foreach($dt as $k=>$v){
             if($v['show']>0){
-                array_push($qrec,array(number_format($v['amount']),number_format($v['price']/$v['amount'],2),number_format($v['price'],2),$v['remark']));
+                array_push($qrec,array($i,$v['remark'],number_format($v['amount']),number_format($v['price']/$v['amount'],2),number_format($v['price'],2)));
+                $i++;
             }
         }
         if(count($qrec)>0){
@@ -206,9 +214,6 @@ function show_quote_df($qid){
             . "<div class='doc-dt'>"
             . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
             . "</div><!-- .doc-dt -->";
-
-
-
 
     //sign
     $pay = ($info['credit']>0?"เครดิต ".$info['credit']." วัน":"ชำระเป็นเงินสด");
