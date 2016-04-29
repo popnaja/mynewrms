@@ -14,6 +14,7 @@ $menu->__autoloadall("form");
 $menu->__autoloadall("table");
 $menu->pap_menu();
 $menu->pageTitle = "PAP | User";
+$menu->ascript[] = $root."js/pap.js";
 $menu->extrascript = <<<END_OF_TEXT
 <style>
         h3 {
@@ -49,7 +50,9 @@ if(isset($opid)) {
             . $form->show_st_form()
             . "<div class='col-100'>"
             . $form->show_text("name","name",$rinfo['op_name'],"เช่น Sales,Production","ชื่อกลุ่ม","","label-inline")
-            . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>";
+            . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>"
+            . $form->show_select("adj_all",$op_authlevel,"label-3070","ปรับทั้งหมด",null)
+            . "<script>adj_role();</script>";
     //table
     $i=1;
     $content .= "<div id='tb-menu' class='ez-table'><table>"
@@ -104,7 +107,9 @@ if(isset($opid)) {
                 . "<h3>เพิ่มกลุ่มผู้ใช้</h3>"
                 . $form->show_st_form()
                 . $form->show_text("name","name","","เช่น Sales,Production","ชื่อกลุ่ม","","label-inline")
-                . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>";
+                . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>"
+                . $form->show_select("adj_all",$op_authlevel,"label-3070","ปรับทั้งหมด",null)
+                . "<script>adj_role();</script>";
         $i=1;
         $content .= "<div id='tb-menu' class='ez-table'><table>"
                 . "<tr class='tb-head'>"

@@ -569,3 +569,12 @@ $(document).ready(function(){
     });
 });
 }
+function adj_role(){
+$(document).ready(function(){
+   var sel = $("#adj_all");
+   var tg = $("select[name='auth[]']");
+   sel.on("change",function(){
+        tg.val($(this).val());
+   });
+});
+}
