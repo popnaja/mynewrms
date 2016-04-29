@@ -560,11 +560,37 @@ if($req == "login"){
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="add_cus_ad"){
-    $db->insert_data("pap_cus_ad", array(null,$_POST['cid'],$_POST['name'],$_POST['address']));
+    if(isset($_POST['media'])){
+        __autoloada("media");
+        $md = new mymedia();
+        $file = $_POST['media'];
+        $des = dirname(__FILE__)."/image/customer/map/".pathinfo($file,PATHINFO_BASENAME);
+        $ndes = check_exist($des);
+        $md->move_file(RDIR.$file, $ndes);
+        $map = "/p-pap/image/customer/map/".pathinfo($ndes,PATHINFO_BASENAME);
+    } else {
+        $map = "";
+    }
+    $db->insert_data("pap_cus_ad", array(null,$_POST['cid'],$_POST['name'],$_POST['address'],$map));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="edit_cus_ad"){
-    $db->update_data("pap_cus_ad", "id", $_POST['aid'], array("name"=>$_POST['name'],"address"=>$_POST['address']));
+    $arrinfo = array(
+        "name"=>$_POST['name'],
+        "address"=>$_POST['address']
+    );
+    if(isset($_POST['media'])){
+        $file = $_POST['media'];
+        if($_POST['ori_media']!=$file){
+            __autoloada("media");
+            $md = new mymedia();
+            $des = dirname(__FILE__)."/image/customer/map/".pathinfo($file,PATHINFO_BASENAME);
+            $ndes = check_exist($des);
+            $md->move_file(RDIR.$file, $ndes);
+            $arrinfo['map'] = "/p-pap/image/customer/map/".pathinfo($ndes,PATHINFO_BASENAME);
+        }
+    }
+    $db->update_data("pap_cus_ad", "id", $_POST['adid'], $arrinfo);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="add_quote"){

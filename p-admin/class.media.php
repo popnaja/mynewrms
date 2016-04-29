@@ -59,6 +59,7 @@ class mymedia {
             $pic_url = substr($root,0,-1).$pic;
             $html .= "<div class='md-pic'>"
                 . "<a href='' title='Delete this picture' class='icon-delete-circle del-media-pic'></a>"
+                . "<a href='' title='Zoom' class='icon-search zoom-media' imgsrc='$pic_url'></a>"
                 . "<img src='$pic_url' alt=''/>"
                 . "<input type='hidden' name='media' value='$pic' />"
                 . "</div><!-- .md-pic -->";
@@ -67,7 +68,7 @@ class mymedia {
             $html .= "";
         }
         $html .= "</div><!-- .md-view -->"
-                . "<script>del_pic();</script>";
+                . "<script>del_pic();zoom_pic();</script>";
         return $html;
     }
     public function media_mul_view($pics,$root,$dir){
@@ -78,13 +79,14 @@ class mymedia {
                 $pic_url = substr($root,0,-1).$pics[$i];
                 $html .= "<div class='md-m-pic'>"
                     . "<a href='' title='Delete this picture' class='icon-delete-circle del-media-pic'></a>"
+                    . "<a href='' title='Zoom' class='icon-search zoom-media' imgsrc='$pic_url'></a>"
                     . "<img src='$pic_url' alt=''/>"
                     . "<input type='hidden' name='media[]' value='$pics[$i]' />"
                     . "</div><!-- .md-m-pic -->";
                 $this->pics++;
             }
         }
-        $html .= "<script>del_pic();</script>";
+        $html .= "<script>del_pic();zoom_pic();</script>";
         return $html;
     }
     public function media_mul_show($pics,$root,$dir){

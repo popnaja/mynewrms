@@ -50,11 +50,17 @@
     display:inline-block;
     padding:15px;
 }
-.md-pic a {
+.md-pic .del-media-pic {
     position:absolute;
     top:0;
     right:0;
     font-size:20px;
+}
+.md-pic .zoom-media {
+    position:absolute;
+    bottom:0;
+    right:0;
+    font-size:30px;
 }
 .md-view img {
     max-width:100%;
@@ -157,8 +163,9 @@ body.md-showing {
     padding:20px;
 }
 .md-dialog>div img {
-  max-height:60vh;
+  max-height:80vh;
   width:auto;
+  max-width:90vw;
 }
 .md-dialog a {
     display:inline-block;

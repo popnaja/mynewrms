@@ -31,21 +31,4 @@ function search_customer(){
         }
     });
 }
-function edit_cus_ad(){
-    $(document).ready(function(){
-       var edit = $(".edit-ad");
-       var iad = $("#address");
-       edit.on("click",function(e){
-           e.preventDefault();
-           var aid = $(this).attr("aid");
-           var ad = $(this).attr("info").split(",");
-           $("#name").val(ad[0]);
-           iad.val(ad[1]);
-           iad.after("<input type='hidden' name='aid' value='"+aid+"'/>");
-           $("#submit").val("Edit");
-           $("#request").val("edit_cus_ad");
-           $("#clear").parent().removeClass("form-hide");
-       })
-    });
-}
 

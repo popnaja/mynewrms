@@ -144,10 +144,11 @@ function show_pdf(id,url){
     });
 }
 function del_pic(){
-    $(document).ready(function(){
-        var but = $(".del-media-pic");
-        but.on("click",function(e){
-            e.preventDefault();
+$(document).ready(function(){
+    var but = $(".del-media-pic");
+    but.on("click",function(e){
+        e.preventDefault();
+        if(confirm("กด OK เพื่อยืนยันการลบไฟล์")){
             $(".md-input").removeClass("form-hide");
             var data = {};
             var url = $("#ajax_req").val();
@@ -155,25 +156,26 @@ function del_pic(){
             data['pic'] = $(this).siblings("input").val();
             $(this).parent().remove();
             post_ajax(data,url);
-        });
+        }
     });
+});
 }
 function delete_md_file(){
-    $(document).ready(function(){
-        var but = $(".delete-md-file");
-        but.on("click",function(e){
-            e.preventDefault();
-            if(confirm("ยืนยันการลบไฟล์")){
-                $(".md-input").removeClass("form-hide");
-                var data = {};
-                var url = $("#ajax_req").val();
-                data['request'] = "del_pic_file";
-                data['pic'] = $(this).siblings("input").val();
-                $(this).parent().remove();
-                post_ajax(data,url);
-            }
-        });
+$(document).ready(function(){
+    var but = $(".delete-md-file");
+    but.on("click",function(e){
+        e.preventDefault();
+        if(confirm("กด OK เพื่อยืนยันการลบไฟล์")){
+            $(".md-input").removeClass("form-hide");
+            var data = {};
+            var url = $("#ajax_req").val();
+            data['request'] = "del_pic_file";
+            data['pic'] = $(this).siblings("input").val();
+            $(this).parent().remove();
+            post_ajax(data,url);
+        }
     });
+});
 }
 function post_draft(fdata){
     var row = $("#ing-food table tr");
@@ -205,24 +207,42 @@ function unlink_pic(url){
     };
 }
 function show_big(){
-    $(document).ready(function(){
-        var pic = $(".md-pic-thumb img");
-        pic.on("click",function(){
-            var url = $(this).attr("src");
-            var html = "<div class='md-dialog'>\n\
-            <div>\n\
-            <a href='' title='Close' class='icon-delete-circle close-md'></a>\n\
-            <img src='"+url+"'/>\n\
-            </div>\n\
-            </div><!-- .md-dialog -->\n\
-            <script>close_md();</script>";
-            $("#content").prepend(html);
-            $("body").addClass("md-showing");
-        });
-        
+$(document).ready(function(){
+    var pic = $(".md-pic-thumb img");
+    pic.on("click",function(){
+        var url = $(this).attr("src");
+        var html = "<div class='md-dialog'>\n\
+        <div>\n\
+        <a href='' title='Close' class='icon-delete-circle close-md'></a>\n\
+        <img src='"+url+"'/>\n\
+        </div>\n\
+        <script>close_md();</script>\n\
+        </div><!-- .md-dialog -->";
+        $("#content").prepend(html);
+        $("body").addClass("md-showing");
     });
+});
+}
+function zoom_pic(){
+$(document).ready(function(){
+    var pic = $(".zoom-media");
+    pic.on("click",function(e){
+        e.preventDefault();
+        var url = $(this).attr("imgsrc");
+        var html = "<div class='md-dialog'>\n\
+        <div>\n\
+        <a href='' title='Close' class='icon-delete-circle close-md'></a>\n\
+        <img src='"+url+"'/>\n\
+        </div>\n\
+        <script>close_md();</script>\n\
+        </div><!-- .md-dialog -->";
+        $("#content").prepend(html);
+        $("body").addClass("md-showing");
+    });
+});
 }
 function close_md(){
+$(document).ready(function(){
     var box = $(".md-dialog");
     var but = $(".close-md");
     box.on("click",function(){
@@ -232,6 +252,7 @@ function close_md(){
         e.preventDefault();
         pic_close();
     });
+});
 }
 function pic_close(){
     $(".md-dialog").remove();

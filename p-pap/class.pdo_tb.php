@@ -595,7 +595,7 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT
-CONCAT("<a href='' title='Edit' class='edit-ad icon-page-edit' aid='",id,"' info='",name,",",address,"'></a>"),
+CONCAT("<a href='shipping_address.php?adid=",id,"' title='Edit' class='icon-page-edit'></a>"),
 CONCAT(name,"<br/>",address)
 FROM pap_cus_ad
 WHERE customer_id=:cid
