@@ -687,7 +687,7 @@ function show_invoice($ivid){
 
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_invoice_dt($ivid,$op_type_unit);
-    $discount = 0;
+    $discount = $info['discount'];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
             . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount)
@@ -750,7 +750,7 @@ function show_receipt($rcid){
     $discount = 0;
     $tax = ($info['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
-            . $tb->show_tb_bill($head,$recs,"tb-rp",$tax,$discount)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount)
             . "<span style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี่จะใช้ได้ต่อเมื่อสามารถเรียกเก็บเงินได้ตามเช็คแล้วเท่านั้น</span>"
             . "</div><!-- .doc-dt -->";
     //signature

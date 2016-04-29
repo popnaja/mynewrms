@@ -21,6 +21,9 @@ function db_error($func,$ex){
 function pap_now(){
     return date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y-m-d H:i:s");
 }
+function pap_today(){
+    return date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y-m-d");
+}
 function pap_nmonth(){
     return date_format(date_create(null,timezone_open("Asia/Bangkok")),"Ym");
 }

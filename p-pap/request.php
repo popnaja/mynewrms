@@ -1551,8 +1551,8 @@ if($req == "login"){
 } else if($req=="add_invoice"){
     //add invoice
     $ivno = $db->check_inv_code($_POST['date']);
-    $total = array_sum($_POST['inv']);
-    $ivid = $db->insert_data("pap_invoice", array(null,$ivno,$_POST['cid'],$_POST['uid'],$_POST['date'],$_POST['due'],$_POST['remark'],$total));
+    $total = array_sum($_POST['inv'])-$_POST['discount'];
+    $ivid = $db->insert_data("pap_invoice", array(null,$ivno,$_POST['cid'],$_POST['uid'],$_POST['date'],$_POST['remark'],$_POST['discount'],$total));
     //add_detail
     for($i=0;$i<count($_POST['inv']);$i++){
         //add inv dt
@@ -1571,12 +1571,12 @@ if($req == "login"){
     header("Location:".$_POST['redirect']);
 } else if($req=="edit_invoice"){
     $ivid = filter_input(INPUT_POST,'ivid',FILTER_SANITIZE_NUMBER_INT);
-    $total = array_sum($_POST['inv']);
+    $total = array_sum($_POST['inv'])-$_POST['discount'];
     $arrinfo = array(
         "customer_id" => $_POST['cid'],
         "date" => $_POST['date'],
-        "due_date" => $_POST['due'],
         "remark" => $_POST['remark'],
+        "discount" => $_POST['discount'],
         "total" => $total
     );
     //update invoice
@@ -1621,7 +1621,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?action=print&rcid=$rcid");
+    header("Location:".$_POST['redirect']);
 } else if($req=="edit_receipt"){
     $rcid = filter_input(INPUT_POST,'rcid',FILTER_SANITIZE_NUMBER_INT);
     $arrinfo = array(
@@ -1651,7 +1651,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?action=print&rcid=$rcid");
+    header("Location:".$_POST['redirect']);
 } else if($req=="update_po_paid"){
     $db->update_data($_POST['table'], "po_id", $_POST['poid'], array("po_paid"=>$_POST['date'],"po_paid_ref"=>$_POST['ref']));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";

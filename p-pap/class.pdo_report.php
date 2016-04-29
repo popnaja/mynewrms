@@ -344,7 +344,7 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT 
-iv.*,user_login,
+iv.*,user_login,discount,
 GROUP_CONCAT(dt.deli_id) AS adid,
 GROUP_CONCAT(dt.amount) AS aamount       
 FROM pap_invoice AS iv
@@ -455,7 +455,7 @@ END_OF_TEXT;
                 $jname = explode(",",$v['jname']);
                 $qty = explode(",",$v['qty']);
                 $type = explode(",",$v['type']);
-                $job = "<ul>";
+                $job = "<ul class='list-inlist'>";
                 for($j=0;$j<count($jname);$j++){
                     $unit = $op[$type[$j]];
                     $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";

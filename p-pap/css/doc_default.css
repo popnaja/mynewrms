@@ -205,6 +205,9 @@
     background-color:#fff;
     text-align:center;
 }
+#tb-rp .list-inlist {
+    padding-left:0.2in;
+}
 /*------------------------------------------------------------------- MULTI QUOTE ---------------------------------------------------------*/
 .print-extra {
     font-size:11pt;

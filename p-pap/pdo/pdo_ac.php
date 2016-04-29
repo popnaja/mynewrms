@@ -47,7 +47,7 @@ END_OF_TEXT;
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = "WHERE deli.id>0";
+            $filter = "WHERE deli.status>=69";
             $filter .= (isset($due)?" AND DATE_FORMAT(DATE_ADD(deli.date, INTERVAL dt.credit DAY),'%Y-%m')='$due'":"");
             $filter .= (isset($status)&&$status>0?" AND deli.status=$status":"");
             $filter .= (isset($s)?" AND dt.job_name LIKE '%$s%'":"");
@@ -124,10 +124,10 @@ END_OF_TEXT;
                     $oinfo = $this->check_job_deli($oid);
                     $rem = $oinfo['amount']-$oinfo['deli'];
                     if($rem==0){
-                        $jobwdeli .= "<span class='ez-circle-green'></span>".substr($oinfo['name'],0,10)."<br/>";
+                        $jobwdeli .= "<span class='ez-circle-green'></span>".mb_substr($oinfo['name'],0,10,"utf-8")."<br/>";
                     } else {
                         $jobwdeli .= "<span class='icon-adjust ac-show-rm'><span class='ac-rm'>ค้างส่ง ".number_format($rem,0)."</span></span>"
-                                . substr($oinfo['name'],0,10)."</br>";
+                                . mb_substr($oinfo['name'],0,10,"utf-8")."</br>";
                     }
                 }
                 $res[$k]['aoid'] = $jobwdeli;
@@ -161,7 +161,7 @@ END_OF_TEXT;
                         if($stmt2->rowCount()>0){
                             $rcs = $stmt2->fetchAll(PDO::FETCH_ASSOC);
                             for($j=0;$j<count($rcs);$j++){
-                                $rctt += $rcs[$j]['amount']/($v['taxex']=="yes"?0.97:1.04);
+                                $rctt += $rcs[$j]['amount'];
                                 $rcid = $rcs[$j]['id'];
                                 $rcno = $rcs[$j]['no'];
                                 $rc .= "<p><a href='ac_bill.php?action=editrc&rcid=$rcid' title='แก้ไขใบเสร็จ' class='icon-page-edit'></a>"

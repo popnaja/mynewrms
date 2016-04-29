@@ -142,9 +142,8 @@ if($action =="add"){
         . $form->show_st_form()
         . "<div class='col-50'>"
         . $form->show_select("cid", $cus, "label-inline", "ลูกค้า", null)
-        . $form->show_text("date","date","","yyyy-mm-dd","วันที่ใบกำกับ","","label-inline")
-        . $form->show_text("due","due","","yyyy-mm-dd","วันนัดชำระ","","label-inline")
-        //. $form->show_select("payment", $op_bill_payment, "label-inline", "วิธีการชำระ", null)
+        . $form->show_text("date","date",pap_today(),"yyyy-mm-dd","วันที่ใบกำกับ","","label-inline")
+        . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-inline","")
         . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-inline")
         . "</div><!-- .col-50 -->"
         . "<div class='col-100'>"
@@ -157,18 +156,18 @@ if($action =="add"){
         . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . $form->show_hidden("redirect","redirect",$redirect)
         . "</div><!-- .col-100 -->";
-    $form->addformvalidate("ez-msg", array('date','due'));
+    $form->addformvalidate("ez-msg", array('date'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
-            . "$('#date,#due').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
             . "inv_function(".json_encode($rec).");"
             . "</script>";
 } else if($action == "rc"){
 /*----------------------------------------------------- CREATE RECEIPT -------------------------------------------------------------------*/
     $rec = [];
     $rinfo = $pdo_ac->get_rc_remain($ivid);
-    $total = ($rinfo['meta_value']=="yes"?0.97:1.04)*$rinfo['total']; //ยอดหหลังหัก ณที่จ่าย
-    array_push($rec,array($ivid,$rinfo['no'],$total,$rinfo['pay']));
+    //$total = ($rinfo['meta_value']=="yes"?0.97:1.04)*$rinfo['total']; //ยอดหหลังหัก ณที่จ่าย
+    array_push($rec,array($ivid,$rinfo['no'],$rinfo['total'],$rinfo['pay']));
 
     $inside = $form->show_text("ivno","ivno","","","ใบกำกับภาษี","","label-3070 readonly",null,"readonly")
             . $form->show_num("amount", "", 1, "", "ยอดรวม", "", "label-3070 readonly","min='0' readonly")
@@ -180,7 +179,7 @@ if($action =="add"){
         . "<div id='ez-msg'>".  showmsg() ."</div>"
         . $form->show_st_form()
         . "<div class='col-50'>"
-        . $form->show_text("date","date","","yyyy-mm-dd","วันที่","","label-inline")
+        . $form->show_text("date","date",pap_today(),"yyyy-mm-dd","วันที่","","label-inline")
         . $form->show_select("payment", $op_bill_payment, "label-inline", "วิธีการชำระ", null)
         . "<div class='sel-payment-0'>"
             . $form->show_text("cno","cno","","","เช็คเลขที่","","label-inline")
@@ -301,8 +300,7 @@ if($action =="add"){
         . $form->show_text("delino","delino",$info['no'],"","เลขที่ใบกำกับ","","label-inline readonly",null,"readonly")
         . $form->show_select("cid", $cus, "label-inline", "ลูกค้า", $info['customer_id'])
         . $form->show_text("date","date",$info['date'],"yyyy-mm-dd","วันที่ใบกำกับ","","label-inline")
-        . $form->show_text("due","due",$info['due_date'],"yyyy-mm-dd","วันนัดชำระ","","label-inline")
-        //. $form->show_select("payment", $op_bill_payment, "label-inline", "วิธีการชำระ", null)
+        . $form->show_num("discount", $info['discount'], 0.01, "", "ส่วนลด", "", "label-inline","")
         . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
         . "</div><!-- .col-50 -->"
         . "<div class='col-100'>"
@@ -322,11 +320,11 @@ if($action =="add"){
         . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . $form->show_hidden("redirect","redirect",$redirect)
         . "</div><!-- .col-100 -->";
-    $form->addformvalidate("ez-msg", array('date','due'));
+    $form->addformvalidate("ez-msg", array('date'));
 
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
-            . "$('#date,#due').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
             . "inv_function(".json_encode($rec).");"
             . "</script>";
 } else if(isset($bid)){
@@ -436,15 +434,19 @@ function find_date($info,$txt){
     } else {
         $type = $info['customer_place_bill'];
     }
-    $month = date_format(date_create(null,timezone_open("Asia/Bangkok")),"m");
-    $year = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y");
-    $today = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+    $today = date_create(null,timezone_open("Asia/Bangkok"));
+    $month = date_format($today,"m");
+    $year = date_format($today,"Y");
     if($type=="day"){
         $d = sprintf("%02s",$info[$txt."_day"]);
     } else if($type=="dofw"){
         $d = dofw_to_date($year, $month, $info[$txt.'_weekday'], $info[$txt.'_week']);
     } else if($type=="eofm"){
-        $d = $today->format("t");
+        $d = date_format($today,"t");
     }
-    return "$year-$month-$d";
+    $res = date_create("$year-$month-$d",timezone_open("Asia/Bangkok"));
+    if($res<$today){
+        date_add($res,  date_interval_create_from_date_string("1 month"));
+    }
+    return date_format($res,"Y-m-d");
 }

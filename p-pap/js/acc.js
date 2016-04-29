@@ -211,7 +211,7 @@ $(document).ready(function(){
     }
 
     function clear(){
-        addbut.val("เพิ่มลงรายการ");
+        edform.addClass("form-hide");
         $("#dno").val("");
         $("#amount").val("");
         $("#remain").val("");
@@ -239,7 +239,7 @@ $(document).ready(function(){
     var addbut = $("#add-list");
     var edform = $(".my-tab-inside");
     var targ = $("#deli-list");
-    var header = ["แก้ไข","ใบกำกับ","ยอดหลังหัก ณ ที่จ่าย","ค้างชำระ","ยอดออกใบเสร็จ"];
+    var header = ["แก้ไข","ใบกำกับ","ยอดตามใบกำกับ","ค้างชำระ","ยอดออกใบเสร็จ"];
     var rec = [];
 
     inputenter(['deli'],'add-list');
@@ -324,7 +324,7 @@ $(document).ready(function(){
     }
 
     function clear(){
-        addbut.val("เพิ่มลงรายการ");
+        edform.addClass("form-hide");
         $("#ivno").val("");
         $("#amount").val("");
         $("#remain").val("");
