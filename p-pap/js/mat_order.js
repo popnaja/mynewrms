@@ -169,7 +169,7 @@ $(document).ready(function(){
             var item = v[1];
             var cproid = v[2];
             var ref = v[3];
-            var unit = v[4]
+            var unit = v[4];
             var amount = parseFloat(v[5]);
             var cost = parseFloat(v[6]);
             var tt = amount*cost;
@@ -179,7 +179,7 @@ $(document).ready(function(){
                 "<span class='edit-po-list icon-page-edit' info='"+ed.toString()+"'></span>",
                 item+"<input type='hidden' name='pid[]' value='"+pid+"' />",
                 ref+"<input type='hidden' name='cproid[]' value='"+cproid+"' />",
-                numformat(unit,2)+"<input type='hidden' name='unit[]' value='"+unit+"' />",
+                unit+"<input type='hidden' name='unit[]' value='"+unit+"' />",
                 numformat(amount,2)+"<input type='hidden' name='vol[]' value='"+amount+"' />",
                 numformat(cost,2)+"<input type='hidden' name='cost[]' value='"+cost+"' />",
                 numformat(tt,2)
@@ -205,7 +205,7 @@ $(document).ready(function(){
                 "<span class='edit-po-list icon-page-edit' info='"+ed.toString()+"'></span>",
                 item+"<input type='hidden' name='pid[]' value='"+pid+"' />",
                 ref+"<input type='hidden' name='cproid[]' value='"+cproid+"' />",
-                numformat(unit,2)+"<input type='hidden' name='unit[]' value='"+unit+"' />",
+                unit+"<input type='hidden' name='unit[]' value='"+unit+"' />",
                 numformat(amount,2)+"<input type='hidden' name='vol[]' value='"+amount+"' />",
                 numformat(cost,2)+"<input type='hidden' name='cost[]' value='"+cost+"' />",
                 numformat(tt,2)

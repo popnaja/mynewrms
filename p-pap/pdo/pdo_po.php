@@ -290,7 +290,7 @@ LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
 LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_pro_po_dt AS podt ON podt.cpro_id=cpro.id
 LEFT JOIN pap_process_po AS po ON po.po_id=podt.po_id
-WHERE pro.process_source=1 AND comp.order_id=:oid
+WHERE pro.process_source=2 AND comp.order_id=:oid
 GROUP BY cpro.id
 ORDER BY cpro.id ASC
 END_OF_TEXT;
