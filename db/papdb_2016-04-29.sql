@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2016 at 05:50 PM
+-- Generation Time: Apr 29, 2016 at 06:02 PM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -725,7 +725,7 @@ CREATE TABLE IF NOT EXISTS `pap_option` (
 
 INSERT INTO `pap_option` (`op_id`, `op_type`, `op_name`, `op_value`) VALUES
 (1, 'role_auth', 'Admin', '{"customer.php":"4","term.php?tax=customer":"4","shipping_address.php":"4","quotation.php":"4","lay.php":"4","ac_schedule.php":"4","ac_bill.php":"4","ac_buy.php":"4","ac_credit.php":"4","order.php?d=ga":"4","order.php":"4","production.php":"4","status.php":"4","outsource.php":"4","outsource.php?action=viewpo":"4","index.php":"4","delivery.php":"4","process.php":"4","machine.php":"4","paper.php":"4","paper.php?action=viewpo":"4","mat.php":"4","supplier.php":"4","term.php?tax=supplier":"4","mat_received.php":"4","outsource_rc.php":"4","userinfo.php":"4","user.php":"3","role.php":"3","pap_option.php?type=product_cat":"3","pap_option.php?type=mat_cat":"3","process_cat.php":"3","pap_option.php?type=paper_allo":"3","pap_option.php?type=paper_type":"3","pap_option.php?type=paper_size":"3","pap_option.php?type=paper_weight":"3","setting.php":"3","upload.php":"4"}'),
-(2, 'role_auth', 'Observer', '{"index.php":"1","customer.php":"1","quotation.php":"1","lay.php":"1","process.php":"1","process_cat.php":"1","user.php":"1","role.php":"1","pap_option.php":"1","setting.php":"1","logout.php":"1"}'),
+(2, 'role_auth', 'Observer', '{"customer.php":"3","term.php?tax=customer":"3","shipping_address.php":"3","quotation.php":"3","lay.php":"3","ac_schedule.php":"3","ac_bill.php":"3","ac_buy.php":"3","ac_credit.php":"3","order.php?d=ga":"3","order.php":"3","production.php":"3","status.php":"3","outsource.php":"3","outsource.php?action=viewpo":"3","index.php":"3","delivery.php":"3","process.php":"3","machine.php":"3","paper.php":"3","paper.php?action=viewpo":"3","mat.php":"3","supplier.php":"3","term.php?tax=supplier":"3","mat_received.php":"3","outsource_rc.php":"3","userinfo.php":"3","user.php":"0","role.php":"0","pap_option.php?type=product_cat":"0","pap_option.php?type=mat_cat":"0","process_cat.php":"0","pap_option.php?type=paper_allo":"0","pap_option.php?type=paper_type":"0","pap_option.php?type=paper_size":"0","pap_option.php?type=paper_weight":"0","setting.php":"0","upload.php":"0"}'),
 (3, 'cinfo', 'name', 'Tempo Co.,Ltd.'),
 (4, 'cinfo', 'address', 'เลขที่ 7 ถนนเพชรเกษม 77 หนองแขม กทม 10160 '),
 (5, 'cinfo', 'email', 'tempo7@gmail.com'),
@@ -1771,7 +1771,7 @@ CREATE TABLE IF NOT EXISTS `pap_user` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_login_UNIQUE` (`user_login`),
   UNIQUE KEY `user_email_UNIQUE` (`user_email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 ;
 
 --
 -- Dumping data for table `pap_user`
@@ -1795,7 +1795,8 @@ INSERT INTO `pap_user` (`user_id`, `user_login`, `user_email`, `user_pass`, `use
 (19, 'manager2', 'm2@gmail.com', '93c6e444c9b2b24528b638149ba4b283', '2016-03-15 20:05:51'),
 (20, 'production', 'pro@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', '2016-04-07 18:34:16'),
 (21, 'account', 'acc@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', '2016-04-07 18:34:38'),
-(22, 'buyer', 'buyer@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', '2016-04-07 18:34:59');
+(22, 'buyer', 'buyer@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', '2016-04-07 18:34:59'),
+(23, 'pornchai', 'pornchai.s@bu.ac.th', '81dc9bdb52d04dc20036dbd8313ed055', '2016-04-29 22:52:49');
 
 -- --------------------------------------------------------
 
@@ -1810,7 +1811,7 @@ CREATE TABLE IF NOT EXISTS `pap_usermeta` (
   `meta_value` text,
   PRIMARY KEY (`id`),
   KEY `fk_pap_usermeta_pap_user1_idx` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=53 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=55 ;
 
 --
 -- Dumping data for table `pap_usermeta`
@@ -1857,7 +1858,9 @@ INSERT INTO `pap_usermeta` (`id`, `user_id`, `meta_key`, `meta_value`) VALUES
 (49, 22, 'user_auth', '75'),
 (50, 22, 'signature', ''),
 (51, 20, 'l_status', ''),
-(52, 22, 'l_status', '');
+(52, 22, 'l_status', ''),
+(53, 23, 'user_auth', '2'),
+(54, 23, 'signature', '');
 
 -- --------------------------------------------------------
 
