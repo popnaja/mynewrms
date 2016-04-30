@@ -120,7 +120,7 @@ END_OF_TEXT;
                 //check delivery
                 $aoid = explode(",",$v['aoid']);
                 $jobwdeli = "";
-                foreach($aoid as $k=>$oid){
+                foreach($aoid as $key=>$oid){
                     $oinfo = $this->check_job_deli($oid);
                     $rem = $oinfo['amount']-$oinfo['deli'];
                     if($rem==0){
@@ -131,14 +131,13 @@ END_OF_TEXT;
                     }
                 }
                 $res[$k]['aoid'] = $jobwdeli;
-
                 unset($res[$k]['did']);
                 unset($res[$k]['pbill_id']);
                 unset($res[$k]['customer_id']);
                 unset($res[$k]['total']);
                 unset($res[$k]['taxex']);
                 if(!isset($res1[implode(";",$res[$k])])){
-                    $res1[implode(";",$res[$k])]  = array();
+                    $res1[implode(";",$res[$k])] = array();
                 }
                 //invoice sql
                 $stmt1->execute();

@@ -415,7 +415,10 @@ if($action=="add"){
         . $form->show_hidden("page","page[]",(isset($cover[0])?$cover[0]['comp_page']:1))
         . "</div><!-- .form-section -->"
         . "</div><!-- .sel-type-10 -->"
-        . "<script>select_option('other');</script>";
+        . "<script>"
+        . "select_option('other');"
+        . "select_option('cwing');"
+        . "</script>";
 
     $show = count($inside);
 
@@ -451,7 +454,7 @@ if($action=="add"){
         . "<div class='sel-other_$i-1'>"
         . $form->show_checkbox("post_$i","post_$i",$pi_checked,"ไดคัท และอื่นๆ","label-3070")
         . "</div>"
-        . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",$info['folding'],"","folding[]")
+        . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",(isset($info['folding'])?$info['folding']:null),"","folding[]")
         . $form->show_num("page_$i",(isset($inside[$i])?$inside[$i]['comp_page']:""),1,"","จำนวนหน้า","","label-3070","min=0","page[]")
         . "</div><!-- .form-section -->"
         . "<script>select_option('other_$i');</script>";
