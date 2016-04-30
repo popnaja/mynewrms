@@ -184,7 +184,7 @@ class mytable {
                 . "</div><!-- #$id -->\n";
         return $html;
     }
-    public function show_tb_wtax($arrheader,$arrdata,$id="",$tax,$discount,$extra=""){
+    public function show_tb_wtax($arrheader,$arrdata,$id="",$tax,$discount,$extra="",$row=null){
         __autoloada("thai");
         function sub_format($v){
             if((float)$v==0){
@@ -202,6 +202,7 @@ class mytable {
             $html .= "<th>$value</th>";
         }
         $html .= "</tr>";
+        $i=0;
         if(isset($arrdata)&&sizeof($arrdata,0)>0){
             foreach($arrdata as $key=>$val){
                 if(!is_array($val)){
@@ -214,10 +215,20 @@ class mytable {
                         $html .= "<td>".$act_v."</td>";
                     }
                     $html .= "</tr>";
+                    $i++;
+                }
+            }
+            if(isset($row)){
+                if($i<$row){
+                    for($j=0;$j<($row-$i);$j++){
+                        $html .= "<tr class='tb-data tb-row'>"
+                                . str_repeat("<td></td>",count($val))
+                                . "</tr>";
+                    }
                 }
             }
             $sum -= $discount;
-            $thaitt = "(".ThaiBahtConversion(round($sum*(1+$tax),2)).")";
+            $thaitt = ($sum!=0?"(".ThaiBahtConversion(round($sum*(1+$tax),2)).")":"");
             $html .= "<tr class='tb-discount'><td colspan='2'></td><td colspan='2'>ส่วนลด / Discount</td><td>".number_format($discount,2)."</td></tr>"
                 . "<tr class='tb-sum'><td colspan='2' rowspan='3'>$thaitt</td><th colspan='2'>รวมเงิน / Sub Total</td><td>".number_format($sum,2)."</td></tr>"
                 . "<tr class='tb-sum'><th colspan='2'>ภาษีมูลค่าเพิ่ม / Tax</td><td>".number_format($sum*$tax,2)."</td></tr>"

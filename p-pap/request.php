@@ -37,7 +37,7 @@ if($req == "login"){
         } else {
             $auth = json_decode($db->get_info("pap_option", "op_id", $umeta['user_auth'])["op_value"],true);
             $_SESSION['upap'] = [$uid,$auth];
-            header("location:".$_POST['redirect']);
+            header("location:".PAP);
         }
     }
 } else if($req == "edit_upass"){

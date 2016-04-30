@@ -1,7 +1,18 @@
 /*------------------------------------------------------------------- for print ---------------------------------------------------------*/
 .print-a4 {
     box-sizing:border-box;
-    width:8.27in;
+    width:8.2in;
+    padding:0.2in;
+    margin-left:auto;
+    margin-right:auto;
+    color:#222;
+    overflow:hidden;
+    background-color:#fff;
+}
+.print-letter {
+    box-sizing:border-box;
+    width:8in;
+    height:10.5in;
     margin-left:auto;
     margin-right:auto;
     color:#222;
@@ -11,7 +22,7 @@
 .print-a4-fix {
     box-sizing:border-box;
     width:8.2in;
-    height:11.6in;
+    height:11.2in;
     padding:0.2in;
     margin-left:auto;
     margin-right:auto;
@@ -107,14 +118,23 @@
     display:block;
     margin-left:auto;
     margin-right:auto;
-    background-color:#0690cf;
-    color:#fff;
-    font-size:18pt;
+    color:#444;
+    font-size:15pt;
     padding:0.2cm 0 0.3cm 0;
     border-radius:0.2cm;
     border:0.1cm solid #444;
 }
-
+.doc-name-center {
+    text-align:center;
+}
+.doc-name-center span {
+    display:inline-block;
+    color:#444;
+    font-size:15pt;
+    padding:0.15in;
+    border-radius:0.2cm;
+    border:0.1cm solid #444;
+}
 /*------------------------------------------------------------------- DOC INFO ---------------------------------------------------------*/
 .doc-info {
     position:relative;
@@ -153,7 +173,7 @@
 #tb-rp td {
     font-size:10.5pt;
 }
-#tb-rp table {
+#tb-rp>table {
     border:rgb(150,150,150) solid 1px;
 }
 #tb-rp th {
@@ -191,7 +211,8 @@
     text-align:left;
 }
 #tb-rp tr.tb-data{
-    height:0.3in;
+    padding:0;
+    height:0.4in;
 }
 
 #tb-rp #tb-multi-q th {
@@ -256,11 +277,28 @@
     padding:0 !important;
 }
 .doc-sign img{
-    height:100%;
+    padding-top:0.1in;
+    height:95%;
     width:auto;
 }
 #rp-cus-sign td,
 #rp-cus-sign th {
     font-size:10pt;
 }
-/*----------------------------------------------------------------  DOC REMARK 2 SIGN   -----------------------------------------------------*/
+/*----------------------------------------------------------------  Jdetail   -----------------------------------------------------*/
+.jdetail {
+    border:none !important;
+}
+.jdetail td:first-child{
+    width:1.3in;
+}
+.jdetail td,
+.jdetail tr{
+    padding:0 !important;
+    vertical-align: top;
+    text-align:left;
+    border:none !important;
+}
+#tb-rp .jdetail tr{
+    height:0.2in;
+}

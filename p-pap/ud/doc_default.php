@@ -6,13 +6,11 @@ function show_quote_df($qid){
     global $rpdb;
     $db = $rpdb;
     $root = PAP;
-
     $tb = new mytable();
+    
     //load info
     $info = $db->get_quote_info($qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
-    $comps = $db->get_print_comp($qid);
     $cus= $db->get_info("pap_customer","customer_id",$info['customer_id'])+$db->get_meta("pap_customer_meta", "customer_id", $info['customer_id']);
-    $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact_id']);
     $show_date = (is_null($info['approved'])?$info['created']:$info['approved']);
 
@@ -33,116 +31,14 @@ function show_quote_df($qid){
         . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
         . "</div>"
         . "</div>";
-
-    //count list
-    $x = 0;
-    //list
-    $process =  $db->get_keypair("pap_process", "process_id", "process_name");
-
-    if($info['cat_id']==10){
-        $page = "<li>เนื้อใน ".$info['page_inside']. " หน้า</li>";
-    } else {
-        if($info['page_inside']==2){
-            $page = "<li>พิพม์ 2 ด้าน</li>";
-        } else {
-            $page = "<li>พิพม์ 1 ด้าน</li>";
-        }
-    }
-    $bind = ($info['binding_id']>0?"<li>เข้าเล่ม : ".$process[$info['binding_id']]."</li>":"");
-    $bname = "<div class='print-box'>"
-            . "<div class='print-list-title'>บริการงานพิมพ์</div>"
-            . "<ul class='print-list'>"
-            . "<li>ชื่องาน : ".$info['name']."</li>"
-            . "<li>ประเภท : ".$product_type[$info['cat_id']]."</li>"
-            . "<li>ขนาด : ".$info['size']. "</li>"
-            . $bind
-            . $page
-            . "</ul>"
-            . "</div>";
-    $x += 5;
-    $cno = 1;
-    foreach($comps as $k=>$v){
-        $post = explode(",",$v['comp_postpress']);
-        if($info['cat_id']==10){
-            if($v['comp_type']==1){
-                $cname = "เนื้อใน ";
-                $cname .= (count($comps)>2?"($cno)":"");
-                $cno++;
-            } else {
-                $cname = "ปก";
-            }
-        } else {
-            $cname = "ลักษณะชิ้นงาน";
-        }
-        //cwing
-        $cwing = "";
-        if($info['cwing']==1&&$v['comp_type']==0){
-            $cwing = "<li>ปีกปกหน้า ".$info['fwing']." cm</li>"
-                    . "<li>ปีกปกหลัง ".$info['bwing']." cm</li>";
-        }
-        //แผ่นพับ show พับกี่ส่วน
-        $fold = "";
-        if($info['cat_id']==11){
-            $fold = "<li>".$process[$info['folding']]."</li>";
-        }
-        $bname .= "<div class='print-box'>"
-                . "<div class='print-list-title'>$cname</div>"
-                . "<ul class='print-list'>"
-                . "<li>".$v['paper']."</li>"
-                . "<li>".$v['weight']." แกรม</li>"
-                . "<li>".$v['color']."</li>"
-                . (isset($v['coating'])?"<li>".$v['coating']."</li>":"")
-                . $cwing
-                . $fold;
-        $x +=4;
-        foreach($post as $p){
-            if($p>0){
-                $bname .= "<li>".$process[$p]."</li>";
-                $x++;
-            }
-        }
-        $bname .= "</ul>"
-                . "</div>";
-    }
-    if($info['prepress']!==""){
-        $pp = explode(",",$info['prepress']);
-        $bname .= "<div class='print-box'>"
-                . "<div class='print-list-title'>การจัดทำต้นฉบับ</div>"
-                . "<ul class='print-list'>";
-        foreach($pp as $k=>$v){
-            if($v>0){
-                $bname .= "<li>$process[$v]</li>";
-                $x++;
-            }
-        }
-        $bname .= "</ul>"
-                . "</div>";
-    }
-    if(strlen($info['packing'])>0||strlen($info['shipping'])>0){
-        $packing = explode(",",$info['packing']);
-        $shipping = explode(",",$info['shipping']);
-        $bname .= "<div class='print-box'>"
-                . "<div class='print-list-title'>ข้อกำหนดอื่นๆ</div>"
-            . "<ul class='print-list'>";
-        foreach($packing as $v){
-            if($v>0){
-                $bname .= "<li>$process[$v]</li>";
-                $x++;
-            }
-        }
-        foreach($shipping as $v){
-            if($v>0){
-                $bname .= "<li>$process[$v]</li>";
-                $x++;
-            }
-        }
-        $bname .= "</ul>"
-                . "</div>";
-    }
-
+    
+    //job detail
+    $jdetail = job_detail($qid);
+    $dttb = job_dttb($jdetail);
+    $x = ceil((count($jdetail,1)-count($jdetail))/2);
+    
     //$due = ($info['plan_delivery']>0?"<div class='print-list-title'>กำหนดส่งงาน : ".thai_date($info['plan_delivery'])."</div>":"");
     //multi quote
-
     $extra = "";
     if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
         $dt = json_decode($info['multi_quote_info'],true);
@@ -181,20 +77,20 @@ function show_quote_df($qid){
                 $x++;
             }
         }
-        array_push($recs,array($i,$bname,$amount,($tt-$sub)/$amount,$tt-$sub));
+        array_push($recs,array($i,$dttb,$amount,($tt-$sub)/$amount,$tt-$sub));
     } else {
-        array_push($recs,array(1,$bname,$amount,$peru,$tt));
+        array_push($recs,array(1,$dttb,$amount,$peru,$tt));
     }
 
     //check row
-    if($x>29){
+    if($x>20){
         $page1 = "หน้า 1/2";
         $page2 = "</div><!-- .print-a4-fix -->"
                 . "<div class='print-a4-fix'>"
                 . print_header("ใบเสนอราคา","หน้า 2/2")
                 . $head
                 . $extra;
-    } else if($x>18){
+    } else if($x>11){
         $page1 = "หน้า 1/2";
         $page2 = $extra
                 . "</div><!-- .print-a4-fix -->"
@@ -387,7 +283,7 @@ function show_mat_po($poid){
     $tb = new mytable();
 
     $info = $db->get_info("pap_mat_po", "po_id", $poid);
-    $content = "<div class='print-a4'>"
+    $content = "<div class='print-letter'>"
             . print_header("ใบสั่งซื้อ");
 
     $content .= "<div class='doc-info'>"
@@ -405,7 +301,7 @@ function show_mat_po($poid){
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_mat_po($poid);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0)
+            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",12)
             . "</div><!-- .doc-dt -->";
 
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
@@ -436,7 +332,7 @@ function show_process_po($poid){
     $tb = new mytable();
 
     $info = $db->get_info("pap_process_po", "po_id", $poid);
-    $content = "<div class='print-a4'>"
+    $content = "<div class='print-letter'>"
             . print_header("ใบสั่งผลิต");
 
     $content .= "<div class='doc-info'>"
@@ -454,7 +350,7 @@ function show_process_po($poid){
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_process_po($poid);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0)
+            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",12)
             . "</div><!-- .doc-dt -->";
 
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
@@ -489,9 +385,7 @@ function show_deli($did){
     $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
     $aoid = explode(",",$info['aoid']);
 
-    $content = "<div class='print-a4'>"
-            . print_header("ใบส่งของ/<br/>ใบแจ้งหนี้");
-    $content .= "<div class='doc-info'>"
+    $docinfo = "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ลูกค้า : </div>"
             . print_cus_info($info['customer_id'],$info['address'])
@@ -511,12 +405,36 @@ function show_deli($did){
 
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_deli_dt($did);
+    $row = 0;
+    foreach($recs[0] as $k=>$v){
+        $qid = $v[1];
+        $data = job_detail($qid);
+        $recs[0][$k][1] = job_dttb($data);
+        $row += count($data,1)-count($data);
+    }
     $discount = $recs[1];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
-    $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount)
+    if($row/2<11){
+        $content = "<div class='print-letter'>"
+            . print_header("ใบส่งของ/ใบแจ้งหนี้")
+            . $docinfo
+            . "<div class='doc-dt'>"
+            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",15-$row)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
+    } else {
+        $content = "<div class='print-letter'>"
+            . print_header("ใบส่งของ/ใบแจ้งหนี้","หน้า 1/2")
+            . $docinfo
+            . "<div class='doc-dt'>"
+            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount)
+            . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
+            . "</div><!-- .doc-dt -->"
+            . "</div><!-- .print-letter -->"
+            . "<div class='print-letter'>"
+            . print_header("ใบส่งของ/ใบแจ้งหนี้","หน้า 2/2")
+            . $docinfo;
+    }
 
     $i = 0;
     $pay = "";
@@ -528,12 +446,12 @@ function show_deli($did){
     }
 
     $content .= "<table id='rp-2sign' class='doc-final'>"
-            . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้รับสินค้า</th><th width='180'>ผู้ส่งสินค้า</th></tr>"
+            . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้ส่งสินค้า</th><th width='180'>ผู้รับสินค้า</th></tr>"
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
             . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
 
-    $content .= "</div><!-- .print-a4 -->";
+    $content .= "</div><!-- .print-letter -->";
     return $content;
 }
 function show_tdeli($tdid){
@@ -551,8 +469,10 @@ function show_tdeli($tdid){
     $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
     $aoid = explode(",",$info['aoid']);
 
-    $content = "<div class='print-a4'>"
-            . print_header("ใบส่งของชั่วคราว");
+    $content = "<div class='print-letter'>"
+            . "<div class='c-head'>"
+            . "<div class='doc-name-center'><span>ใบส่งของชั่วคราว</span></div>"
+            . "</div>";
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ลูกค้า : </div>"
@@ -567,7 +487,7 @@ function show_tdeli($tdid){
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".  thai_date($info['date'])."</div>"
             . "<div class='doc-600'> <span class='float-left'>เลขที่เอกสาร : </span>".  $info['no']."</div>"
-            . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
+            //. "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
             . "</div>"
             . "</div>";
 
@@ -575,7 +495,7 @@ function show_tdeli($tdid){
     $recs = $rp->rp_tdeli_dt($tdid);
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,0)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,0,"",12)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
 
@@ -589,7 +509,7 @@ function show_tdeli($tdid){
     }
 
     $content .= "<table id='rp-2sign' class='doc-final'>"
-            . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้รับสินค้า</th><th width='180'>ผู้ส่งสินค้า</th></tr>"
+            . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้ส่งสินค้า</th><th width='180'>ผู้รับสินค้า</th></tr>"
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
             . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
@@ -838,4 +758,104 @@ function print_header($docname,$page=null){
             . "<div class='doc-page'>$page</div>"
             . "</div>";
     return $head;
+}
+function job_dttb($data){
+    $dttb = "<table class='jdetail'>";
+    foreach($data as $k=>$v){
+        $rh = count($v);
+        $dttb .= "<tr><td rowspan='$rh'>$k</td>";
+        for($i=0;$i<$rh;$i++){
+            $dttb .= ($i==0?"":"<tr>")
+                . "<td>$v[$i]</td></tr>";
+        }
+    }
+    $dttb .= "</table>";
+    return $dttb;
+}
+function job_detail($qid){
+    global $rpdb;
+    $db = $rpdb;
+    $info = $db->get_quote_info($qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
+    $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
+    $process =  $db->get_keypair("pap_process", "process_id", "process_name");
+    $comps = $db->get_print_comp($qid);
+    //page
+    if($info['cat_id']==10||$info['cat_id']==69){
+        $page = "เนื้อใน ".$info['page_inside']. " หน้า";
+    } else {
+        if($info['page_inside']==2){
+            $page = "พิพม์ 2 ด้าน";
+        } else {
+            $page = "พิพม์ 1 ด้าน";
+        }
+    }
+    $data['บริการงานพิมพ์'] = array(
+        "ชื่องาน : ".$info['name'],
+        "ประเภท : ".$product_type[$info['cat_id']],
+        "ขนาด : ".$info['size'],
+        $page
+    );
+    $cno = 1;
+    foreach($comps as $k=>$v){
+        $post = explode(",",$v['comp_postpress']);
+        if($info['cat_id']==10||$info['cat_id']==69){
+            if($v['comp_type']==1){
+                $cname = "เนื้อใน ";
+                $cname .= (count($comps)>2?"($cno)":"");
+                $cno++;
+            } else {
+                $cname = "ปก";
+            }
+        } else {
+            $cname = "ลักษณะชิ้นงาน";
+        }
+        $data[$cname] = array(
+            $v['paper'],
+            $v['weight']." แกรม",
+            $v['color']
+        );
+        //coating
+        if(isset($v['coating'])){
+            array_push($data[$cname],$v['coating']);
+        }
+        //cwing
+        if($info['cwing']==1&&$v['comp_type']==0){
+            array_push($data[$cname],"ปีกปกหน้า ".$info['fwing']." cm","ปีกปกหลัง ".$info['bwing']." cm");
+        }
+        //แผ่นพับ show พับกี่ส่วน
+        if($info['cat_id']==11){
+            array_push($data[$cname],$process[$info['folding']]);
+        }
+        //ไดคัท
+        foreach($post as $p){
+            if($p>0){
+                array_push($data[$cname],$process[$p]);
+            }
+        }
+    }
+    if($info['prepress']!==""){
+        $pp = explode(",",$info['prepress']);
+        $data["การจัดทำต้นฉบับ"] = array();
+        foreach($pp as $k=>$v){
+            if($v>0){
+                array_push($data["การจัดทำต้นฉบับ"],$process[$v]);
+            }
+        }
+    }
+    if(strlen($info['packing'])>0||strlen($info['shipping'])>0){
+        $packing = explode(",",$info['packing']);
+        $shipping = explode(",",$info['shipping']);
+        $data["ข้อกำหนดอื่นๆ"] = array();
+        foreach($packing as $v){
+            if($v>0){
+                array_push($data["ข้อกำหนดอื่นๆ"],$process[$v]);
+            }
+        }
+        foreach($shipping as $v){
+            if($v>0){
+                array_push($data["ข้อกำหนดอื่นๆ"],$process[$v]);
+            }
+        }
+    }
+    return $data;
 }

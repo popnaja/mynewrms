@@ -225,8 +225,9 @@ END_OF_TEXT;
         try{
             $sql = <<<END_OF_TEXT
 SELECT
-job_name,qty,price/qty,discount
-FROM pap_delivery_dt
+quote_id,qty,price/qty,discount
+FROM pap_delivery_dt AS dt
+LEFT JOIN pap_order AS job ON job.order_id=dt.order_id
 WHERE deli_id=:did
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
