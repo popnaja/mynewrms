@@ -133,7 +133,7 @@ if(isset($oid)){
     $iperpage = 20;
     /* ------------------------------------------------- Graphic view -----------------------------------------------------------------*/
     if(isset($d)){
-        $head = array("แก้ไข","ชื่องาน","ลูกค้า","ยอดผลิต","กำหนดส่งงาน","แผนPlate","สถานะ","Plate");
+        $head = array("แก้ไข","เอกสาร","ชื่องาน","ลูกค้า","ยอดผลิต","กำหนดส่งงาน","แผนPlate","สถานะ","Plate");
         $all_rec = $tbpdo->view_order_ga($pauth,$op_plan_status_icon,$op_job_status, $status,$s);
         $rec = $tbpdo->view_order_ga($pauth,$op_plan_status_icon, $op_job_status,$status,$s, $page, $iperpage);
         $max = ceil(count($all_rec)/$iperpage);

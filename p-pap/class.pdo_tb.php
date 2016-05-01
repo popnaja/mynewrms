@@ -375,6 +375,7 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 po.order_id,
+meta1.meta_value AS qsign,      
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":<br/>",pq.name,"</a>"),
 cus.customer_name,
 FORMAT(amount,0),
@@ -386,6 +387,7 @@ FROM pap_order AS po
 LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
 LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key ="page_inside"
+LEFT JOIN pap_quote_meta AS meta1 ON meta1.quote_id=po.quote_id AND meta1.meta_key ="quote_sign"
 $filter
 ORDER BY pq.plan_delivery ASC
 $lim_sql
@@ -408,7 +410,10 @@ END_OF_TEXT;
                 } else {
                     $res[$k]['order_id'] = "";
                 }
-
+                if(strlen($v['qsign'])>0){
+                    $qsign = substr(ROOTS,0,-1).$v['qsign'];
+                    $res[$k]['qsign'] = "<a href='$qsign' title='View Doc' class='icon-search' target='_blank'></a>";
+                }
             }
             return $res;
         } catch (Exception $ex) {
@@ -608,17 +613,17 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_job_deli($auth,$op,$due=null,$status=null,$s=null,$page=null,$perpage=null){
+    public function view_job_deli($auth,$op,$mm=null,$status=null,$s=null,$page=null,$perpage=null){
         include_once("class.pappdo.php");
         $db = new PAPdb(DB_PAP);
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po.status BETWEEN 69 AND 79";
-            $filter .= (isset($due)?" AND quo.plan_delivery='$due'":"");
+            $filter .= (isset($mm)?" AND DATE_FORMAT(deli.date,'%y%m')='$mm'":"");
             $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',quo.name) LIKE '%$s%'":"");
-            if(is_null($s)&&is_null($status)&&is_null($due)){
+            if(is_null($s)&&is_null($status)&&is_null($mm)){
                 $filter .= " AND po.status IN (69,70)";
             }
             $sql = <<<END_OF_TEXT

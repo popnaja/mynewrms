@@ -1007,6 +1007,20 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_job_deli_mm(){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT DISTINCT
+DATE_FORMAT(date,'%y%m'),DATE_FORMAT(date,'%b-%y')
+                    FROM pap_delivery 
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function get_job_due(){
         try {
             $sql = <<<END_OF_TEXT

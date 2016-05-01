@@ -214,34 +214,36 @@ if($action=="add"){
     }
 } else {
     /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
-    $cat = (isset($_GET['fil_cat'])&&$_GET['fil_cat']>0?$_GET['fil_cat']:null);
     $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
     $mm = (isset($_GET['fil_mm'])&&$_GET['fil_mm']>0?$_GET['fil_mm']:null);
-    $due = (isset($_GET['fil_due'])&&$_GET['fil_due']>0?$_GET['fil_due']:null);
 
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
 
-    $arrdue = $db->get_job_due();
+    $jdeli = $db->get_job_deli_mm();
 
     //view
     $head = array("ชื่องาน","ลูกค้า","กำหนดส่ง","ยอดผลิต","รวม","สร้าง","ใบแจ้งหนี้","ใบส่งของ");
-    $rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$due,$status,$s, $page, $iperpage);
-
-    $all_rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$due,$status,$s);
+    $rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$mm,$status,$s, $page, $iperpage);
+    $all_rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$mm,$status,$s);
+    if($pauth>3){
+        $csvlink = $root."csv_download.php?req=deli_csv&month=$mm";
+    }
+    $csv = "<a id='quote-csv' href='$csvlink' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>";
     $max = ceil(count($all_rec)/$iperpage);
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน",$s)
             . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_delivery, $status,"สถานะ")
-            . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดส่ง")
+            . $tb->show_filter(current_url(), "fil_mm", $jdeli, $mm,"เดือน")
             . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
             . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec,"tb-job-delivery")
             . "<div class='tb-legend'>"
             . my_legend($op_job_delivery,$op_job_delivery_icon)
+            . $csv
             . "</div>"
             . $form->show_button("mix-deli", "สร้างใบส่งของรวม", "float-right")
             . "</div><!-- .col-100 -->";

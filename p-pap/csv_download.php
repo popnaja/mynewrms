@@ -29,6 +29,13 @@ if($req == "quote_csv"){
     $rec = $db->get_acc_csv($due);
     $tt = array_merge($head,$rec);
     $filename = "acc.csv";
+} else if($req == "deli_csv"){
+    $month = filter_input(INPUT_GET,'month',FILTER_UNSAFE_RAW);
+    $head[] = array("ชื่องาน","ลูกค้า","กำหนดส่ง","ยอดผลิต","สร้าง","ใบแจ้งหนี้","ใบส่งของ","สถานะ");
+    $rec = $db->get_deli_csv($op_job_status+$op_job_account,$month);
+    $tt = array_merge($head,$rec);
+    //var_dump($tt);
+    $filename = "deli.csv";
 } else {
     header("location:".PAP);
     exit();
@@ -157,6 +164,41 @@ END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $res;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
+    public function get_deli_csv($op,$month=null){
+        try {
+            $filter = "WHERE po.status>=69";
+            $filter .= (isset($month)&&$month!=""?" AND DATE_FORMAT(deli.date,'%y%m')='$month'":"");
+            $sql = <<<END_OF_TEXT
+SELECT
+CONCAT(order_no,":",quo.name),
+CONCAT(cus.customer_code,":",cus.customer_name),
+quo.plan_delivery AS due,
+quo.amount,
+deli.date,
+deli.no,
+GROUP_CONCAT(tdeli.no) AS gtno,
+deli.status
+FROM pap_order AS po
+LEFT JOIN pap_quotation AS quo on quo.quote_id=po.quote_id
+LEFT JOIN pap_customer AS cus ON cus.customer_id=quo.customer_id
+LEFT JOIN pap_delivery_dt AS dt ON dt.order_id=po.order_id
+LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
+LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
+$filter
+GROUP BY po.order_id
+ORDER BY quo.plan_delivery ASC, tdeli.id ASC
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach($res as $k=>$v){
+                $res[$k]['status'] = $op[$v['status']];
+            }
             return $res;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
