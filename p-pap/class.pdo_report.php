@@ -327,7 +327,7 @@ END_OF_TEXT;
                 $type = explode(",",$v['type']);
                 $date = thai_date($v['date'],true);
                 $due = thai_date($v['due'], true);
-                $job = "<ul>";
+                $job = "<ul class='job-list'>";
                 for($j=0;$j<count($jname);$j++){
                     $unit = $op[$type[$j]];
                     $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";
@@ -389,7 +389,7 @@ END_OF_TEXT;
                 $jname = explode(",",$v['jname']);
                 $qty = explode(",",$v['qty']);
                 $type = explode(",",$v['type']);
-                $job = "<ul>";
+                $job = "<ul class='job-list'>";
                 for($j=0;$j<count($jname);$j++){
                     $unit = $op[$type[$j]];
                     $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";

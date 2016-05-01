@@ -241,7 +241,7 @@ class mytable {
                 . "</div><!-- #$id -->\n";
         return $html;
     }
-    public function show_tb_bill($arrheader,$arrdata,$id=""){
+    public function show_tb_bill($arrheader,$arrdata,$id="",$row=null){
         __autoloada("thai");
         $sum = 0;
         $n = count($arrdata);
@@ -253,6 +253,7 @@ class mytable {
             $html .= "<th>$value</th>";
         }
         $html .= "</tr>";
+        $i = 0;
         if(isset($arrdata)&&sizeof($arrdata,0)>0){
             foreach($arrdata as $key=>$val){
                 if(!is_array($val)){
@@ -265,6 +266,16 @@ class mytable {
                         $html .= "<td>".$act_v."</td>";
                     }
                     $html .= "</tr>";
+                    $i++;
+                }
+            }
+            if(isset($row)){
+                if($i<$row){
+                    for($j=0;$j<($row-$i);$j++){
+                        $html .= "<tr class='tb-data tb-row'>"
+                                . str_repeat("<td></td>",count($val))
+                                . "</tr>";
+                    }
                 }
             }
             $total = number_format($sum,2);

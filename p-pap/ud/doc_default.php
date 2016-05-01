@@ -530,7 +530,7 @@ function show_pbill($bid){
     $info = $rp->rp_pbill_info($bid);
     $thdate = thai_date($info['date']);
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
-    $content = "<div class='print-a4'>"
+    $content = "<div class='print-letter'>"
             . print_header("ใบวางบิล");
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
@@ -554,7 +554,7 @@ function show_pbill($bid){
     $head = array("ลำดับ<br/>No","เลขที่เอกสาร<br/>Document No","วันที่เอกสาร<br/>Date","ครบกำหนดชำระ<br/>Due Date","จำนวนเงิน<br/>Amount(Baht)");
     $recs = $rp->rp_pbill_dt($bid,$op_type_unit);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_bill($head,$recs,"tb-rp")
+            . $tb->show_tb_bill($head,$recs,"tb-rp",10)
             . "<span style='font-size:11pt;'>ได้รับบิลไว้ตรวจสอบตามรายการข้างต้นนี้ถูกต้องแล้ว</span>"
             . "</div><!-- .doc-dt -->";
     $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
@@ -566,7 +566,7 @@ function show_pbill($bid){
             . "<tr><td>วันที่ : </td><td>วันที่ : $thdate</td></tr>"
             . "</table>";
 
-    $content .= "</div><!-- .print-a4 -->";
+    $content .= "</div><!-- .print-letter -->";
     return $content;
 }
 function show_invoice($ivid){
@@ -583,10 +583,8 @@ function show_invoice($ivid){
     //$ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
     $cus = $db->get_meta("pap_customer_meta", "customer_id", $info['customer_id']);
     $thdate = thai_date($info['date']);
-    $original = "<div class='print-a4-fix'>"
+    $original = "<div class='print-letter'>"
             . print_header("ต้นฉบับ<br/>ใบกำกับภาษี");
-    $copy = "<div class='print-a4-fix'>"
-            . print_header("สำเนา<br/>ใบกำกับภาษี");
     $doc = "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ลูกค้า : </div>"
@@ -610,7 +608,7 @@ function show_invoice($ivid){
     $discount = $info['discount'];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",10)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
 
@@ -621,13 +619,13 @@ function show_invoice($ivid){
     $pay = "";
 
     $doc .= "<table id='rp-2sign' class='doc-final'>"
-            . "<tr><th width='110'>ชำระเงินโดย :</th><td>$pay</td><th width='180'>ผู้รับเงิน</th><th width='180'>ผู้จัดการ</th></tr>"
-            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'>$msign</td></tr>"
-            . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
+            . "<tr><th width='110'>ชำระเงินโดย :</th><td>$pay</td><th width='180'>ผู้ส่งสินค้า</th><th width='180'>ผู้รับสินค้า</th></tr>"
+            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
+            . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
 
-    $doc .= "</div><!-- .print-a4 -->";
-    return $original.$doc.$copy.$doc;
+    $doc .= "</div><!-- .print-letter -->";
+    return $original.$doc;
 }
 function show_receipt($rcid){
     global $rpdb;
@@ -643,7 +641,7 @@ function show_receipt($rcid){
     //$ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
     $thdate = thai_date($info['date']);
 
-    $doc = "<div class='print-a4-fix'>"
+    $doc = "<div class='print-letter'>"
             . print_header("ใบเสร็จรับเงิน");
 
     $doc .= "<div class='doc-info'>"
@@ -670,7 +668,7 @@ function show_receipt($rcid){
     $discount = 0;
     $tax = ($info['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",10)
             . "<span style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี่จะใช้ได้ต่อเมื่อสามารถเรียกเก็บเงินได้ตามเช็คแล้วเท่านั้น</span>"
             . "</div><!-- .doc-dt -->";
     //signature
@@ -691,12 +689,12 @@ function show_receipt($rcid){
     }
     //show footer
     $doc .= "<table id='rp-2sign' class='doc-final'>"
-            . "<tr><th width='110'>ชำระเงินโดย :</th><td>$pay</td><th width='180'>ผู้รับเงิน</th><th width='180'>ผู้จัดการ</th></tr>"
-            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'>$msign</td></tr>"
-            . "<tr><td>วันที่ : $thdate</td><td>วันที่ : $thdate</td></tr>"
+            . "<tr><th width='110'>ชำระเงินโดย :</th><td></td><th width='180'>ผู้ตรวจ</th><th width='180'>ผู้รับเงิน</th></tr>"
+            . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"
+            . "<tr><td>วันที่ : </td><td>วันที่ : </td></tr>"
             . "</table>";
 
-    $doc .= "</div><!-- .print-a4 -->";
+    $doc .= "</div><!-- .print-letter -->";
     return $doc;
 }
 function compare_plan($plan,$act){
