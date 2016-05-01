@@ -40,9 +40,9 @@ function show_quote_df($qid){
     //$due = ($info['plan_delivery']>0?"<div class='print-list-title'>กำหนดส่งงาน : ".thai_date($info['plan_delivery'])."</div>":"");
     //multi quote
     $extra = "";
+    $x++;
     if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
         $dt = json_decode($info['multi_quote_info'],true);
-        $x += count($dt)+2;
         $qhead = array("ลำดับ","หมายเหตุ","ยอดพิมพ์","ราคาหน่วยละ","จำนวนเงิน");
         $qrec = array();
         $i = 1;
@@ -50,6 +50,7 @@ function show_quote_df($qid){
             if($v['show']>0){
                 array_push($qrec,array($i,$v['remark'],number_format($v['amount']),number_format($v['price']/$v['amount'],2),number_format($v['price'],2)));
                 $i++;
+                $x++;
             }
         }
         if(count($qrec)>0){
@@ -81,16 +82,15 @@ function show_quote_df($qid){
     } else {
         array_push($recs,array(1,$dttb,$amount,$peru,$tt));
     }
-
     //check row
-    if($x>20){
+    if($x>15){
         $page1 = "หน้า 1/2";
         $page2 = "</div><!-- .print-a4-fix -->"
                 . "<div class='print-a4-fix'>"
                 . print_header("ใบเสนอราคา","หน้า 2/2")
                 . $head
                 . $extra;
-    } else if($x>11){
+    } else if($x>7){
         $page1 = "หน้า 1/2";
         $page2 = $extra
                 . "</div><!-- .print-a4-fix -->"
@@ -414,12 +414,12 @@ function show_deli($did){
     }
     $discount = $recs[1];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
-    if($row/2<11){
+    if(ceil($row/2)<11){
         $content = "<div class='print-letter'>"
             . print_header("ใบส่งของ/ใบแจ้งหนี้")
             . $docinfo
             . "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",15-$row)
+            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",12-ceil($row/2))
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
     } else {
@@ -495,7 +495,7 @@ function show_tdeli($tdid){
     $recs = $rp->rp_tdeli_dt($tdid);
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,0,"",12)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,0,"",11)
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
 

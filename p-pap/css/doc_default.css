@@ -1,7 +1,18 @@
 /*------------------------------------------------------------------- for print ---------------------------------------------------------*/
 .print-a4 {
     box-sizing:border-box;
-    width:8.2in;
+    width:7.8in;
+    padding:0.2in;
+    margin-left:auto;
+    margin-right:auto;
+    color:#222;
+    overflow:hidden;
+    background-color:#fff;
+}
+.print-a4-fix {
+    box-sizing:border-box;
+    width:7.8in;
+    height:11.2in;
     padding:0.2in;
     margin-left:auto;
     margin-right:auto;
@@ -13,17 +24,6 @@
     box-sizing:border-box;
     width:8in;
     height:10.5in;
-    margin-left:auto;
-    margin-right:auto;
-    color:#222;
-    overflow:hidden;
-    background-color:#fff;
-}
-.print-a4-fix {
-    box-sizing:border-box;
-    width:8.2in;
-    height:11.2in;
-    padding:0.2in;
     margin-left:auto;
     margin-right:auto;
     color:#222;
@@ -246,6 +246,9 @@
 #tb-multi-q th:nth-child(2){
     width:4in;
 }
+#tb-multi-q tr{
+    height:0.4in;
+}
 #tb-multi-q td{
     border-right: rgb(150,150,150) solid 1px;
 }
@@ -288,6 +291,7 @@
 /*----------------------------------------------------------------  Jdetail   -----------------------------------------------------*/
 .jdetail {
     border:none !important;
+    background:none !important;
 }
 .jdetail td:first-child{
     width:1.3in;
