@@ -675,9 +675,9 @@ END_OF_TEXT;
             $f = "%".$find."%";
             $sql = <<<END_OF_TEXT
 SELECT
-CONCAT(size_name,"(",size_height,"x",size_width,")"),size_id
+CONCAT(size_name,"(",size_width,"x",size_height,")"),size_id
 FROM pap_size
-WHERE CONCAT(size_name,"(",size_height,"x",size_width,")") like :find
+WHERE CONCAT(size_name,"(",size_width,"x",size_height,")") like :find
 ORDER BY size_height ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);

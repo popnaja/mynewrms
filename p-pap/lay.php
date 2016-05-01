@@ -158,7 +158,7 @@ if($action=="add"){
     $iperpage = 20;
     
     //view
-    $head = array("แก้ไข","ชื่อ","ขนาด","กระดาษปก","ปกเลย์","กระดาษเนื้อ","เนื้อเลย์");
+    $head = array("แก้ไข","ชื่อ","ขนาด(กว้างxสูง)","กระดาษปก","ปกเลย์","กระดาษเนื้อ","เนื้อเลย์");
     $all_rec = $tbpdo->view_jobsize($pauth,$s);
     $rec = $tbpdo->view_jobsize($pauth,$s,$page,$iperpage);
     $max = ceil(count($all_rec)/$iperpage);

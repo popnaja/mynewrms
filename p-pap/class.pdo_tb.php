@@ -137,7 +137,7 @@ END_OF_TEXT;
             $edit = "";
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
-            $filter = (isset($s)?"WHERE CONCAT(size_name,'(',size_height,'x',size_width,')') LIKE '%$s%'":"");
+            $filter = (isset($s)?"WHERE CONCAT(size_name,'(',size_width,'x',size_height,')') LIKE '%$s%'":"");
             if($auth>1){
                 $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='lay.php?sid=",size_id,"' title='Edit' class='icon-page-edit'></a>"),
@@ -151,7 +151,7 @@ END_OF_TEXT;
                     SELECT
                     $edit
                     size_name,
-                    CONCAT(size_height,'x',size_width),
+                    CONCAT(size_width,'x',size_height),
                     op.op_name AS cover_paper,
                     cover_lay,
                     op1.op_name AS inside_paper,
