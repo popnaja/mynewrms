@@ -19,12 +19,12 @@ if($req=="upload_paper"){
      * 5 = lead time
      * 
      */
-    $dir = "upload/";
+    $dir = dirname(__FILE__)."/upload/";
     $fileurl = $up->move_file($_FILES['csv-input'], $dir);
     if($fileurl==false){
         $_SESSION['error'] = "Upload file Error";
-        header("Location:".$_POST['redirect']);
-        exit();
+        //header("Location:".$_POST['redirect']);
+        //exit();
     } else {
         $paper_type = $db->get_keypair("pap_option", "op_name", "op_id","WHERE op_type='paper_type'");
         $paper_size = $db->get_keypair("pap_option", "op_name", "op_id","WHERE op_type='paper_size'");
@@ -32,7 +32,6 @@ if($req=="upload_paper"){
         $file = fopen($fileurl,"r");
         while(!feof($file)){
             $row = fgetcsv($file);
-            //var_dump($row);
             //check type
             $type = "paper_type";
             if(!$db->check_optdup($type,$row[0])){
@@ -129,8 +128,8 @@ if($req=="upload_paper"){
         fclose($file);
         $_SESSION['message'] = "Upload completed";
     }
-    header("Location:".$_POST['redirect']);
-    exit();
+    //header("Location:".$_POST['redirect']);
+    //exit();
 } else if($req=="upload_customer"){
     /*
      * 12 = ct_name
@@ -166,5 +165,5 @@ if($req=="upload_paper"){
         $_SESSION['message'] = "Upload completed";
     }
     //header("Location:".$_POST['redirect']);
-    exit();
+    //exit();
 }

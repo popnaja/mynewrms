@@ -103,7 +103,7 @@ END_OF_TEXT;
         try {
             $size_sql = (isset($size)?"AND mat_size=$size":"");
             $type_sql = (isset($type)?" AND mat_type=$type":"");
-            $order = ($field=="mat_weight"?"ORDER BY CAST(po.op_name AS UNSIGNED) ASC":"");
+            $order = ($field=="mat_weight"?"ORDER BY CAST(po.op_name AS UNSIGNED) ASC":" ORDER BY po.op_name ASC");
             $sql = <<<END_OF_TEXT
                     SELECT
                     $field, po.op_name

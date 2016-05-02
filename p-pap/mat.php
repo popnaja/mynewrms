@@ -52,8 +52,8 @@ if($action=="add"){
     }
     //add
     $mat = array("0"=>"--กลุ่มวัตถุดิบ--")+$db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='mat_cat'");
-    $paper_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_type'");
-    $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
+    $paper_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_type' ORDER BY op_name ASC");
+    $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size' ORDER BY op_name ASC");
     $paper_weight = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_weight' ORDER BY CAST(op_name AS DECIMAL) ASC");
     $res_cat = "sel-cat-".implode(" sel-cat-",array_diff(array_keys($mat),array(0,8)));
     $content .= "<h1 class='page-title'>เพิ่ม$pagename</h1>"
@@ -99,8 +99,8 @@ if($action=="add"){
     $p_cost = (isset($info['paper_cost'])?$info['paper_cost']:"");
     //edit
     $mat = array("0"=>"--กลุ่มวัตถุดิบ--")+$db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='mat_cat'");
-    $paper_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_type'");
-    $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
+    $paper_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_type' ORDER BY op_name ASC");
+    $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size' ORDER BY op_name ASC");
     $paper_weight = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_weight' ORDER BY CAST(op_name AS DECIMAL) ASC");
     $res_cat = "sel-cat-".implode(" sel-cat-",array_diff(array_keys($mat),array(0,8)));
     $content .= "<h1 class='page-title'>แก้ไข$pagename</h1>"
