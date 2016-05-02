@@ -1152,6 +1152,58 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_plate_sch($op,$year,$month){
+        try {
+            $mm = new DateTime($year.$month."01",new DateTimeZone("Asia/Bangkok"));
+            $mm->sub(new DateInterval("P1M"));
+            $st = $mm->format("Ym");
+            $mm->add(new DateInterval("P2M"));
+            $en = $mm->format("Ym");
+            $sql = <<<END_OF_TEXT
+SELECT
+DATE_FORMAT(job.plate_plan,"%Y%m%d") AS plandate,
+DATE_FORMAT(job.plate_received,"%Y%m%d") AS rcdate,
+job.order_id AS id,
+quo.name AS name,
+job.status AS status,
+frame.frame
+FROM pap_order AS job
+LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+LEFT JOIN (
+	SELECT
+	comp.order_id AS id,
+	SUM(IF(quo.cat_id=69 AND comp.type=1,1,ceil(page/paper_lay))) AS frame
+	FROM pap_order_comp AS comp
+	LEFT JOIN pap_order AS job ON job.order_id=comp.order_id
+	LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+	GROUP BY comp.order_id
+) AS frame ON frame.id=job.order_id
+WHERE job.plate_plan IS NOT NULL AND DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":st",$st);
+            $stmt->bindParam(":en",$en);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $res1 = array();
+            foreach($res as $k=>$v){
+                $day = ($v['rcdate']==""?$v['plandate']:$v['rcdate']);
+                $frame = $v['frame'];
+                if(!isset($res1[$day])){
+                    $res1[$day] = array(0,"","");
+                }
+                $res1[$day][0]++;
+                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['id'];
+                $res1[$day][2] .= ($res1[$day][0]>1?",":"")
+                        . ($v['status']>7?"(PR)":$op[$v['status']])
+                        . mb_substr($v['name'],0,10,"utf-8")
+                        . " ($frame)";
+            }
+            return $res1;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function get_job_status($oid){
         try {
             $sql = <<<END_OF_TEXT

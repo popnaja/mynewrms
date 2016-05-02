@@ -24,7 +24,8 @@ class PAPmenu extends mymenu {
                 "วงเงินลูกค้า" => $root."ac_credit.php"
             ),
             "ฝ่ายกราฟฟิก" => array(
-                "ใบสั่งงาน" => $root."order.php?d=ga"
+                "ใบสั่งงาน" => $root."order.php?d=ga",
+                "ตารางส่งเพลต" => $root."plate_schedule.php"
             ),
             "ฝ่ายผลิต" => array(
                 "ใบสั่งงาน" => $root."order.php",

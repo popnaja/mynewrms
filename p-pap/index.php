@@ -30,7 +30,7 @@ $job = $db->get_job_schedule($year, $month);
 $cd = new mycalendar($year,$month,150);
 $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . "<div id='mycd-div'>"
-        . $cd->show_calendar($job,"month","mycd_change();")
+        . $cd->show_calendar($job,"month","mycd_change('mycd_change');")
         . "</div>";
 $content .= $menu->showfooter();
 echo $content;

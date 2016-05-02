@@ -227,7 +227,7 @@ if($action=="add"){
     $head = array("ชื่องาน","ลูกค้า","กำหนดส่ง","ยอดผลิต","รวม","สร้าง","ใบแจ้งหนี้","ใบส่งของ");
     $rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$mm,$status,$s, $page, $iperpage);
     $all_rec = $tbpdo->view_job_deli($pauth,$op_job_delivery_icon,$mm,$status,$s);
-    if($pauth>3){
+    if($pauth>1){
         $csvlink = $root."csv_download.php?req=deli_csv&month=$mm";
     }
     $csv = "<a id='quote-csv' href='$csvlink' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>";

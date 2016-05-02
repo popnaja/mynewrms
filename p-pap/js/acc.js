@@ -84,37 +84,6 @@ $(document).ready(function(){
     });
 });
 }
-function mycd_bill(){
-$(document).ready(function(){
-    //change month
-    var but = $(".mycd-c-month");
-    var url = $("#ajax_req").val();
-    but.on("click",function(){
-        if(!$(this).hasClass("mycd-disable")){
-            var data = {};
-            data['request'] = "mycd_bill_m";
-            data['year'] = $(this).attr("year");
-            data['month'] = $(this).attr("month");
-            data['type'] = $(this).attr('cdtype');
-            post_ajax(data,url)
-        }
-    });
-
-    //change type
-    var tbut = $(".mycd-switch-type");
-    tbut.on("click",function(){
-        if(!$(this).hasClass("mycd-active")){
-            var data = {};
-            data['request'] = "mycd_bill_t";
-            data['type'] = $(this).attr('cdtype');
-            data['year'] = $(this).attr("year");
-            data['month'] = $(this).attr("month");
-            post_ajax(data,url)
-        }
-    });
-
-});
-}
 function inv_function(pre){
 $(document).ready(function(){
     var cancel = $("#cancel");
