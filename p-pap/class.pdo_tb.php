@@ -430,7 +430,7 @@ END_OF_TEXT;
             $filter .= (isset($status)&&$status>0?" AND po.status=$status":"");
             $filter .= (isset($s)?" AND CONCAT(po.order_no,':',pq.name) LIKE '%$s%'":"");
             if(is_null($s)&&is_null($status)){
-                $filter .= " AND prod_finished IS NULL = 1";
+                $filter .= " AND prod_finished IS NULL = 1 AND po.status<69";
             }
             $sql = <<<END_OF_TEXT
 SELECT

@@ -1509,8 +1509,13 @@ if($req == "login"){
       //update job status
       update_job_status($_POST['oid']);
     } else {
-      //update main status
-      $db->update_data("pap_order", "order_id", $_POST['oid'], array("status"=>$_POST['status']));
+        //update main status
+        if($_POST['status']==69){
+            $finished = pap_now();
+        } else {
+            $finished = null;
+        }
+        $db->update_data("pap_order", "order_id", $_POST['oid'], array("status"=>$_POST['status'],"prod_finished"=>$finished));
     }
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);

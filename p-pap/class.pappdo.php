@@ -1028,7 +1028,7 @@ SELECT DISTINCT
 quo.plan_delivery,DATE_FORMAT(quo.plan_delivery,'%d-%b')
 FROM pap_order AS job
 LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
-WHERE job.status BETWEEN 1 AND 11
+WHERE job.status BETWEEN 7 AND 69
 ORDER BY quo.plan_delivery ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
