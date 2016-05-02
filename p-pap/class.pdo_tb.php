@@ -623,19 +623,30 @@ END_OF_TEXT;
             $filter .= (isset($mm)?" AND DATE_FORMAT(deli.date,'%y%m')='$mm'":"");
             $filter .= (isset($status)&&$status>0?" AND deli.status=$status":"");
             $filter .= (isset($s)?" AND job_name LIKE '%$s%'":"");
+            if(is_null($mm)&&is_null($status)&&is_null($s)){
+                $filter .= " AND deli.status<79";
+            }
             $sql = <<<END_OF_TEXT
 SELECT
 dt.job_name,cus.customer_name,
-FORMAT(dt.qty,0),FORMAT(dt.price,2),
+FORMAT(dt.qty,0) AS qty,FORMAT(dt.price,2),
 deli.id,
 deli.no,
 deli.status,
-GROUP_CONCAT(tdeli.id) AS tid,
-GROUP_CONCAT(tdeli.no) AS tno
+GROUP_CONCAT(CONCAT(tdeli.id,":",tdeli.no) ORDER BY tdeli.no ASC) AS tid,
+dt.qty AS dqty,
+tdt.tqty
 FROM pap_delivery_dt AS dt
 LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
 LEFT JOIN pap_customer AS cus ON cus.customer_id=dt.customer_id
 LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
+LEFT JOIN (
+    SELECT
+    job_name,SUM(qty) AS tqty
+    FROM pap_temp_dt
+    WHERE order_id=0
+    GROUP BY job_name
+) AS tdt ON tdt.job_name=dt.job_name
 $filter
 GROUP BY dt.job_name
 ORDER BY deli.date ASC
@@ -650,23 +661,29 @@ END_OF_TEXT;
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach($res as $k=>$v){
                 $did = $v['id'];
-                unset($res[$k]['id']);
                 $res[$k]['no'] = "<a href='mdelivery.php?action=edit&did=$did' title='Edit' class='icon-page-edit'></a>"
                         . "<a href='mdelivery.php?action=print&did=$did' title='Print' target='_blank'>".$v['no']."</a>";
                 $res[$k]['status'] = $op[$v['status']];
                 //temp deli
                 $atid = explode(",",$v['tid']);
-                $atno = explode(",",$v['tno']);
                 $tdeli = "";
                 for($i=0;$i<count($atid);$i++){
-                    $tdid = $atid[$i];
+                    $data = explode(":",$atid[$i]);
+                    $tdid = $data[0];
+                    $tno = $data[1];
                     if($tdid>0){
                         $tdeli .= "<a href='mdelivery.php?action=edit&tdid=$tdid' title='Edit' class='icon-page-edit'></a>"
-                        . "<a href='mdelivery.php?action=print&tdid=$tdid' title='Print' target='_blank'>".$atno[$i]."</a>";
+                        . "<a href='mdelivery.php?action=print&tdid=$tdid' title='Print' target='_blank'>".$tno."</a>"
+                                . "<br/>";
                     }
                 }
-                unset($res[$k]['tno']);
+                if($v['dqty']!=$v['tqty']){
+                    $tdeli .= "<a href='mdelivery.php?action=addtdeli&did=$did' title='Add' class='icon-plus-square'></a>";
+                }
                 $res[$k]['tid'] = $tdeli;
+                unset($res[$k]['dqty']);
+                unset($res[$k]['tqty']);
+                unset($res[$k]['id']);
             }
             return $res;
         } catch (Exception $ex) {

@@ -113,19 +113,20 @@ $(document).ready(function(){
     }
     function pre_tb(){
         $.each(pre,function(k,v){
-            var oid = v[0];
-            var name = v[1];
-            var amount = v[2]
-            var price = amount - v[3];
-            var discount = typeof v[4] !=="undefined" ? v[4] : price;
-            var ed = [oid,name,amount,price,discount];
+            var name = v[0];
+            var type = parseInt(v[1]);
+            var amount = parseFloat(v[2]);
+            var price = parseFloat(v[3]);
+            var discount = parseFloat(v[4]);
+            var ed = [name,type,amount,price,discount];
             rec[name] = [
-                //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
+                "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
                 "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
-                name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
-                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
-                price+"<input type='hidden' name='rem[]' value='"+price+"' />",
-                discount+"<input type='hidden' name='discount[]' value='"+discount+"' />"
+                name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                typen[type]+"<input type='hidden' name='type[]' value='"+type+"' />",
+                numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                numformat(price,2)+"<input type='hidden' name='price[]' value='"+price+"' />",
+                numformat(discount,2)+"<input type='hidden' name='discount[]' value='"+discount+"' />"
             ];
         });
         draw_tb();
@@ -145,9 +146,9 @@ $(document).ready(function(){
                 "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
                 name+"<input type='hidden' name='name[]' value='"+name+"' />",
                 typen[type]+"<input type='hidden' name='type[]' value='"+type+"' />",
-                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
-                price+"<input type='hidden' name='price[]' value='"+price+"' />",
-                discount+"<input type='hidden' name='discount[]' value='"+discount+"' />"
+                numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                numformat(price,2)+"<input type='hidden' name='price[]' value='"+price+"' />",
+                numformat(discount,2)+"<input type='hidden' name='discount[]' value='"+discount+"' />"
             ];
             draw_tb();
             clear();
@@ -184,6 +185,98 @@ $(document).ready(function(){
         $("#amount").val("");
         $("#price").val("");
         $("#discount").val("");
+        cancel.addClass("form-hide");
+        //edform.addClass("form-hide");
+    }
+});
+}
+function mtdeli_function(pre){
+$(document).ready(function(){
+    var cancel = $("#cancel");
+    var addbut = $("#add-list");
+    var edform = $(".my-tab-inside");
+    var targ = $("#deli-list");
+    var header = ["ลบ","แก้ไข","ชื่องาน","ยอดงาน","ค้างส่ง","ยอดส่ง"];
+    var rec = {};
+    inputenter(['deli'],'add-list');
+    //cancel
+    var cancel = $("#cancel");
+    cancel.on("click",function(){
+        clear();
+    });
+    if($.type(pre)!=="undefined"){
+        pre_tb();
+    }
+    function pre_tb(){
+        $.each(pre,function(k,v){
+            var name = v[0];
+            var amount = parseFloat(v[1]);
+            var remain = parseFloat(v[2]);
+            var deli = parseFloat(v[3]);
+            var ed = [name,amount,remain,deli];
+            rec[name] = [
+                "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                numformat(remain,0)+"<input type='hidden' name='remain[]' value='"+remain+"' />",
+                numformat(deli,0)+"<input type='hidden' name='deli[]' value='"+deli+"' />"
+            ];
+        });
+        draw_tb();
+    }
+    addbut.on("click",function(){
+        var remain = parseFloat($("#remain").val());
+        var deli = parseFloat($("#deli").val());
+        if(!valZero("deli")||!valZero(['remain'])){
+            //show msg
+        } else if(deli>remain){
+            pg_dialog("คำเตือน","ยอดส่งมากกว่ายอดค้างส่ง");
+        } else {
+            var name = $("#name").val();
+            var amount = parseFloat($("#amount").val());
+            var ed = [name,amount,remain,deli];
+            rec[name] = [
+                "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                numformat(remain,0)+"<input type='hidden' name='remain[]' value='"+remain+"' />",
+                numformat(deli,0)+"<input type='hidden' name='deli[]' value='"+deli+"' />"
+            ];
+            draw_tb();
+            clear();
+        }
+    });
+    //draw table
+    function draw_tb(){
+        targ.html(show_table(header,rec,'tb-mdeli-list'));
+        var del = $(".del-list");
+        del.off("click");
+        del.on("click",function(){
+            delete rec[$(this).attr("rid")];
+            $(this).parents("tr").remove();
+        });
+        //edit
+        var edit = $(".edit-list");
+        edit.off("click");
+        edit.on("click",function(){
+            edform.removeClass("form-hide");
+            cancel.removeClass("form-hide");
+            var info = $(this).attr("info").split(",");
+            addbut.val("แก้ไข");
+            $("#name").val(info[0]);
+            $("#amount").val(info[1]);
+            $("#remain").val(info[2]);
+            $("#deli").val(info[3]);
+        });
+    }
+    function clear(){
+        addbut.val("เพิ่มลงรายการ");
+        $("#name").val("");
+        $("#amount").val("");
+        $("#remain").val("");
+        $("#deli").val("");
         cancel.addClass("form-hide");
         //edform.addClass("form-hide");
     }
@@ -247,6 +340,7 @@ $(document).ready(function(){
             var data = {};
             data['request'] = "delete_temp_deli";
             data['tdid'] = $("#tdid").val();
+            data['did'] = $("#did").val();
             data['redirect'] = $("#redirect").val();
             post_ajax(data,$("#ajax_req").val());
         }

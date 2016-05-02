@@ -1059,6 +1059,24 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_job_mdeli($jname,$tdid=null){
+        try {
+            $exclude = (isset($tdid)?" AND temp_deli_id<>$tdid":"");
+            $sql = <<<END_OF_TEXT
+SELECT
+SUM(qty) AS qty
+FROM pap_temp_dt
+WHERE order_id=0 AND job_name=:jname $exclude
+GROUP BY job_name
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":jname",$jname);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function check_job_in_deli($arroid){
         try {
             $oid = implode(",",$arroid);
@@ -1079,26 +1097,33 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function check_next_tdeli_code($oid){
+    public function check_next_tdeli_code($oid,$jname=null){
         try {
+            $filter = (isset($jname)?"WHERE dt.job_name='$jname'":"WHERE dt.order_id=:oid");
             $sql = <<<END_OF_TEXT
 SELECT
 deli.no AS delino,tdeli.no AS tno,deli.id
 FROM pap_delivery_dt AS dt
 LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
 LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
-WHERE dt.order_id=:oid
+$filter
 ORDER BY tdeli.id DESC
 LIMIT 1
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(":oid",$oid);
+            if(!isset($jname)){
+                $stmt->bindParam(":oid",$oid);
+            }
             $stmt->execute();
             $temp = $stmt->fetch(PDO::FETCH_ASSOC);
-            $lastcode = $temp['tno'];
-            $maincode = $temp['delino'];
-            $next = (int)str_replace($maincode."-","",$lastcode)+1;
-            return array($temp['id'],$maincode."-".$next);
+            if($temp['tno']==""){
+                return $temp['delino'];
+            } else {
+                $lastcode = $temp['tno'];
+                $maincode = $temp['delino'];
+                $next = (int)str_replace($maincode."-","",$lastcode)+1;
+                return array($temp['id'],$maincode."-".$next);
+            }
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }

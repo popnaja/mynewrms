@@ -103,6 +103,189 @@ if($action=="add"){
             . "mdeli_function('',$typen);"
             . "get_cus_info();"
             . "</script>";
+} else if ($action=="edit"&&isset($did)){
+    /*----------------------------------------------------- EDIT MANUAL DELIVERY ------------------------------------------------------------*/
+    //loaddata
+    $info = $db->get_info("pap_delivery", "id", $did);
+    $dtinfo = $db->get_infos("pap_delivery_dt", "deli_id", $info['id']);
+    $cid = $dtinfo[0]['customer_id'];
+    $credit = $dtinfo[0]['credit'];
+    $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$cid);
+    $cinfo = $db->get_info("pap_customer", "customer_id", $cid);
+    $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
+    $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id=$cid");
+    $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
+    $typen = json_encode($product_type);
+    
+    $rec = [];
+    foreach($dtinfo as $k=>$v){
+        array_push($rec,array($v['job_name'],$v['type'],$v['qty'],$v['price'],$v['discount']));
+    }
+    $jrec = json_encode($rec);
+    $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070",null,"")
+            . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
+            . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
+            . $form->show_num("price", "", 0.01, "", "ราคา", "", "label-3070","min='0'")
+            . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=1")
+            . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
+            . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
+
+    $content .= "<h1 class='page-title'>แก้ไข$pagename </h1>"
+            . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . $form->show_st_form()
+            . "<div class='col-50'>"
+            . $form->show_text("dno","dno",$info['no'],"","รหัสใบแจ้งหนี้","","label-inline readonly",null," readonly")
+            . $form->show_hidden("cid","cid",$cid)
+            . $form->show_select("deli_ct", $contacts, "label-inline", "ผู้ติดต่อ", $info['contact'])
+            . $form->show_radio("address", $address, "radio-inline", "ที่อยู่จัดส่ง",$info['address'])
+            . "<a href='shipping_address.php?cid=$cid' title='เพิ่มที่อยู่จัดส่ง'>เพิ่มที่อยู่จัดส่ง</a>"
+            . $form->show_num("credit", $credit, 1, "", "เครดิต(วัน)", "", "label-inline","min=0")
+            . $form->show_text("date","date",$info['date'],"yyyy-mm-dd","วันที่ส่ง","","label-inline")
+            . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-100'>"
+            . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
+            . "<div id='deli-list'></div>";
+    if($pauth > 3){
+        $del = "<span id='del-job-deli' class='red-but'>Delete</span>"
+                . "<script>del_job_deli();</script>";
+    } else {
+        $del = "";
+    }
+    $content .= $del 
+            . $form->show_submit("submit","Update","but-right")
+            . $form->show_hidden("request","request","edit_mjob_deli")
+            . $form->show_hidden("uid","uid",$uid)
+            . $form->show_hidden("did","did",$did)
+            . $form->show_hidden("pauth","pauth",$pauth)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . "</div><!-- col-100 -->";
+    $form->addformvalidate("ez-msg", array('date'));
+    $content .= $form->submitscript("check_mdeli(e);")
+            . "<script>"
+            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "mdeli_function($jrec,$typen);"
+            . "</script>";
+} else if ($action=="addtdeli"&&isset($did)){
+    /*----------------------------------------------------- ADD TEMP DELIVERY ------------------------------------------------------------*/
+    //loaddata
+    $info = $db->get_info("pap_delivery", "id", $did);
+    $dtinfo = $db->get_infos("pap_delivery_dt", "deli_id", $info['id']);
+    $cid = $dtinfo[0]['customer_id'];
+    $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$cid);
+    $cinfo = $db->get_info("pap_customer", "customer_id", $cid);
+    $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
+    $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id=$cid");
+    $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
+    $typen = json_encode($product_type);
+    
+    $rec = [];
+    foreach($dtinfo as $k=>$v){
+        $deli_qty = $db->get_job_mdeli($v['job_name']);
+        array_push($rec,array($v['job_name'],$v['qty'],$v['qty']-$deli_qty['qty'],$v['qty']-$deli_qty['qty']));
+    }
+    $jrec = json_encode($rec);
+    $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070 readonly",null,"readonly")
+            . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070 readonly","min='1' readonly")
+            . $form->show_num("remain", "", 1, "", "ค้างส่ง", "", "label-3070 readonly","min='0' readonly")
+            . $form->show_num("deli", "", 1, "", "ยอดส่ง", "", "label-3070","min=1")
+            . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
+            . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
+
+    $content .= "<h1 class='page-title'>สร้างใบส่งของชั่วคราว</h1>"
+            . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . $form->show_st_form()
+            . "<div class='col-50'>"
+            . $form->show_text("dno","dno",$info['no'],"","รหัสใบแจ้งหนี้","","label-inline readonly",null," readonly")
+            . $form->show_hidden("cid","cid",$cid)
+            . $form->show_select("deli_ct", $contacts, "label-inline", "ผู้ติดต่อ", $info['contact'])
+            . $form->show_radio("address", $address, "radio-inline", "ที่อยู่จัดส่ง",$info['address'])
+            . "<a href='shipping_address.php?cid=$cid' title='เพิ่มที่อยู่จัดส่ง'>เพิ่มที่อยู่จัดส่ง</a>"
+            . $form->show_text("date","date",$info['date'],"yyyy-mm-dd","วันที่ส่ง","","label-inline")
+            . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-100'>"
+            . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
+            . "<div id='deli-list'></div>";
+    $content .= $form->show_submit("submit","Add New","but-right")
+            . $form->show_hidden("request","request","add_mjob_tdeli")
+            . $form->show_hidden("uid","uid",$uid)
+            . $form->show_hidden("did","did",$did)
+            . $form->show_hidden("pauth","pauth",$pauth)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . "</div><!-- col-100 -->";
+    $form->addformvalidate("ez-msg", array('date'));
+    $content .= $form->submitscript("check_mdeli(e);")
+            . "<script>"
+            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "mtdeli_function($jrec);"
+            . "</script>";
+} else if ($action=="edit"&&isset($tdid)){
+    /*----------------------------------------------------- EDIT TEMP DELIVERY ------------------------------------------------------------*/
+    //loaddata
+    $info = $db->get_info("pap_temp_deli", "id", $tdid);
+    $dtinfo = $db->get_infos("pap_delivery_dt", "deli_id", $info['deli_id']);
+    $ctinfo = $db->get_info("pap_contact","contact_id",$info['contact']);
+    $cid = $ctinfo['customer_id'];
+    $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$cid);
+    $cinfo = $db->get_info("pap_customer", "customer_id", $cid);
+    $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
+    $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id=$cid");
+    $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
+    $typen = json_encode($product_type);
+    
+    $rec = [];
+    foreach($dtinfo as $k=>$v){
+        $deli_qty = $db->get_job_mdeli($v['job_name'],$tdid);
+        array_push($rec,array($v['job_name'],$v['qty'],$v['qty']-$deli_qty['qty'],$v['qty']-$deli_qty['qty']));
+    }
+    $jrec = json_encode($rec);
+    $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070 readonly",null,"readonly")
+            . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070 readonly","min='1' readonly")
+            . $form->show_num("remain", "", 1, "", "ค้างส่ง", "", "label-3070 readonly","min='0' readonly")
+            . $form->show_num("deli", "", 1, "", "ยอดส่ง", "", "label-3070","min=1")
+            . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
+            . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
+
+    $content .= "<h1 class='page-title'>สร้างใบส่งของชั่วคราว</h1>"
+            . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . $form->show_st_form()
+            . "<div class='col-50'>"
+            . $form->show_text("dno","dno",$info['no'],"","รหัสใบแจ้งหนี้","","label-inline readonly",null," readonly")
+            . $form->show_hidden("cid","cid",$cid)
+            . $form->show_select("deli_ct", $contacts, "label-inline", "ผู้ติดต่อ", $info['contact'])
+            . $form->show_radio("address", $address, "radio-inline", "ที่อยู่จัดส่ง",$info['address'])
+            . "<a href='shipping_address.php?cid=$cid' title='เพิ่มที่อยู่จัดส่ง'>เพิ่มที่อยู่จัดส่ง</a>"
+            . $form->show_text("date","date",$info['date'],"yyyy-mm-dd","วันที่ส่ง","","label-inline")
+            . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-100'>"
+            . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
+            . "<div id='deli-list'></div>";
+    if($pauth >3){
+        $del = "<span id='del-temp-deli' class='red-but'>Delete</span>"
+                . "<script>del_temp_deli();</script>";
+    } else {
+        $del = "";
+    }
+    $content .= $del
+            . $form->show_submit("submit","Update","but-right")
+            . $form->show_hidden("request","request","edit_mjob_tdeli")
+            . $form->show_hidden("uid","uid",$uid)
+            . $form->show_hidden("tdid","tdid",$tdid)
+            . $form->show_hidden("did","did",$info['deli_id'])
+            . $form->show_hidden("pauth","pauth",$pauth)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . "</div><!-- col-100 -->";
+    $form->addformvalidate("ez-msg", array('date'));
+    $content .= $form->submitscript("check_mdeli(e);")
+            . "<script>"
+            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "mtdeli_function($jrec);"
+            . "</script>";
 } else {
     /*----------------------------------------------------- VIEW ใบแจ้งหนี้ -------------------------------------------------------------------*/
     $status = (isset($_GET['fil_status'])&&$_GET['fil_status']!=0?$_GET['fil_status']:null);
@@ -139,7 +322,6 @@ if($action=="add"){
             . my_legend($op_job_delivery,$op_job_delivery_icon)
             . $csv
             . "</div>"
-            . $form->show_button("mix-deli", "สร้างใบส่งของรวม", "float-right")
             . "</div><!-- .col-100 -->";
 
     $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")

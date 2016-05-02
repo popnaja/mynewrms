@@ -253,7 +253,7 @@ END_OF_TEXT;
         try{
             $sql = <<<END_OF_TEXT
 SELECT
-CONCAT(job.order_no," : ",quo.name),dt.qty,0
+IF(dt.order_id=0,dt.job_name,CONCAT(job.order_no," : ",quo.name)),dt.qty,0
 FROM pap_temp_dt AS dt
 LEFT JOIN pap_order AS job ON job.order_id=dt.order_id
 LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
@@ -395,7 +395,7 @@ END_OF_TEXT;
                 $job .= "</ul>";
                 $percent = round($v['amount']*100/$v['price'],2);
                 $per = ($percent==100?"":"(".number_format($percent,2)."%)");
-                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ $per ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['amount'],$v['amount']);
+                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['amount'],$v['amount']);
                 $i++;
             }
             return $res1;
@@ -461,7 +461,7 @@ END_OF_TEXT;
                 $paid = $v['paid'];
                 $percent = round($paid*100/$v['price'],2);
                 $per = ($percent==100?"":"(".number_format($percent,2)."%)");
-                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ $per ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['paid'],$v['paid']);
+                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['paid'],$v['paid']);
                 $i++;
             }
             return $res1;

@@ -43,6 +43,24 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function check_job_mdeli($jname){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT
+dt.job_name,dt.qty,IFNULL(SUM(deli.qty),0) AS deli
+FROM pap_delivery_dt AS dt
+LEFT JOIN pap_temp_dt AS deli ON deli.job_name=dt.job_name
+WHERE dt.order_id=0 AND dt.job_name=:jname
+GROUP BY dt.job_name
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":jname",$jname);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function view_job_pbill($auth,$due=null,$status=null,$s=null,$s_cus=null,$page=null,$perpage=null){
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
@@ -60,6 +78,7 @@ SELECT
 deli.no,deli.id AS did,
 GROUP_CONCAT(DISTINCT cus.customer_name),
 GROUP_CONCAT(dt.order_id) AS aoid,
+GROUP_CONCAT(dt.job_name) AS jname,
 DATE_FORMAT(deli.date,'%d-%b'),
 DATE_FORMAT(MIN(DATE_ADD(deli.date, INTERVAL dt.credit DAY)),'%d-%b'),
 bdt.pbill_id,bill.no AS bno,
@@ -119,15 +138,30 @@ END_OF_TEXT;
                 }
                 //check delivery
                 $aoid = explode(",",$v['aoid']);
+                $jname = explode(",",$v['jname']);
                 $jobwdeli = "";
-                foreach($aoid as $key=>$oid){
-                    $oinfo = $this->check_job_deli($oid);
-                    $rem = $oinfo['amount']-$oinfo['deli'];
-                    if($rem==0){
-                        $jobwdeli .= "<span class='ez-circle-green'></span>".mb_substr($oinfo['name'],0,10,"utf-8")."<br/>";
+                for($x=0;$x<count($aoid);$x++){
+                    $oid = $aoid[$x];
+                    if($oid>0){
+                        $oinfo = $this->check_job_deli($oid);
+                        $rem = $oinfo['amount']-$oinfo['deli'];
+                        if($rem==0){
+                            $jobwdeli .= "<span class='ez-circle-green'></span>".mb_substr($oinfo['name'],0,10,"utf-8")."<br/>";
+                        } else {
+                            $jobwdeli .= "<span class='icon-adjust ac-show-rm'><span class='ac-rm'>ค้างส่ง ".number_format($rem,0)."</span></span>"
+                                    . mb_substr($oinfo['name'],0,10,"utf-8")."</br>";
+                        }
                     } else {
-                        $jobwdeli .= "<span class='icon-adjust ac-show-rm'><span class='ac-rm'>ค้างส่ง ".number_format($rem,0)."</span></span>"
-                                . mb_substr($oinfo['name'],0,10,"utf-8")."</br>";
+                        //check manual deli
+                        $jobn = $jname[$x];
+                        $minfo = $this->check_job_mdeli($jobn);
+                        $rem = $minfo['qty']-$minfo['deli'];
+                        if($rem==0){
+                            $jobwdeli .= "<span class='ez-circle-green'></span>".mb_substr($minfo['job_name'],0,10,"utf-8")."<br/>";
+                        } else {
+                            $jobwdeli .= "<span class='icon-adjust ac-show-rm'><span class='ac-rm'>ค้างส่ง ".number_format($rem,0)."</span></span>"
+                                    . mb_substr($minfo['job_name'],0,10,"utf-8")."</br>";
+                        }
                     }
                 }
                 $res[$k]['aoid'] = $jobwdeli;
@@ -136,6 +170,7 @@ END_OF_TEXT;
                 unset($res[$k]['customer_id']);
                 unset($res[$k]['total']);
                 unset($res[$k]['taxex']);
+                unset($res[$k]['jname']);
                 if(!isset($res1[implode(";",$res[$k])])){
                     $res1[implode(";",$res[$k])] = array();
                 }
@@ -294,7 +329,7 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 deli.no,
-GROUP_CONCAT(DISTINCT dt.job_name) AS job,
+GROUP_CONCAT(DISTINCT dt.job_name SEPARATOR ':') AS job,
 deli.total,
 iv.inv AS ivamount
 FROM pap_delivery AS deli
@@ -341,14 +376,23 @@ ddt.order_id AS oid,
 ddt.price-ddt.discount AS price,
 deli.total,
 rc.amount AS paid,
-meta_value AS tax_ex
+iv.ivdiscount AS ivdiscount
 FROM pap_delivery AS deli
 LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=deli.id
 LEFT JOIN (
-	SELECT deli_id,SUM(rc.amount) AS amount FROM pap_invoice_dt AS dt
-    LEFT JOIN pap_rc_dt AS rc ON rc.invoice_id=dt.invoice_id WHERE deli_id=:did GROUP BY deli_id
+    SELECT deli_id,SUM(rc.amount) AS amount FROM pap_invoice_dt AS dt
+    LEFT JOIN pap_rc_dt AS rc ON rc.invoice_id=dt.invoice_id 
+    WHERE deli_id=:did
+    GROUP BY deli_id
 ) AS rc ON rc.deli_id=deli.id
-LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=ddt.customer_id AND meta_key='tax_exclude'
+LEFT JOIN (
+	SELECT 
+    deli_id,sum(iv.discount) AS ivdiscount
+    FROM pap_invoice_dt AS dt
+    LEFT JOIN pap_invoice AS iv ON iv.id=dt.invoice_id
+    WHERE deli_id=:did
+    GROUP BY deli_id
+) AS iv ON iv.deli_id=deli.id
 WHERE deli.id=:did
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);

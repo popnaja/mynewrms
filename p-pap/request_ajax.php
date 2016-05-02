@@ -117,15 +117,27 @@ if($req=="show_pic"){
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
     //get oid info
     $arr_oid = $db->get_mm_arr("pap_temp_dt", "order_id", "temp_deli_id", $_POST['tdid']);
+    //get jobname
+    $arr_jname = $db->get_mm_arr("pap_temp_dt", "job_name", "temp_deli_id", $_POST['tdid']);
     //delete
     $db->delete_data("pap_temp_deli", "id", $_POST['tdid']);
     //update job status and delivery
     foreach($arr_oid AS $oid){
-        $info = $db->get_job_remain_deli($oid);
-        if($info['deli']==0){
-            $db->update_data("pap_order", "order_id", $oid, array("status"=>69,"delivery"=>null)); //69 = พร้อมส่ง
-        } else {
-            $db->update_data("pap_order", "order_id", $oid, array("status"=>70)); //70 = ส่งบางส่วน
+        if($oid>0){
+            $info = $db->get_job_remain_deli($oid);
+            if($info['deli']==0){
+                $db->update_data("pap_order", "order_id", $oid, array("status"=>69,"delivery"=>null)); //69 = พร้อมส่ง
+            } else {
+                $db->update_data("pap_order", "order_id", $oid, array("status"=>70)); //70 = ส่งบางส่วน
+            }
+        }
+    }
+    //update manual temp deli
+    foreach($arr_jname AS $jname){
+        if($jname!=""){
+            $info = $db->get_job_mdeli($jname);
+            $status = ($info['qty']==0?69:70);
+            $db->update_data("pap_delivery", "id", $_POST['did'], array("status"=>$status));
         }
     }
     echo json_encode(array("redirect",$_POST['redirect']));

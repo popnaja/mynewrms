@@ -1381,6 +1381,81 @@ if($req == "login"){
     }
     //update deli total
     $db->update_data("pap_delivery", "id", $did, array("total"=>$tt));
+    $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
+    header("Location:".$_POST['redirect']);
+} else if($req=="edit_mjob_deli"){
+    //update deli
+    $arrinfo = array(
+        "contact" => $_POST['deli_ct'],
+        "address" => $_POST['address'],
+        "remark" => $_POST['remark'],
+        "date" => $_POST['date']
+    );
+    $db->update_data("pap_delivery", "id", $_POST['did'], $arrinfo);
+    //delete deli detail
+    $db->delete_data("pap_delivery_dt", "deli_id", $_POST['did']);
+    //add deli detail
+    $tt = 0;
+    for($i=0;$i<count($_POST['name']);$i++){
+        if($_POST['amount'][$i]>0){
+            $tt += $_POST['price'][$i]-$_POST['discount'][$i];
+            $db->insert_data("pap_delivery_dt", array(null,$_POST['did'],"",$_POST['amount'][$i],$_POST['price'][$i],$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+        }
+    }
+    //update deli total
+    $db->update_data("pap_delivery", "id", $_POST['did'], array("total"=>$tt));
+    $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
+    header("Location:".$_POST['redirect']);
+} else if($req=="add_mjob_tdeli"){
+    //check เคยส่ง
+    $check = $db->get_info("pap_temp_deli", "deli_id", $_POST['did']);
+    //check if deli=amount
+    $amount_vs_deli = 0;
+    $remain_vs_deli = 0;
+    for($i=0;$i<count($_POST['name']);$i++){
+        $amount_vs_deli += $_POST['amount'][$i]-$_POST['deli'][$i];
+        $remain_vs_deli += $_POST['remain'][$i]-$_POST['deli'][$i];
+    }
+    if(is_array($check)){
+        //เคยส่งแล้ว
+        $temp = $db->check_next_tdeli_code(0, $_POST['name'][0]);
+        $tno = $temp[1];
+    } else {
+        //ยังไม่เคยส่ง
+        //deli = amount
+        $tno = ($amount_vs_deli==0?$_POST['dno']:$_POST['dno']."-1");
+    }
+    $tdid = $db->insert_data("pap_temp_deli", array(null,$_POST['did'],$tno,$_POST['deli_ct'],$_POST['address'],$_POST['remark'],$_POST['date']));
+    //add temp detail
+    for($i=0;$i<count($_POST['name']);$i++){
+        $db->insert_data("pap_temp_dt", array($tdid,0,$_POST['deli'][$i],$_POST['name'][$i]));
+    }
+    //update deli status
+    $status = ($remain_vs_deli>0?70:79);
+    $db->update_data("pap_delivery", "id", $_POST['did'], array("status"=>$status));
+    $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
+    header("Location:".$_POST['redirect']);
+} else if($req=="edit_mjob_tdeli"){
+    $arrinfo = array(
+        "contact" => $_POST['deli_ct'],
+        "address" => $_POST['address'],
+        "remark" => $_POST['remark'],
+        "date" => $_POST['date']
+    );
+    $db->update_data("pap_temp_deli", "id", $_POST['tdid'], $arrinfo);
+    //del temp detail
+    $db->delete_data("pap_temp_dt", "temp_deli_id", $_POST['tdid']);
+    //add temp detail
+    $rem = 0;
+    for($i=0;$i<count($_POST['name']);$i++){
+        $db->insert_data("pap_temp_dt", array($_POST['tdid'],0,$_POST['deli'][$i],$_POST['name'][$i]));
+        $rem += $_POST['remain'][$i]-$_POST['deli'][$i];
+    }
+    //update deli status
+    $status = ($rem>0?70:79);
+    $db->update_data("pap_delivery", "id", $_POST['did'], array("status"=>$status));
+    $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
+    header("Location:".$_POST['redirect']);
 } else if($req=="add_job_deli"){
     //check any oid in temp deli
     if($db->check_job_in_deli($_POST['oid'])){
@@ -1644,7 +1719,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="edit_receipt"){
     $rcid = filter_input(INPUT_POST,'rcid',FILTER_SANITIZE_NUMBER_INT);
     $arrinfo = array(
@@ -1674,7 +1749,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="update_po_paid"){
     $db->update_data($_POST['table'], "po_id", $_POST['poid'], array("po_paid"=>$_POST['date'],"po_paid_ref"=>$_POST['ref']));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
@@ -1738,11 +1813,11 @@ function update_job_paid($adid){
     foreach($adid as $key=>$did){
         $info = $pdo_ac->check_job_paid($did);
         foreach($info as $k=>$v){
-            $paid_before_tax = $v['paid']/($v['tax_ex']=="yes"?0.97:1.04);
+            $paid_before_tax = $v['paid'];
             $opaid = $paid_before_tax*$v['price']/$v['total'];
             $db->update_data("pap_order", "order_id", $v['oid'], array("paid"=>$opaid));
             $paid = $paid_before_tax;
-            $tt = $v['total'];
+            $tt = $v['total']-$v['ivdiscount'];
         }
         if($paid==$tt){
             //update deli status

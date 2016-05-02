@@ -392,7 +392,6 @@ if($action =="add"){
 
     //csv
     $csv = ($pauth>3?"<a href='$root"."csv_download.php?req=acc&due=$mm' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>":"");
-
     //view
     $head = array("ใบส่งของ","ลูกค้า","งาน","วันที่ส่ง","กำหนดชำระ","ใบวางบิล","วันนัดชำระ","ใบกำกับ","ใบเสร็จ");
     $rec = $pdo_ac->view_job_pbill($pauth,$due,$status,$s,$s_cus,$page, $iperpage);
