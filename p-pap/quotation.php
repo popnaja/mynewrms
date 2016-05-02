@@ -287,7 +287,12 @@ if($action=="add"){
         . $form->show_num("peru",$info['q_price']/$info['amount'],0.01,"","ราคาค่อหน่วย","","label-3070 ","min='0'")
         . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ","min='0' ");
     } else {
-        unset($qstatus[2]);
+        if($info['status']==1){
+            unset($qstatus[2]);
+        }
+        if($info['status']<4){
+            unset($qstatus[5]);
+        }
         $qprice = $form->show_hidden("q_price","q_price",$info['q_price'])
                 . $form->show_hidden("discount","discount",$info['discount']);
     }
@@ -302,10 +307,15 @@ if($action=="add"){
             . "</div><!-- .label-3070 -->"
             . "</div><!-- .sel-status-9 -->"
             . $qprice
+            . "<div class='sel-status-4'>"
+            . $form->show_num("n_price",(isset($info['n_price'])?$info['n_price']:""),0.01,"","ราคาค่อรอง","","label-3070 ","min='0'")
+            . "</div><!-- .sel-status-4 -->"
             . $form->show_hidden("ttcost","ttcost",$pcost)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . "<input type='button' class='blue-but' value='Update' style='float:right' onClick='submit2();' />"
-            . "<script>select_option_byval('status');</script>";
+            . "<script>"
+            . "select_option_byval('status');"
+            . "</script>";
     //แสดงราคาแบบ แยกส่วน
     $phead = array("แสดง","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $prec = array();
@@ -491,7 +501,7 @@ if($action=="add"){
     $iperpage = 20;
 
     //view
-    $head = array("พิมพ์","งาน","ลูกค้า","ราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
+    $head = array("พิมพ์","งาน","ลูกค้า","ราคา","ต่อรองราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
     $rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm, ($pauth>3?$sid:$uid),$page, $iperpage);
     $all_rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm,($pauth>3?$sid:$uid));
     $sale = array("0"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");

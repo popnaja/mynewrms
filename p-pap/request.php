@@ -833,6 +833,10 @@ if($req == "login"){
     if($_POST['type']==11){
         $meta['folding'] = $_POST['folding'][0];
     }
+    //ต่อรองราคา
+    if($status==4){
+        $meta['n_price'] = $_POST['n_price'];
+    }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
     //calculate cost

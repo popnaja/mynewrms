@@ -32,7 +32,9 @@
     font-size:22px;
     color:#66BB6A;
 }
-
+.circle-yellow:before {
+    color:#FDD835;
+}
 /*===============================================================  Status.php ==========================================================*/
 
 #tb-pstatus tr th:first-child{

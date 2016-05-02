@@ -322,6 +322,7 @@ CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' 
 CONCAT(quote_no,"<br/>",name),
 cus.customer_name,
 FORMAT(q_price,0),
+FORMAT(meta2.meta_value,0) AS nego,
 CONCAT(size_name,' (',size_height,'x',size_width,')') AS size,
 meta.meta_value AS pages,
 FORMAT(amount,0),
@@ -334,6 +335,7 @@ LEFT JOIN pap_option AS op ON op.op_id=cat_id
 LEFT JOIN pap_size ON size_id=job_size_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=quo.quote_id AND meta.meta_key ="page_inside"
 LEFT JOIN pap_quote_meta AS meta1 ON meta1.quote_id=quo.quote_id AND meta1.meta_key ="quote_sign"
+LEFT JOIN pap_quote_meta AS meta2 ON meta2.quote_id=quo.quote_id AND meta2.meta_key ="n_price"
 LEFT JOIn pap_customer AS cus ON cus.customer_id=quo.customer_id
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=cus.customer_id
 LEFT JOIN pap_user AS user ON user.user_id=sale.user_id

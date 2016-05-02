@@ -155,6 +155,7 @@ $op_quote_status = array(
     2 => "ตรวจแล้ว",
     3 => "นำเสนอลูกค้าแล้ว",
     4 => "ลูกค้าต่อรอง",
+    5 => "ตอบลูกค้าต่อรอง",
     9 => "ลูกค้าตกลง",
     10 => "ลูกค้าปฏิเสธ"
 );
@@ -162,7 +163,8 @@ $op_quote_status_icon = array(
     1 => "<span class='ez-circle-blank'></span>",
     2 => "<span class='ez-circle-yellow'></span>",
     3 => "<span class='ez-circle-green'></span>",
-    4 => "<span class='icon-adjust'></span>",
+    4 => "<span class='icon-adjust circle-yellow'></span>",
+    5 => "<span class='icon-adjust'></span>",
     9 => "<span class='icon-check'></span>",
     10 => "<span class='icon-remove'></span>"
 );
