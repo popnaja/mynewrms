@@ -97,11 +97,11 @@ function show_table(head,rec,id){
         html += "<th>"+val+"</th>";
     });
     html += "</tr>";
-    if(rec.length>0){
-        $.each(rec,function(i,val){
-            if($.isArray(val)){
+    if(rec.length>0||Object.keys(rec).length>0){
+        $.each(rec,function(key,value){
+            if($.type(value)=="array"){
                 html += "<tr class='tb-data'>";
-                $.each(val,function(k,v){
+                $.each(value,function(k,v){
                     html += "<td>"+v+"</td>";
                 });
                 html += "</tr>";

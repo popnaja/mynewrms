@@ -296,39 +296,8 @@ function quote_search(){
         });
     }
 }
-
-function quote_function(cp,ip){
+function search_customer(){
 $(document).ready(function(){
-    //hide cover
-    var title = $("#sel-name");
-    var but = $("#view-more-but");
-    hid_cover();
-    $("#type").on("change",function(){
-       hid_cover();
-    });
-    function hid_cover(){
-        var type = parseInt($("#type").val());
-        var bind = $("#bind-sec");
-        var fold = $("#folding_0");
-        if(type===10||type===69){
-            title.html("เนื้อใน");
-            but.show();
-            bind.show();
-            fold.parent().addClass("form-hide");
-       } else {
-            $("#paper_type").val("0");
-            title.html("ชิ้นงาน");
-            but.hide();
-            $("#binding").val("0");
-            bind.hide();
-            if(type===11){
-                fold.parent().removeClass("form-hide");
-            } else {
-                fold.parent().addClass("form-hide");
-            }
-       }
-    }
-
     //auto search customer
     var id = "scid";
     var target = $("#cid");
@@ -367,7 +336,39 @@ $(document).ready(function(){
             }
         });
     }
-
+});
+}
+function quote_function(cp,ip){
+$(document).ready(function(){
+    //hide cover
+    var title = $("#sel-name");
+    var but = $("#view-more-but");
+    hid_cover();
+    $("#type").on("change",function(){
+       hid_cover();
+    });
+    function hid_cover(){
+        var type = parseInt($("#type").val());
+        var bind = $("#bind-sec");
+        var fold = $("#folding_0");
+        if(type===10||type===69){
+            title.html("เนื้อใน");
+            but.show();
+            bind.show();
+            fold.parent().addClass("form-hide");
+       } else {
+            $("#paper_type").val("0");
+            title.html("ชิ้นงาน");
+            but.hide();
+            $("#binding").val("0");
+            bind.hide();
+            if(type===11){
+                fold.parent().removeClass("form-hide");
+            } else {
+                fold.parent().addClass("form-hide");
+            }
+       }
+    }
     //fix paper
     if($.type(cp)!=="undefined"){
         //gram

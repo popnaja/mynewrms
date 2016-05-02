@@ -35,6 +35,7 @@ class PAPmenu extends mymenu {
                 "ใบจ้างผลิต" => $root."outsource.php?action=viewpo",
                 "ตารางส่งมอบ" => $root."index.php",
                 "ใบส่งของ/แจ้งหนี้" => $root."delivery.php",
+                "Manual/ใบแจ้งหนี้" => $root."mdelivery.php",
                 "กระบวนการผลิต" => $root."process.php",
                 "เครื่องจักร" => $root."machine.php"
             ),

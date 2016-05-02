@@ -256,6 +256,10 @@ $op_job_delivery_icon = array(
     "69" => "<span class='ez-circle-hgreen'></span>",
     "70" => "<span class='icon-adjust'></span>",
     "79" => "<span class='ez-circle-green'></span>",
+    "80" => "ใบแจ้งหนี้",
+    "90" => "ออกใบกำกับภาษี",
+    "98" => "รับชำระบางส่วน",
+    "99" => "รับชำระทั้งหมด"
 );
 $op_job_account = array(
     "80" => "ใบแจ้งหนี้",

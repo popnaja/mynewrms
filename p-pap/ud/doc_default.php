@@ -407,10 +407,14 @@ function show_deli($did){
     $recs = $rp->rp_deli_dt($did);
     $row = 0;
     foreach($recs[0] as $k=>$v){
-        $qid = $v[1];
-        $data = job_detail($qid);
-        $recs[0][$k][1] = job_dttb($data);
-        $row += count($data,1)-count($data);
+        if(is_numeric($v[1])){
+            $qid = $v[1];
+            $data = job_detail($qid);
+            $recs[0][$k][1] = job_dttb($data);
+            $row += count($data,1)-count($data);
+        } else {
+            $row++;
+        }
     }
     $discount = $recs[1];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);

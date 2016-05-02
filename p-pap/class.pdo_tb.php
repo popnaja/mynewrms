@@ -615,6 +615,64 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function view_job_mdeli($auth,$op,$mm=null,$status=null,$s=null,$page=null,$perpage=null){
+        try {
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
+            $filter = "WHERE dt.order_id=''";
+            $filter .= (isset($mm)?" AND DATE_FORMAT(deli.date,'%y%m')='$mm'":"");
+            $filter .= (isset($status)&&$status>0?" AND deli.status=$status":"");
+            $filter .= (isset($s)?" AND job_name LIKE '%$s%'":"");
+            $sql = <<<END_OF_TEXT
+SELECT
+dt.job_name,cus.customer_name,
+FORMAT(dt.qty,0),FORMAT(dt.price,2),
+deli.id,
+deli.no,
+deli.status,
+GROUP_CONCAT(tdeli.id) AS tid,
+GROUP_CONCAT(tdeli.no) AS tno
+FROM pap_delivery_dt AS dt
+LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
+LEFT JOIN pap_customer AS cus ON cus.customer_id=dt.customer_id
+LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
+$filter
+GROUP BY dt.job_name
+ORDER BY deli.date ASC
+$lim_sql
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach($res as $k=>$v){
+                $did = $v['id'];
+                unset($res[$k]['id']);
+                $res[$k]['no'] = "<a href='mdelivery.php?action=edit&did=$did' title='Edit' class='icon-page-edit'></a>"
+                        . "<a href='mdelivery.php?action=print&did=$did' title='Print' target='_blank'>".$v['no']."</a>";
+                $res[$k]['status'] = $op[$v['status']];
+                //temp deli
+                $atid = explode(",",$v['tid']);
+                $atno = explode(",",$v['tno']);
+                $tdeli = "";
+                for($i=0;$i<count($atid);$i++){
+                    $tdid = $atid[$i];
+                    if($tdid>0){
+                        $tdeli .= "<a href='mdelivery.php?action=edit&tdid=$tdid' title='Edit' class='icon-page-edit'></a>"
+                        . "<a href='mdelivery.php?action=print&tdid=$tdid' title='Print' target='_blank'>".$atno[$i]."</a>";
+                    }
+                }
+                unset($res[$k]['tno']);
+                $res[$k]['tid'] = $tdeli;
+            }
+            return $res;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function view_job_deli($auth,$op,$mm=null,$status=null,$s=null,$page=null,$perpage=null){
         include_once("class.pappdo.php");
         $db = new PAPdb(DB_PAP);

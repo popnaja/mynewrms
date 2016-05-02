@@ -1,107 +1,205 @@
 function deli_function(pre){
-    $(document).ready(function(){
-        var cancel = $("#cancel");
-        var addbut = $("#add-list");
-        var edform = $(".my-tab-inside");
-        var targ = $("#deli-list");
-        var header = ["แก้ไข","งาน","ยอดงาน","ค้างส่ง","จัดส่ง"];
-        var rec = [];
-        
-        inputenter(['deli'],'add-list');
-        //cancel
-        var cancel = $("#cancel");
-        cancel.on("click",function(){
-            clear();
-        });
-        
-        if($.type(pre)!=="undefined"){
-            pre_tb();
-        }
-        addbut.on("click",function(){
-            if(!valNoBlank("oref")||!valNoBlank("deli")||!valZero(['deli'])){
-                //show msg
-            } else {
-                var oid = $("#oref").attr("oid");
-                var name = $("#oref").val();
-                var amount = parseFloat($("#amount").val());
-                var remain = parseFloat($("#remain").val());
-                var deli = parseFloat($("#deli").val());
-                if(deli>remain){
-                    deli = remain;
-                }
-                var ed = [oid,name,amount,remain,deli];
-                rec[oid] = [
-                    //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
-                    "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
-                    name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
-                    amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
-                    remain+"<input type='hidden' name='rem[]' value='"+remain+"' />",
-                    deli+"<input type='hidden' name='deli[]' value='"+deli+"' />"
-                ];
-                draw_tb();
-                clear();
+$(document).ready(function(){
+    var cancel = $("#cancel");
+    var addbut = $("#add-list");
+    var edform = $(".my-tab-inside");
+    var targ = $("#deli-list");
+    var header = ["แก้ไข","งาน","ยอดงาน","ค้างส่ง","จัดส่ง"];
+    var rec = [];
+    inputenter(['deli'],'add-list');
+    //cancel
+    var cancel = $("#cancel");
+    cancel.on("click",function(){
+        clear();
+    });
+    if($.type(pre)!=="undefined"){
+        pre_tb();
+    }
+    addbut.on("click",function(){
+        if(!valNoBlank("oref")||!valNoBlank("deli")||!valZero(['deli'])){
+            //show msg
+        } else {
+            var oid = $("#oref").attr("oid");
+            var name = $("#oref").val();
+            var amount = parseFloat($("#amount").val());
+            var remain = parseFloat($("#remain").val());
+            var deli = parseFloat($("#deli").val());
+            if(deli>remain){
+                deli = remain;
             }
-        });
-        
-        function pre_tb(){
-            $.each(pre,function(k,v){
-                var oid = v[0];
-                var name = v[1];
-                var amount = v[2]
-                var remain = amount - v[3];
-                var deli = typeof v[4] !=="undefined" ? v[4] : remain;
-                var ed = [oid,name,amount,remain,deli];
-                rec[oid] = [
-                    //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
-                    "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
-                    name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
-                    amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
-                    remain+"<input type='hidden' name='rem[]' value='"+remain+"' />",
-                    deli+"<input type='hidden' name='deli[]' value='"+deli+"' />"
-                ];
-            });
+            var ed = [oid,name,amount,remain,deli];
+            rec[oid] = [
+                //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
+                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                remain+"<input type='hidden' name='rem[]' value='"+remain+"' />",
+                deli+"<input type='hidden' name='deli[]' value='"+deli+"' />"
+            ];
             draw_tb();
-        }
-
-        //draw table
-        function draw_tb(){
-            targ.html(show_table(header,rec,'tb-deli-list'));
-            var del = $(".del-list");
-            del.off("click");
-            del.on("click",function(){
-                delete rec[$(this).attr("rid")];
-                $(this).parents("tr").remove();
-            });
-            //edit
-            var edit = $(".edit-list");
-            edit.off("click");
-            edit.on("click",function(){
-                edform.removeClass("form-hide");
-                cancel.removeClass("form-hide");
-                var info = $(this).attr("info").split(",");
-                addbut.val("แก้ไข");
-                $("#oref").attr("oid",info[0]);
-                $("#oref").val(info[1]);
-                $("#amount").val(info[2]);
-                $("#remain").val(info[3]);
-                $("#deli").val(info[4]);
-            });
-        }
-        
-        function clear(){
-            addbut.val("เพิ่มลงรายการ");
-            $("#oref").val("");
-            $("#amount").val("");
-            $("#remain").val("");
-            $("#deli").val("");
-            cancel.addClass("form-hide");
-            edform.addClass("form-hide");
+            clear();
         }
     });
-    
+    function pre_tb(){
+        $.each(pre,function(k,v){
+            var oid = v[0];
+            var name = v[1];
+            var amount = v[2]
+            var remain = amount - v[3];
+            var deli = typeof v[4] !=="undefined" ? v[4] : remain;
+            var ed = [oid,name,amount,remain,deli];
+            rec[oid] = [
+                //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
+                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                remain+"<input type='hidden' name='rem[]' value='"+remain+"' />",
+                deli+"<input type='hidden' name='deli[]' value='"+deli+"' />"
+            ];
+        });
+        draw_tb();
+    }
+    //draw table
+    function draw_tb(){
+        targ.html(show_table(header,rec,'tb-deli-list'));
+        var del = $(".del-list");
+        del.off("click");
+        del.on("click",function(){
+            delete rec[$(this).attr("rid")];
+            $(this).parents("tr").remove();
+        });
+        //edit
+        var edit = $(".edit-list");
+        edit.off("click");
+        edit.on("click",function(){
+            edform.removeClass("form-hide");
+            cancel.removeClass("form-hide");
+            var info = $(this).attr("info").split(",");
+            addbut.val("แก้ไข");
+            $("#oref").attr("oid",info[0]);
+            $("#oref").val(info[1]);
+            $("#amount").val(info[2]);
+            $("#remain").val(info[3]);
+            $("#deli").val(info[4]);
+        });
+    }
+    function clear(){
+        addbut.val("เพิ่มลงรายการ");
+        $("#oref").val("");
+        $("#amount").val("");
+        $("#remain").val("");
+        $("#deli").val("");
+        cancel.addClass("form-hide");
+        edform.addClass("form-hide");
+    }
+});
+}
+function mdeli_function(pre,typen){
+$(document).ready(function(){
+    var cancel = $("#cancel");
+    var addbut = $("#add-list");
+    var edform = $(".my-tab-inside");
+    var targ = $("#deli-list");
+    var header = ["ลบ","แก้ไข","ชื่องาน","ชนิด","ยอดงาน","ราคา","ส่วนลด"];
+    var rec = {};
+    inputenter(['deli'],'add-list');
+    //cancel
+    var cancel = $("#cancel");
+    cancel.on("click",function(){
+        clear();
+    });
+    if($.type(pre)!=="undefined"){
+        pre_tb();
+    }
+    function pre_tb(){
+        $.each(pre,function(k,v){
+            var oid = v[0];
+            var name = v[1];
+            var amount = v[2]
+            var price = amount - v[3];
+            var discount = typeof v[4] !=="undefined" ? v[4] : price;
+            var ed = [oid,name,amount,price,discount];
+            rec[name] = [
+                //"<span class='del-list icon-delete-circle' rid='"+oid+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='oid[]' value='"+oid+"' />",
+                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                price+"<input type='hidden' name='rem[]' value='"+price+"' />",
+                discount+"<input type='hidden' name='discount[]' value='"+discount+"' />"
+            ];
+        });
+        draw_tb();
+    }
+    addbut.on("click",function(){
+        if(!valNoBlank("name")||!valZero("amount")||!valZero(['price'])){
+            //show msg
+        } else {
+            var name = $("#name").val();
+            var type = $("#type").val();
+            var amount = parseFloat($("#amount").val());
+            var price = parseFloat($("#price").val());
+            var discount = parseFloat($("#discount").val());
+            var ed = [name,type,amount,price,discount];
+            rec[name] = [
+                "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                typen[type]+"<input type='hidden' name='type[]' value='"+type+"' />",
+                amount+"<input type='hidden' name='amount[]' value='"+amount+"' />",
+                price+"<input type='hidden' name='price[]' value='"+price+"' />",
+                discount+"<input type='hidden' name='discount[]' value='"+discount+"' />"
+            ];
+            draw_tb();
+            clear();
+        }
+    });
+    //draw table
+    function draw_tb(){
+        targ.html(show_table(header,rec,'tb-mdeli-list'));
+        var del = $(".del-list");
+        del.off("click");
+        del.on("click",function(){
+            delete rec[$(this).attr("rid")];
+            $(this).parents("tr").remove();
+        });
+        //edit
+        var edit = $(".edit-list");
+        edit.off("click");
+        edit.on("click",function(){
+            edform.removeClass("form-hide");
+            cancel.removeClass("form-hide");
+            var info = $(this).attr("info").split(",");
+            addbut.val("แก้ไข");
+            $("#name").val(info[0]);
+            $("#type").val(info[1]);
+            $("#amount").val(info[2]);
+            $("#price").val(info[3]);
+            $("#discount").val(info[4]);
+        });
+    }
+    function clear(){
+        addbut.val("เพิ่มลงรายการ");
+        $("#name").val("");
+        $("#type").val(10);
+        $("#amount").val("");
+        $("#price").val("");
+        $("#discount").val("");
+        cancel.addClass("form-hide");
+        //edform.addClass("form-hide");
+    }
+});
 }
 function check_deli(e){
     var deli = $("input[name='deli[]']").length;
+    if(deli<=0){
+        e.preventDefault();
+        show_submit_error('ez-msg');
+    } else {
+        $("#papform").submit();
+    }
+}
+function check_mdeli(e){
+    var deli = $("input[name='name[]']").length;
     if(deli<=0){
         e.preventDefault();
         show_submit_error('ez-msg');
@@ -166,5 +264,47 @@ $(document).ready(function(){
             post_ajax(data,$("#ajax_req").val());
         }
     });
+});
+}
+function get_cus_info(){
+$(document).ready(function(){
+    //auto search customer
+    var id = "scid";
+    var target = $("#cid");
+    auto_complete_input(id,findex,show);
+    function show(ele){
+        if(ele.hasClass("nores")){
+            $("#"+id).val("");
+        } else {
+            $("#"+id).val(ele.html());
+            target.val(ele.attr("cid"));
+            //get new select
+            var url = $("#ajax_req").val();
+            var cdata = {};
+            cdata['request'] = "get_contact_ad";
+            cdata['cid'] = ele.attr("cid");
+            post_ajax(cdata,url);
+        }
+    }
+    function findex(find,f1,f2){
+        var data = {};
+        data['request'] = "find_customer";
+        data['f'] = find;
+        data['pauth'] = $("#pauth").val();
+        data['uid'] = $("#uid").val();
+        var url = $("#ajax_req").val();
+        $.ajax({
+            url:url,
+            type:'POST',
+            dataType:"json",
+            data:data,
+            success: function(response) {
+                f1(response);
+            },
+            error: function(err){
+                f2("ERROR"+JSON.stringify(err));
+            }
+        });
+    }
 });
 }

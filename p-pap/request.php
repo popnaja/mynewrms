@@ -1367,6 +1367,20 @@ if($req == "login"){
     $db->check_ppo_vs_delivery($_POST['poid']);
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
+} else if($req=="add_mjob_deli"){
+    //create deli
+    $code = $db->check_deli_code($_POST['date']);
+    $did = $db->insert_data("pap_delivery", array(null,$code,$_POST['deli_ct'],$_POST['address'],$_POST['remark'],$_POST['date'],69,0));
+    //add deli detail
+    $tt = 0;
+    for($i=0;$i<count($_POST['name']);$i++){
+        if($_POST['amount'][$i]>0){
+            $tt += $_POST['price'][$i]-$_POST['discount'][$i];
+            $db->insert_data("pap_delivery_dt", array(null,$did,"",$_POST['amount'][$i],$_POST['price'][$i],$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+        }
+    }
+    //update deli total
+    $db->update_data("pap_delivery", "id", $did, array("total"=>$tt));
 } else if($req=="add_job_deli"){
     //check any oid in temp deli
     if($db->check_job_in_deli($_POST['oid'])){
@@ -1379,7 +1393,7 @@ if($req == "login"){
         //add temp deli detail
         for($i=0;$i<count($_POST['deli']);$i++){
             if($_POST['deli'][$i]>0){
-                $db->insert_data("pap_temp_dt", array($tdid,$_POST['oid'][$i],$_POST['deli'][$i]));
+                $db->insert_data("pap_temp_dt", array($tdid,$_POST['oid'][$i],$_POST['deli'][$i],""));
             }
             //check deli==remain?
             if($_POST['rem'][$i]==$_POST['deli'][$i]){
@@ -1401,7 +1415,7 @@ if($req == "login"){
                 $oid = $_POST['oid'][$i];
                 $jprice = $db->get_job_price($oid);
                 $tt += $jprice['q_price']-$jprice['discount'];
-                $db->insert_data("pap_delivery_dt", array($did,$oid,$_POST['amount'][$i],$jprice['q_price'],$jprice['discount'],$jprice['jname'],$jprice['credit'],$jprice['customer_id'],$jprice['cat_id']));
+                $db->insert_data("pap_delivery_dt", array(null,$did,$oid,$_POST['amount'][$i],$jprice['q_price'],$jprice['discount'],$jprice['jname'],$jprice['credit'],$jprice['customer_id'],$jprice['cat_id']));
             }
         }
         //update deli total
@@ -1418,7 +1432,7 @@ if($req == "login"){
         //add temp deli detail
         for($i=0;$i<count($_POST['deli']);$i++){
             if($_POST['deli'][$i]>0){
-                $db->insert_data("pap_temp_dt", array($tdid,$_POST['oid'][$i],$_POST['deli'][$i]));
+                $db->insert_data("pap_temp_dt", array($tdid,$_POST['oid'][$i],$_POST['deli'][$i],""));
             }
             //check deli==amount?
             if($_POST['amount'][$i]==$_POST['deli'][$i]){
@@ -1455,7 +1469,7 @@ if($req == "login"){
     //add temp deli detail
     for($i=0;$i<count($_POST['deli']);$i++){
         if($_POST['deli'][$i]>0){
-            $db->insert_data("pap_temp_dt", array($_POST['tdid'],$_POST['oid'][$i],$_POST['deli'][$i]));
+            $db->insert_data("pap_temp_dt", array($_POST['tdid'],$_POST['oid'][$i],$_POST['deli'][$i],""));
         }
         //check deli==remain?
         if($_POST['rem'][$i]==$_POST['deli'][$i]){

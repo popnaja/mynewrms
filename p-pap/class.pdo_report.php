@@ -225,7 +225,7 @@ END_OF_TEXT;
         try{
             $sql = <<<END_OF_TEXT
 SELECT
-quote_id,qty,price/qty,discount
+IFNULL(quote_id,job_name),qty,price/qty,discount
 FROM pap_delivery_dt AS dt
 LEFT JOIN pap_order AS job ON job.order_id=dt.order_id
 WHERE deli_id=:did
@@ -240,11 +240,9 @@ END_OF_TEXT;
                 //sum discount
                 $discount += $v[3];
                 unset($res[$k][3]);
-                
                 array_push($res[$k],$v[1]*$v[2]);
                 array_unshift($res[$k],$i);
                 $i++;
-                
             }
             return array($res,$discount);
         } catch (Exception $ex) {
@@ -436,14 +434,12 @@ rcdt.amount AS paid,
 GROUP_CONCAT(ddt.job_name) AS jname,
 GROUP_CONCAT(ddt.qty) AS qty,
 GROUP_CONCAT(ddt.type) AS type,
-deli.total AS price,
-meta_value AS taxex
+deli.total AS price
 FROM pap_rc_dt AS rcdt
 LEFT JOIN pap_invoice AS iv ON iv.id=rcdt.invoice_id
 LEFT JOIN pap_invoice_dt AS ivdt ON ivdt.invoice_id=rcdt.invoice_id
 LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=ivdt.deli_id
 LEFT JOIN pap_delivery AS deli ON deli.id=ivdt.deli_id
-LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=iv.customer_id AND meta_key='tax_exclude'
 WHERE rcdt.rc_id=:rcid
 GROUP BY deli.id
 END_OF_TEXT;
@@ -462,8 +458,8 @@ END_OF_TEXT;
                     $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";
                 }
                 $job .= "</ul>";
-                $paid_btax = $v['paid']/($v['taxex']=="yes"?0.97:1.04);
-                $percent = round($paid_btax*100/$v['price'],2);
+                $paid = $v['paid'];
+                $percent = round($paid*100/$v['price'],2);
                 $per = ($percent==100?"":"(".number_format($percent,2)."%)");
                 $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ $per ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['paid'],$v['paid']);
                 $i++;

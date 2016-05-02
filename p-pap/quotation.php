@@ -192,6 +192,7 @@ if($action=="add"){
             . "view_more_section('quote-comp');"
             . "select_option_byval('type');"
             . "quote_function();"
+            . "search_customer();"
             . "search_size('$ajax');"
             . "</script>"
             . "</div><!-- .col-100 -->";

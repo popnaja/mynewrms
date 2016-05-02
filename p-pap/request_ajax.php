@@ -299,6 +299,17 @@ if($req=="show_pic"){
 } else if($req == "find_customer"){
     $res = $db->find_customer($_POST['f']);
     echo json_encode($res);
+} else if($req == "get_contact_ad"){
+    $cid = $_POST['cid'];
+    $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$cid);
+    $cinfo = $db->get_info("pap_customer", "customer_id", $cid);
+    $ad[0] = $cinfo['customer_name']."<br/>".$cinfo['customer_address'];
+    $address = $ad+$db->get_keypair("pap_cus_ad", "id", "CONCAT(name,'<br/>',address)", "WHERE customer_id=$cid");
+    $html = $form->show_select("deli_ct", $contacts, "label-inline", "ผู้ติดต่อ", null)
+            . $form->show_radio("address", $address, "radio-inline", "ที่อยู่จัดส่ง",0)
+            . "<a href='shipping_address.php?cid=$cid' title='เพิ่มที่อยู่จัดส่ง'>เพิ่มที่อยู่จัดส่ง</a>"
+            . $form->show_num("credit", $cinfo['customer_credit_day'], 1, "", "เครดิต(วัน)", "", "label-inline","min=0");
+    echo json_encode(array("html_replace","cus_info",$html));
 } else if($req == "find_size"){
     $res = $db->find_size($_POST['f']);
     echo json_encode($res);
