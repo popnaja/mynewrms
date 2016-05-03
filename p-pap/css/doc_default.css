@@ -177,7 +177,16 @@
     border:rgb(150,150,150) solid 1px;
 }
 #tb-rp th {
+    background-color:#fff;
+}
+#tb-rp tr.tb-data:nth-child(odd){
+    background-color:#fff;
+}
+.head-color #tb-rp th {
     background-color:#ffe699;
+}
+.head-color #tb-rp tr.tb-data:nth-child(odd){
+    background-color:#f5f8f9;
 }
 #tb-rp th:nth-child(1){
     width:0.5in;
@@ -263,6 +272,9 @@
     border-collapse: collapse;
 }
 .doc-final th{
+    background-color:#fff;
+}
+.doc-final.head-color th{
     background-color:#ffe699;
 }
 .doc-final th,

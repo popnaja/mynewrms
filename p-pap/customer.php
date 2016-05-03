@@ -65,7 +65,7 @@ if($action=="add"){
             . $form->show_select("status",$op_cus_status,"label-3070","สถานะลูกค้า",null)
             . $form->show_textarea("address","",4,10,"","ที่อยู่ $req","label-3070")
             . $form->show_text("url","url","","","เว็บไซต์","","label-3070")
-            . $form->show_text("email","email","","","อีเมล $req","","label-3070","email")
+            . $form->show_text("email","email","","","อีเมล","","label-3070","email")
             . $form->show_text("tel","tel","","","โทรศัพท์ $req","","label-3070")
             . $form->show_text("fax","fax","","","โทรสาร","","label-3070")
             . $form->show_select("pay",$op_payment,"label-3070","การชำระเงิน",null)
@@ -109,7 +109,7 @@ if($action=="add"){
         $content .= "<div class='form-section cus_ct $hid'>"
             . "<h4>ผู้ติดต่อ</h4>"
             . $form->show_text("cname_$i","cname[]","","","ชื่อ $req","","label-3070")
-            . $form->show_text("cemail_$i","cemail[]","","","Email $req","","label-3070","email")
+            . $form->show_text("cemail_$i","cemail[]","","","Email","","label-3070","email")
             . $form->show_text("ctel_$i","ctel[]","","","โทร $req","","label-3070")
             . $form->show_textarea("cetc_$i","",3,10,"","อื่นๆ","label-3070","cetc[]")
             . "</div><!-- .form-section -->";
@@ -127,7 +127,7 @@ if($action=="add"){
             . "view_more_section('cus_ct');"
             . "</script>";
             
-    $form->addformvalidate("ez-msg", array('name','address','email','tel',"cname_0","cemail_0","ctel_0"),null,null,array("cat"));
+    $form->addformvalidate("ez-msg", array('name','address','tel',"cname_0","cemail_0","ctel_0"),null,null,array("cat"));
     $content .= $form->submitscript("$('#papform').submit();")
             . "</div><!-- .col-100 -->";
 } else if(isset($cid)) {
@@ -278,7 +278,7 @@ if($action=="add"){
                 . $form->show_select("status",$op_cus_status,"label-3070","สถานะลูกค้า",$info['customer_status'])
                 . $form->show_textarea("address",$info['customer_address'],4,10,"","ที่อยู่ $req","label-3070")
                 . $form->show_text("url","url",$info['customer_url'],"","เว็บไซต์","","label-3070")
-                . $form->show_text("email","email",$info['customer_email'],"","อีเมล $req","","label-3070","email")
+                . $form->show_text("email","email",$info['customer_email'],"","อีเมล","","label-3070","email")
                 . $form->show_text("tel","tel",$info['customer_tel'],"","โทรศัพท์ $req","","label-3070")
                 . $form->show_text("fax","fax",$info['customer_fax'],"","โทรสาร","","label-3070")
                 . $form->show_select("pay",$op_payment,"label-3070","การชำระเงิน",$info['customer_pay'])
@@ -332,7 +332,7 @@ if($action=="add"){
             . "<h4>รายชื่อผู้ติดต่อ</h4>"
             . $tb->show_table($head,$contacts)
             . $form2->show_text("cname","cname","","","ชื่อ $req","","label-3070")
-            . $form2->show_text("cemail","cemail","","","Email $req","","label-3070","email")
+            . $form2->show_text("cemail","cemail","","","Email","","label-3070","email")
             . $form2->show_text("ctel","ctel","","","โทร $req","","label-3070")
             . $form2->show_textarea("cetc","",3,10,"","อื่นๆ","label-3070","cetc")
             . $form->show_hidden("ctid","ctid",0)
@@ -355,7 +355,7 @@ if($action=="add"){
                 . "select_option_byval('bill');"
                 . "select_option_byval('cheque');"
                 . "</script>";
-        $form->addformvalidate("ez-msg", array('name','address','email','tel'),null,null,array("cat"));
+        $form->addformvalidate("ez-msg", array('name','address','tel'),null,null,array("cat"));
         $content .= $form->submitscript("$('#papform').submit();");
     }
 } else {

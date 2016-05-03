@@ -1376,7 +1376,8 @@ if($req == "login"){
     for($i=0;$i<count($_POST['name']);$i++){
         if($_POST['amount'][$i]>0){
             $tt += $_POST['price'][$i]-$_POST['discount'][$i];
-            $db->insert_data("pap_delivery_dt", array(null,$did,"",$_POST['amount'][$i],$_POST['price'][$i],$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            $totalp = $_POST['price'][$i]*$_POST['amount'][$i];
+            $db->insert_data("pap_delivery_dt", array(null,$did,"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
         }
     }
     //update deli total
@@ -1399,7 +1400,8 @@ if($req == "login"){
     for($i=0;$i<count($_POST['name']);$i++){
         if($_POST['amount'][$i]>0){
             $tt += $_POST['price'][$i]-$_POST['discount'][$i];
-            $db->insert_data("pap_delivery_dt", array(null,$_POST['did'],"",$_POST['amount'][$i],$_POST['price'][$i],$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            $totalp = $_POST['price'][$i]*$_POST['amount'][$i];
+            $db->insert_data("pap_delivery_dt", array(null,$_POST['did'],"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
         }
     }
     //update deli total

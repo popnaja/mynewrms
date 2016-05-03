@@ -72,7 +72,7 @@ if($action=="add"){
     $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070",null,"")
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
-            . $form->show_num("price", "", 0.01, "", "ราคา", "", "label-3070","min='0'")
+            . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
             . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=1")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
@@ -119,13 +119,13 @@ if($action=="add"){
     
     $rec = [];
     foreach($dtinfo as $k=>$v){
-        array_push($rec,array($v['job_name'],$v['type'],$v['qty'],$v['price'],$v['discount']));
+        array_push($rec,array($v['job_name'],$v['type'],$v['qty'],$v['price']/$v['qty'],$v['discount']));
     }
     $jrec = json_encode($rec);
     $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070",null,"")
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
-            . $form->show_num("price", "", 0.01, "", "ราคา", "", "label-3070","min='0'")
+            . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
             . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=1")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";

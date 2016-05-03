@@ -107,7 +107,7 @@ function show_quote_df($qid){
     $content = "<div class='print-a4-fix'>"
             . print_header("ใบเสนอราคา",$page1)
             . $head
-            . "<div class='doc-dt'>"
+            . "<div class='doc-dt head-color'>"
             . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
             . "</div><!-- .doc-dt -->";
 
@@ -125,13 +125,13 @@ function show_quote_df($qid){
         $msign = "<img src='".ROOTS.$manager['signature']."' />";
     }
     $content .= $page2
-            . "<table id='rp-2sign' class='doc-final'>"
+            . "<table id='rp-2sign' class='doc-final head-color'>"
     . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้อนุมัติ</th><th width='180'>เจ้าหน้าที่ฝ่ายขาย</th></tr>"
     . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='70'>$msign</td><td class='doc-sign' height='70'>$sign</td></tr>"
     . "<tr><td>วันที่ : $date</td><td>วันที่ : $date</td></tr>"
     . "</table>";
 
-    $content .= "<table id='rp-cus-sign' class='doc-final'>"
+    $content .= "<table id='rp-cus-sign' class='doc-final head-color'>"
             . "<tr><td rowspan='4'>"
             . "<ul style='padding-left:0.7cm;'>"
             . "<li>บริษัทฯขอสงวนสิทธิในการเปลี่ยนแปลงราคา หากรายละเอียดงานมีการเปลี่ยนแปลงเกิดขึ้นภายหลังการว่าจ้าง</li>"
@@ -442,11 +442,19 @@ function show_deli($did){
 
     $i = 0;
     $pay = "";
-    foreach($aoid as $oid){
-        $oinfo = $rp->rp_order($oid);
-        $pay .= ($i==0?"":"<br/>");
-        $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
-        $i++;
+    if($aoid[0]==0){
+        //manual
+        $credit = explode(",",$info['credit']);
+        $cd = max($credit);
+        $pay = ($cd>0?"เครดิต $cd วัน":"ชำระเป็นเงินสด");
+    } else {
+        //normal
+        foreach($aoid as $oid){
+            $oinfo = $rp->rp_order($oid);
+            $pay .= ($i==0?"":"<br/>");
+            $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
+            $i++;
+        }
     }
 
     $content .= "<table id='rp-2sign' class='doc-final'>"
@@ -505,13 +513,20 @@ function show_tdeli($tdid){
 
     $i = 0;
     $pay = "";
-    foreach($aoid as $oid){
-        $oinfo = $rp->rp_order($oid);
-        $pay .= ($i==0?"":"<br/>");
-        $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
-        $i++;
+    if($aoid[0]==0){
+        //manual
+        $credit = explode(",",$info['credit']);
+        $cd = max($credit);
+        $pay = ($cd>0?"เครดิต $cd วัน":"ชำระเป็นเงินสด");
+    } else {
+        foreach($aoid as $oid){
+            $oinfo = $rp->rp_order($oid);
+            $pay .= ($i==0?"":"<br/>");
+            $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
+            $i++;
+        }
     }
-
+    
     $content .= "<table id='rp-2sign' class='doc-final'>"
             . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้ส่งสินค้า</th><th width='180'>ผู้รับสินค้า</th></tr>"
             . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='100'></td><td class='doc-sign' height='100'></td></tr>"

@@ -100,7 +100,7 @@ $(document).ready(function(){
     var addbut = $("#add-list");
     var edform = $(".my-tab-inside");
     var targ = $("#deli-list");
-    var header = ["ลบ","แก้ไข","ชื่องาน","ชนิด","ยอดงาน","ราคา","ส่วนลด"];
+    var header = ["ลบ","แก้ไข","ชื่องาน","ชนิด","ยอดงาน","ราคาต่อหน่วย","ส่วนลด"];
     var rec = {};
     inputenter(['deli'],'add-list');
     //cancel

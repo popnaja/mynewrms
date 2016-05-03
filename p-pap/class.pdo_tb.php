@@ -668,13 +668,15 @@ END_OF_TEXT;
                 $atid = explode(",",$v['tid']);
                 $tdeli = "";
                 for($i=0;$i<count($atid);$i++){
-                    $data = explode(":",$atid[$i]);
-                    $tdid = $data[0];
-                    $tno = $data[1];
-                    if($tdid>0){
-                        $tdeli .= "<a href='mdelivery.php?action=edit&tdid=$tdid' title='Edit' class='icon-page-edit'></a>"
-                        . "<a href='mdelivery.php?action=print&tdid=$tdid' title='Print' target='_blank'>".$tno."</a>"
-                                . "<br/>";
+                    if($atid[$i]!=""){
+                        $data = explode(":",$atid[$i]);
+                        $tdid = $data[0];
+                        $tno = $data[1];
+                        if($tdid>0){
+                            $tdeli .= "<a href='mdelivery.php?action=edit&tdid=$tdid' title='Edit' class='icon-page-edit'></a>"
+                            . "<a href='mdelivery.php?action=print&tdid=$tdid' title='Print' target='_blank'>".$tno."</a>"
+                                    . "<br/>";
+                        }
                     }
                 }
                 if($v['dqty']!=$v['tqty']){

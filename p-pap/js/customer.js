@@ -133,7 +133,7 @@ function add_contact(aname){
     $(document).ready(function(){
         var but = $("#add-more-ct");
         but.on("click",function(){
-            if(!valNoBlank("cname")||!valNoBlank("cemail")||!valNoBlank("ctel")||!valEmail("cemail")){
+            if(!valNoBlank("cname")||!valNoBlank("ctel")){
                 //show msg
             } else {
                 var data = get_val(aname);
@@ -165,7 +165,7 @@ function add_sup_ct(aname){
     $(document).ready(function(){
         var but = $("#add-more-ct");
         but.on("click",function(){
-            if(!valNoBlank("cname")||!valNoBlank("cemail")||!valNoBlank("ctel")||!valEmail("cemail")){
+            if(!valNoBlank("cname")||!valNoBlank("ctel")){
                 //show msg
             } else {
                 var data = get_val(aname);

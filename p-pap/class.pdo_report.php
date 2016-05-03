@@ -180,7 +180,8 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT 
 deli.*,ct.customer_id,user.user_login,
-GROUP_CONCAT(dt.order_id) AS aoid
+GROUP_CONCAT(dt.order_id) AS aoid,
+GROUP_CONCAT(dt.credit) AS credit
 FROM pap_delivery AS deli
 LEFT JOIN pap_contact AS ct ON ct.contact_id=deli.contact
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=ct.customer_id
@@ -203,12 +204,14 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT 
 deli.*,ct.customer_id,user.user_login,
-GROUP_CONCAT(dt.order_id) AS aoid
+GROUP_CONCAT(dt.order_id) AS aoid,
+GROUP_CONCAT(ddt.credit) AS credit
 FROM pap_temp_deli AS deli
 LEFT JOIN pap_contact AS ct ON ct.contact_id=deli.contact
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=ct.customer_id
 LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 LEFT JOIN pap_temp_dt AS dt ON dt.temp_deli_id=deli.id
+LEFT JOIN pap_delivery_dt AS ddt ON ddt.job_name=dt.job_name
 WHERE deli.id=:tdid
 GROUP BY deli.id
 END_OF_TEXT;
