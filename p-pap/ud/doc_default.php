@@ -430,7 +430,7 @@ function show_deli($did){
             . print_header("ใบส่งของ/ใบแจ้งหนี้")
             . $docinfo
             . "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",11-ceil($row/2))
+            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",10-ceil($row/2))
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
     } else {
@@ -813,12 +813,16 @@ function job_detail($qid){
             $page = "พิพม์ 1 ด้าน";
         }
     }
+    //เข้าเล่ม
     $data['บริการงานพิมพ์'] = array(
         "ชื่องาน : ".$info['name'],
         "ประเภท : ".$product_type[$info['cat_id']],
         "ขนาด : ".$info['size'],
         $page
     );
+    if($info['binding_id']>0){
+        array_push($data['บริการงานพิมพ์'],"เข้าเล่ม : ".$process[$info['binding_id']]);
+    }
     $cno = 1;
     foreach($comps as $k=>$v){
         $post = explode(",",$v['comp_postpress']);
