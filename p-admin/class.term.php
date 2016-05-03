@@ -24,9 +24,9 @@ END_OF_TEXT;
             }
             $stmt->execute();
             if($stmt->rowCount()>0){
-                return array(0=>"none")+$stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+                return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
             } else {
-                return array(0=>"none");
+                return array();
             }
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);

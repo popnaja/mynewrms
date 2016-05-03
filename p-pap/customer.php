@@ -45,7 +45,7 @@ $md = new mymedia(PAP."request_ajax.php");
 $tbpdo = new tbPDO();
 $tb = new mytable();
 
-$sale = array("0"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");
+$sale = array("-1"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");
 if($action=="add"){
     //check
     if($pauth<=1){
@@ -362,8 +362,7 @@ if($action=="add"){
     $cat = (isset($_GET['cat'])&&$_GET['cat']>0?$_GET['cat']:null);
     $status = (isset($_GET['st'])&&$_GET['st']>0?$_GET['st']:null);
     $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
-    $sid = filter_input(INPUT_GET,'sid',FILTER_UNSAFE_RAW);
-
+    $sid = (isset($_GET['sid'])&&$_GET['sid']!=0?$_GET['sid']:null);
     
     $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
     $iperpage = 20;
@@ -381,7 +380,7 @@ if($action=="add"){
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
     } 
     if($pauth>3){
-        $fil_sale = $tb->show_filter(current_url(), "sid", array("n"=>"ยังไม่ระบุ")+$sale, $sid,"--Sale--");
+        $fil_sale = $tb->show_filter(current_url(), "sid", $sale, $sid,"--Sale--");
     }
     $content .= "<h1 class='page-title'>ฐานข้อมูลลูกค้า $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"

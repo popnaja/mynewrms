@@ -189,7 +189,7 @@ END_OF_TEXT;
                 case null :
                     $filter .= "";
                     break;
-                case "n" :
+                case "-1" :
                     $filter .= " AND uu.user_id IS NULL";
                     break;
                 default :

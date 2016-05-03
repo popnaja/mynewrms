@@ -110,7 +110,7 @@ if($req=="upload_paper"){
      * 2 = description
      * 
      */
-    $dir = "upload/";
+    $dir = dirname(__FILE__)."/upload/";
     $fileurl = $up->move_file($_FILES['csv-input'], $dir);
     if($fileurl==false){
         $_SESSION['error'] = "Upload file Error";
@@ -137,8 +137,10 @@ if($req=="upload_paper"){
      * 14 = ct_tel
      * 15 = cus_cat
      * 16 = cus_status
+     * 17 = sale id
+     * 18 = tax exclude
      */
-    $dir = "upload/";
+    $dir = dirname(__FILE__)."/upload/";
     $fileurl = $up->move_file($_FILES['csv-input'], $dir);
     if($fileurl==false){
         $_SESSION['error'] = "Upload file Error";
@@ -155,11 +157,23 @@ if($req=="upload_paper"){
             array_push($arrinfo,pap_now(),$row[16]);
             $cid = $db->insert_data("pap_customer",$arrinfo);
             
+            //add meta
+            if($row[18]=="yes"||$row[18]=="no"){
+                $db->update_meta("pap_customer_meta", "customer_id", $cid, array("tax_exclude"=>$row[18]));
+            }
+            
+            //add sale
+            if($row[17]>0){
+                $db->insert_data("pap_sale_cus", array($row[17],$cid));
+            }
+            
             //add cat
             $db->insert_data("pap_customer_cat", array($row[15],$cid));
 
             //add contact
-            $db->insert_data("pap_contact",array(null,$cid,1,$row[12],$row[13],$row[14],""));
+            if($row[12]!=""){
+                $db->insert_data("pap_contact",array(null,$cid,1,$row[12],$row[13],$row[14],""));
+            }
         }
         fclose($file);
         $_SESSION['message'] = "Upload completed";
