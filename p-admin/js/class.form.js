@@ -314,7 +314,7 @@ function valNoMatch(id1,id2){
 }
 function valEmail(id){
     var email = $("#"+id);
-    var email_filter = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-z0-9](?:[a-zA-z0-9-]{0,61}[a-zA-z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-z0-9]{0,61}[a-zA-z0-9])?)+$/;
+    var email_filter = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
     if(email.val().search(email_filter) !== -1){
         email.attr("placeholder","");
         email.css({'border-color':"rgb(238,238,238)"});
