@@ -69,7 +69,12 @@ if($action=="add"){
     //loaddata
     $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
     $typen = json_encode($product_type);
+    $jdt = "";
+    for($i=1;$i<=8;$i++){
+        $jdt .= $form->show_text("jdt_$i","jdt[]","","","รายละเอียด $i","","label-3070",null,"");
+    }
     $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070",null,"")
+            . $jdt
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
             . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
@@ -80,12 +85,16 @@ if($action=="add"){
     $content .= "<h1 class='page-title'>สร้าง$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
-            . "<div class='col-100'>"
+            . "<div class='col-50'>"
             . $form->show_text("scid","scid","","ค้นหา 3 ตัวอักษรขึ้นไป","ลูกค้า","","label-inline")
             . $form->show_hidden("cid","cid","0")
             . "<div id='cus_info'></div>"
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-50'>"
             . $form->show_text("date","date","","yyyy-mm-dd","วันที่ส่ง","","label-inline")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-inline")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-100'>"
             . $form->my_toggle_tab("add-more-deli", "รายการ", $inside)
             . "<div id='deli-list'></div>";
 
@@ -119,10 +128,17 @@ if($action=="add"){
     
     $rec = [];
     foreach($dtinfo as $k=>$v){
-        array_push($rec,array($v['job_name'],$v['type'],$v['qty'],$v['price']/$v['qty'],$v['discount']));
+        $meta = $db->get_meta("pap_delidt_meta", "dtid", $v['id']);
+        $detail = (isset($meta['job_detail'])?$meta['job_detail']:"");
+        array_push($rec,array($v['job_name'],$v['type'],$v['qty'],$v['price']/$v['qty'],$v['discount'],$detail));
     }
     $jrec = json_encode($rec);
+    $jdt = "";
+    for($i=1;$i<=8;$i++){
+        $jdt .= $form->show_text("jdt_$i","jdt[]","","","รายละเอียด $i","","label-3070",null,"");
+    }
     $inside = $form->show_text("name","name","","","งานพิมพ์","","label-3070",null,"")
+            . $jdt
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
             . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
@@ -140,6 +156,8 @@ if($action=="add"){
             . $form->show_radio("address", $address, "radio-inline", "ที่อยู่จัดส่ง",$info['address'])
             . "<a href='shipping_address.php?cid=$cid' title='เพิ่มที่อยู่จัดส่ง'>เพิ่มที่อยู่จัดส่ง</a>"
             . $form->show_num("credit", $credit, 1, "", "เครดิต(วัน)", "", "label-inline","min=0")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-50'>"
             . $form->show_text("date","date",$info['date'],"yyyy-mm-dd","วันที่ส่ง","","label-inline")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
             . "</div><!-- .col-50 -->"

@@ -100,8 +100,9 @@ $(document).ready(function(){
     var addbut = $("#add-list");
     var edform = $(".my-tab-inside");
     var targ = $("#deli-list");
-    var header = ["ลบ","แก้ไข","ชื่องาน","ชนิด","ยอดงาน","ราคาต่อหน่วย","ส่วนลด"];
+    var header = ["ลบ","แก้ไข","ชื่องาน","รายละเอียด","ชนิด","ยอดงาน","ราคาต่อหน่วย","ส่วนลด"];
     var rec = {};
+    var detail = $("[name='jdt[]']")
     inputenter(['deli'],'add-list');
     //cancel
     var cancel = $("#cancel");
@@ -118,11 +119,13 @@ $(document).ready(function(){
             var amount = parseFloat(v[2]);
             var price = parseFloat(v[3]);
             var discount = parseFloat(v[4]);
+            var dts = v[5].split(",");
             var ed = [name,type,amount,price,discount];
             rec[name] = [
                 "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
-                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"' jdt='"+dts.toString()+"'></span>",
                 name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                show_list(dts)+"<input type='hidden' name='job_detail[]' value='"+dts.toString()+"' />",
                 typen[type]+"<input type='hidden' name='type[]' value='"+type+"' />",
                 numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
                 numformat(price,2)+"<input type='hidden' name='price[]' value='"+price+"' />",
@@ -140,11 +143,19 @@ $(document).ready(function(){
             var amount = parseFloat($("#amount").val());
             var price = parseFloat($("#price").val());
             var discount = parseFloat($("#discount").val());
+            var dts = [];
+            $.each(detail,function(){
+                if($(this).val().length>0){
+                    dts.push($(this).val());
+                }
+            });
+            console.log(dts);
             var ed = [name,type,amount,price,discount];
             rec[name] = [
                 "<span class='del-list icon-delete-circle' rid='"+name+"'></span>",
-                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"'></span>",
+                "<span class='edit-list icon-page-edit' info='"+ed.toString()+"' jdt='"+dts.toString()+"'></span>",
                 name+"<input type='hidden' name='name[]' value='"+name+"' />",
+                show_list(dts)+"<input type='hidden' name='job_detail[]' value='"+dts.toString()+"' />",
                 typen[type]+"<input type='hidden' name='type[]' value='"+type+"' />",
                 numformat(amount,0)+"<input type='hidden' name='amount[]' value='"+amount+"' />",
                 numformat(price,2)+"<input type='hidden' name='price[]' value='"+price+"' />",
@@ -154,6 +165,15 @@ $(document).ready(function(){
             clear();
         }
     });
+    //show list
+    function show_list(arr){
+        var list = "<ul style='padding-left:15px;'>";
+        $.each(arr,function(i,v){
+           list += "<li style='text-align:left;'>"+v+"</li>";
+        });
+        list += "</ul>";
+        return list;
+    }
     //draw table
     function draw_tb(){
         targ.html(show_table(header,rec,'tb-mdeli-list'));
@@ -170,12 +190,16 @@ $(document).ready(function(){
             edform.removeClass("form-hide");
             cancel.removeClass("form-hide");
             var info = $(this).attr("info").split(",");
+            var dt = $(this).attr("jdt").split(",");
             addbut.val("แก้ไข");
             $("#name").val(info[0]);
             $("#type").val(info[1]);
             $("#amount").val(info[2]);
             $("#price").val(info[3]);
             $("#discount").val(info[4]);
+            $.each(dt,function(i,v){
+                detail.eq(i).val(v);
+            });
         });
     }
     function clear(){
@@ -185,6 +209,7 @@ $(document).ready(function(){
         $("#amount").val("");
         $("#price").val("");
         $("#discount").val("");
+        detail.val("");
         cancel.addClass("form-hide");
         //edform.addClass("form-hide");
     }

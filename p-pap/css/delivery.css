@@ -32,3 +32,12 @@
 #tb-mdeli-list {
     padding:0;
 }
+#tb-mdeli-list th:first-child,
+#tb-mdeli-list th:nth-child(2){
+    width:50px;
+}
+#tb-mdeli-list th:nth-child(6),
+#tb-mdeli-list th:nth-child(7),
+#tb-mdeli-list th:nth-child(8){
+    width:80px;
+}

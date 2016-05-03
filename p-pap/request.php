@@ -1375,11 +1375,14 @@ if($req == "login"){
     $tt = 0;
     for($i=0;$i<count($_POST['name']);$i++){
         if($_POST['amount'][$i]>0){
-            $tt += $_POST['price'][$i]-$_POST['discount'][$i];
             $totalp = $_POST['price'][$i]*$_POST['amount'][$i];
-            $db->insert_data("pap_delivery_dt", array(null,$did,"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            $tt += $totalp-$_POST['discount'][$i];
+            $dtid = $db->insert_data("pap_delivery_dt", array(null,$did,"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            //add mdeli meta
+            $db->update_meta("pap_delidt_meta", "dtid", $dtid, array("job_detail"=>$_POST['job_detail'][$i]));
         }
     }
+    
     //update deli total
     $db->update_data("pap_delivery", "id", $did, array("total"=>$tt));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
@@ -1399,9 +1402,11 @@ if($req == "login"){
     $tt = 0;
     for($i=0;$i<count($_POST['name']);$i++){
         if($_POST['amount'][$i]>0){
-            $tt += $_POST['price'][$i]-$_POST['discount'][$i];
             $totalp = $_POST['price'][$i]*$_POST['amount'][$i];
-            $db->insert_data("pap_delivery_dt", array(null,$_POST['did'],"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            $tt += $totalp-$_POST['discount'][$i];
+            $dtid = $db->insert_data("pap_delivery_dt", array(null,$_POST['did'],"",$_POST['amount'][$i],$totalp,$_POST['discount'][$i],$_POST['name'][$i],$_POST['credit'],$_POST['cid'],$_POST['type'][$i]));
+            //add mdeli meta
+            $db->update_meta("pap_delidt_meta", "dtid", $dtid, array("job_detail"=>$_POST['job_detail'][$i]));
         }
     }
     //update deli total
@@ -1721,7 +1726,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="edit_receipt"){
     $rcid = filter_input(INPUT_POST,'rcid',FILTER_SANITIZE_NUMBER_INT);
     $arrinfo = array(
@@ -1751,7 +1756,7 @@ if($req == "login"){
         update_job_paid($adid);
     }
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="update_po_paid"){
     $db->update_data($_POST['table'], "po_id", $_POST['poid'], array("po_paid"=>$_POST['date'],"po_paid_ref"=>$_POST['ref']));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";

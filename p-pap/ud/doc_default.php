@@ -413,7 +413,14 @@ function show_deli($did){
             $recs[0][$k][1] = job_dttb($data);
             $row += count($data,1)-count($data);
         } else {
-            $row++;
+            $jinfo = explode(";",$v[1]);
+            $jname = $jinfo[0];
+            $meta = $db->get_meta("pap_delidt_meta", "dtid", $jinfo[1]);
+            $dt = explode(",",$meta['job_detail']);
+            array_unshift($dt,"ชื่องาน: $jname");
+            $data["บริการงานพิมพ์"] = $dt;
+            $recs[0][$k][1] = job_dttb($data);
+            $row += count($data,1)-count($data);
         }
     }
     $discount = $recs[1];

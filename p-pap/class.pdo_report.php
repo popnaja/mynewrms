@@ -228,7 +228,7 @@ END_OF_TEXT;
         try{
             $sql = <<<END_OF_TEXT
 SELECT
-IFNULL(quote_id,job_name),qty,price/qty,discount
+IFNULL(quote_id,CONCAT(job_name,";",id)),qty,price/qty,discount
 FROM pap_delivery_dt AS dt
 LEFT JOIN pap_order AS job ON job.order_id=dt.order_id
 WHERE deli_id=:did
