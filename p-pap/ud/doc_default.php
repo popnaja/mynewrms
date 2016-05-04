@@ -495,7 +495,7 @@ function show_tdeli($tdid){
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ลูกค้า : </div>"
-            . print_cus_info($info['customer_id'],$info['address'])
+            . print_cus_info($info['customer_id'],$info['address'],false)
             . "</div><!-- .doc-to -->"
             . "<div class='doc-to'>"
             . "<div class='float-left doc-600'>ติดต่อ : </div>"
@@ -745,7 +745,7 @@ function print_sup_info($sid){
         . "</div><!-- .sup-info -->";
     return $sup;
 }
-function print_cus_info($cid,$aid=0){
+function print_cus_info($cid,$aid=0,$showtax=true){
     global $rpdb;
     $db = $rpdb;
     $sinfo = $db->get_info("pap_customer", "customer_id", $cid);
@@ -759,9 +759,10 @@ function print_cus_info($cid,$aid=0){
         . $sinfo['customer_address']."<br/>"
         . "Tel: ".$sinfo['customer_tel']."<br/>";
     }
+    $tax = ($showtax?"<span class='c-tax'>Tax ID: ".$sinfo['customer_taxid']."</span>":"");
     $sup = "<div class='sup-info'>"
         . $address
-        . "<span class='c-tax'>Tax ID: ".$sinfo['customer_taxid']."</span>"
+        . $tax
         . $contact
         . "</div><!-- .sup-info -->";
     return $sup;
