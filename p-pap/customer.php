@@ -127,7 +127,7 @@ if($action=="add"){
             . "view_more_section('cus_ct');"
             . "</script>";
             
-    $form->addformvalidate("ez-msg", array('name','address','tel',"cname_0","cemail_0","ctel_0"),null,null,array("cat"));
+    $form->addformvalidate("ez-msg", array('name','address','tel',"cname_0","ctel_0"),null,null,array("cat"));
     $content .= $form->submitscript("$('#papform').submit();")
             . "</div><!-- .col-100 -->";
 } else if(isset($cid)) {
