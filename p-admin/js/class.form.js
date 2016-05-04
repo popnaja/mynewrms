@@ -750,6 +750,7 @@ $(document).ready(function(){
     var tab = $("#"+id+" .my-tab-top");
     tab.on("click",function(){
         $("#"+id+" .my-tab-inside").toggleClass("form-hide");
+        flex_menu();
     });
 });
 }

@@ -34,6 +34,7 @@ function flex_menu(){
         var ct = $("#content");
         mh = menu.outerHeight();
         wh = $(window).height()-44;
+        ct.height("auto");
         ch = ct.height();
         ph = panel.height();
         if(mh>wh){
