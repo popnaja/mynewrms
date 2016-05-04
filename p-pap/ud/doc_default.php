@@ -808,9 +808,9 @@ function job_detail($qid){
         $page = "เนื้อใน ".$info['page_inside']. " หน้า";
     } else {
         if($info['page_inside']==2){
-            $page = "พิพม์ 2 ด้าน";
+            $page = "พิมพ์ 2 ด้าน";
         } else {
-            $page = "พิพม์ 1 ด้าน";
+            $page = "พิมพ์ 1 ด้าน";
         }
     }
     //เข้าเล่ม
