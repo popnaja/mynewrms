@@ -87,7 +87,7 @@ $content .= $form->show_submit("submit","Update","but-right")
 $form->addformvalidate("ez-msg", array('name','address','email','tel','tax_id'));
 $content .= $form->submitscript("$('#papform').submit();")
         . "<script>"
-        . "format_id('tax_id');"
+        //. "format_id('tax_id');"
         . "</script>";
 
 $content .= $menu->showfooter();

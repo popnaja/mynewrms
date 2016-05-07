@@ -76,11 +76,11 @@
 }
 .c-logo {
     display:inline-block;
-    height:0.8in
+    width:15%;
 }
 .c-logo img {
-    width:auto;
-    height:100%;
+    width:100%;
+    height:auto;
 }
 .c-info {
     display:inline-block;
@@ -93,14 +93,10 @@
 .c-name {
     font-weight:600;
 }
-.c-tax {
-    font-weight:600;
-}
 .doc-name {
-    position:absolute;
-    right:0.1in;
     display:inline-block;
-    width:25%;
+    width:22%;
+    margin-left:3%;
     text-align:center;
     vertical-align: top;
 }
@@ -320,4 +316,37 @@
 }
 .job-list {
     padding-left:0.2in;
+}
+/*----------------------------------------------------------------  FONT   -----------------------------------------------------*/
+@font-face {
+    font-family: 'Conv_supermarket_1';
+    src: url('fonts/supermarket_1.eot');
+    src: local('☺'), url('fonts/supermarket_1.woff') format('woff'), url('fonts/supermarket_1.ttf') format('truetype'), url('fonts/supermarket_1.svg') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.ghpp_font .c-info,
+.ghpp_font .c-info span,
+.ghpp_font .doc-name span{
+    font-family: 'Conv_supermarket_1' !important;
+    line-height:0.6cm;
+    font-size:14pt;
+}
+.doc-info.ghpp-doc-info{
+    border:none;
+}
+#tb-rp.ghpp-tb th{
+    font-size:11.5pt;
+    background-color:#BAD68E;
+}
+#tb-rp.ghpp-tb tr.tb-data{
+    border-bottom:none;
+    border-top:none;
+}
+.ghpp-sign {
+    padding-top:0.5cm;
+    text-align:center;
+}
+.ghpp-sign p{
+    padding-top:0.2cm;
 }

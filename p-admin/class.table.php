@@ -184,7 +184,7 @@ class mytable {
                 . "</div><!-- #$id -->\n";
         return $html;
     }
-    public function show_tb_wtax($arrheader,$arrdata,$id="",$tax,$discount,$extra="",$row=null){
+    public function show_tb_wtax($arrheader,$arrdata,$id="",$tax,$discount,$extra="",$row=null,$class=null){
         __autoloada("thai");
         function sub_format($v){
             if((float)$v==0){
@@ -194,8 +194,9 @@ class mytable {
             }
         }
         $sum = 0;
+        $c = (isset($class)?$class:"");
         $len = sizeof($arrheader,0);
-        $html = "<div id='$id' class='ez-table'>"
+        $html = "<div id='$id' class='ez-table $c'>"
                 . "<table>"
                 . "<tr class='tb-head tb-row'>";
         foreach($arrheader as $value){
@@ -230,9 +231,9 @@ class mytable {
             $sum -= $discount;
             $thaitt = ($sum!=0?"(".ThaiBahtConversion(round($sum*(1+$tax),2)).")":"");
             $html .= "<tr class='tb-discount'><td colspan='2'></td><td colspan='2'>ส่วนลด / Discount</td><td>".number_format($discount,2)."</td></tr>"
-                . "<tr class='tb-sum'><td colspan='2' rowspan='3'>$thaitt</td><th colspan='2'>รวมเงิน / Sub Total</td><td>".number_format($sum,2)."</td></tr>"
-                . "<tr class='tb-sum'><th colspan='2'>ภาษีมูลค่าเพิ่ม / Tax</td><td>".number_format($sum*$tax,2)."</td></tr>"
-                . "<tr class='tb-sum tb-gtt'><th colspan='2'>รวมทั้งสิ้น / Grand Total</td><td>".number_format($sum*(1+$tax),2)."</td></tr>";
+                . "<tr class='tb-sum'><td colspan='2' rowspan='3'>$thaitt</td><th colspan='2'>มูลค่าสินค้า</td><td>".number_format($sum,2)."</td></tr>"
+                . "<tr class='tb-sum'><th colspan='2'>ภาษีมูลค่าเพิ่ม 7%</td><td>".number_format($sum*$tax,2)."</td></tr>"
+                . "<tr class='tb-sum tb-gtt'><th colspan='2'>รวมเป็นเงินทั้งสิ้น</td><td>".number_format($sum*(1+$tax),2)."</td></tr>";
         } else {
             
             $html .= "<tr><td colspan='$len' class='td-span5 tb-noinfo'>No information.</td></tr>";
