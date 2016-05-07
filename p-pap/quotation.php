@@ -185,7 +185,7 @@ if($action=="add"){
             . $form->show_hidden("redirect","redirect",$redirect)
             . $form->show_hidden("pauth","pauth",$pauth)
             . $form->show_hidden("uid","uid",$uid);
-    $form->addformvalidate("ez-msg", array('name',"cusct",'amount'),null,null,array('cid','type','sid'));
+    $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
@@ -478,7 +478,7 @@ if($action=="add"){
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)
             . $form->show_hidden("redirect","redirect",$redirect);
-    $form->addformvalidate("ez-msg", array('name',"cusct",'amount'),null,null,array('cid','type','sid'));
+    $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"

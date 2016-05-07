@@ -181,7 +181,8 @@ END_OF_TEXT;
 SELECT 
 deli.*,ct.customer_id,user.user_login,
 GROUP_CONCAT(dt.order_id) AS aoid,
-GROUP_CONCAT(dt.credit) AS credit
+GROUP_CONCAT(dt.credit) AS credit,
+GROUP_CONCAT(dt.customer_id) AS acid
 FROM pap_delivery AS deli
 LEFT JOIN pap_contact AS ct ON ct.contact_id=deli.contact
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=ct.customer_id
@@ -205,13 +206,14 @@ END_OF_TEXT;
 SELECT 
 deli.*,ct.customer_id,user.user_login,
 GROUP_CONCAT(dt.order_id) AS aoid,
-GROUP_CONCAT(ddt.credit) AS credit
+GROUP_CONCAT(ddt.credit) AS credit,
+GROUP_CONCAT(ddt.customer_id) AS acid
 FROM pap_temp_deli AS deli
 LEFT JOIN pap_contact AS ct ON ct.contact_id=deli.contact
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=ct.customer_id
 LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 LEFT JOIN pap_temp_dt AS dt ON dt.temp_deli_id=deli.id
-LEFT JOIN pap_delivery_dt AS ddt ON ddt.job_name=dt.job_name
+LEFT JOIN pap_delivery_dt AS ddt ON ddt.job_name=dt.job_name OR ddt.order_id=dt.order_id
 WHERE deli.id=:tdid
 GROUP BY deli.id
 END_OF_TEXT;
@@ -282,12 +284,15 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT 
-pb.*,ct.customer_id,user.user_login
+pb.*,ct.customer_id,user.user_login,GROUP_CONCAT(ddt.customer_id) AS acid
 FROM pap_pbill AS pb
 LEFT JOIN pap_contact AS ct ON ct.contact_id=pb.contact
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=ct.customer_id
 LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
+LEFT JOIN pap_pbill_dt AS bdt ON bdt.pbill_id=pb.id
+LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=bdt.deli_id
 WHERE pb.id=:bid
+GROUP BY pb.id
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":bid",$bid);
@@ -410,14 +415,17 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT 
-rc.*,iv.customer_id,user_login,meta_value AS tax_exclude,iv.no AS invoiceno
+rc.*,iv.customer_id,user_login,meta_value AS tax_exclude,iv.no AS invoiceno,iv.id AS ivid,
+GROUP_CONCAT(ivdt.deli_id) AS adeli
 FROM pap_rc AS rc
 LEFT JOIN pap_rc_dt AS rcdt ON rcdt.rc_id=rc.id
 LEFT JOIN pap_invoice AS iv ON iv.id=rcdt.invoice_id
+LEFT JOIN pap_invoice_dt AS ivdt ON ivdt.invoice_id=iv.id
 LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=iv.customer_id
 LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=iv.customer_id AND meta_key='tax_exclude'
 WHERE rc.id=:rcid
+GROUP BY rc.id
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":rcid",$rcid);

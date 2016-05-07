@@ -290,6 +290,54 @@ class mytable {
                 . "</div><!-- #$id -->\n";
         return $html;
     }
+    public function show_tb_bill_o($arrheader,$arrdata,$id="",$row=null){
+        __autoloada("thai");
+        $sum = 0;
+        $n = count($arrdata);
+        $len = sizeof($arrheader,0);
+        $html = "<div id='$id' class='ez-table ghpp-tb'>"
+                . "<table>"
+                . "<tr class='tb-head tb-row'>";
+        foreach($arrheader as $value){
+            $html .= "<th>$value</th>";
+        }
+        $html .= "</tr>";
+        $i = 0;
+        if(isset($arrdata)&&sizeof($arrdata,0)>0){
+            foreach($arrdata as $key=>$val){
+                if(!is_array($val)){
+                    break;
+                } else {
+                    $html .= "<tr class='tb-data tb-row'>";
+                    foreach($val as $k => $v){
+                        $act_v = (in_array($k,array(3))?number_format($v,2):$v);
+                        $sum += ($k==3?$v:0);
+                        $html .= "<td>".$act_v."</td>";
+                    }
+                    $html .= "</tr>";
+                    $i++;
+                }
+            }
+            if(isset($row)){
+                if($i<$row){
+                    for($j=0;$j<($row-$i);$j++){
+                        $html .= "<tr class='tb-data tb-row'>"
+                                . str_repeat("<td></td>",count($val))
+                                . "</tr>";
+                    }
+                }
+            }
+            $total = number_format($sum,2);
+            $thaitt = "(".ThaiBahtConversion(round($sum,2)).")";
+            $html .= "<tr class='tb-sum'><td colspan='".($len-2)."'>จำนวน $n รายการ <br/>$thaitt</td><th>รวมเป็นเงินทั้งสิ้น</td><td class='tb-gtt'>$total</td></tr>";
+        } else {
+            
+            $html .= "<tr><td colspan='$len' class='td-span5 tb-noinfo'>No information.</td></tr>";
+        }
+        $html .= "</table>"
+                . "</div><!-- #$id -->\n";
+        return $html;
+    }
     public function prep_get_url($url,$name){
         if(is_integer(strpos($url,"?"))){
             $t = explode("?",$url);

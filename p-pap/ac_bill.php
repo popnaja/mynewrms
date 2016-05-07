@@ -38,7 +38,7 @@ END_OF_TEXT;
     } else if(isset($ivid)){
         $show = show_invoice_ghpp($ivid);
     } else if(isset($rcid)){
-        $show = show_receipt($rcid);
+        $show = show_rc_ghpp($rcid);
     }
     $content = $menu->showhead()
             . $show

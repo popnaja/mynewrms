@@ -16,14 +16,7 @@ function show_quote_df($qid){
 
     $head = "<div class='doc-info'>"
         . "<div class='doc-to'>"
-        . "<div class='float-left doc-600'>ถึง/To : </div>"
         . print_cus_info($info['customer_id'])
-        . "</div><!-- .doc-to -->"
-        . "<div class='doc-to'>"
-        . "<div class='float-left doc-600'>ติดต่อ : </div>"
-        . "<div class='sup-info'>"
-        . $ct['contact_name']. " (". $ct['contact_tel'].")"
-        . "</div><!-- .sup-info -->"
         . "</div><!-- .doc-to -->"
         . "<div class='doc-date'>"
         . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".  thai_date($show_date)."</div>"
@@ -87,7 +80,7 @@ function show_quote_df($qid){
         $page1 = "หน้า 1/2";
         $page2 = "</div><!-- .print-a4-fix -->"
                 . "<div class='print-a4-fix'>"
-                . print_header("ใบเสนอราคา","หน้า 2/2")
+                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
                 . $head
                 . $extra;
     } else if($x>7){
@@ -95,7 +88,7 @@ function show_quote_df($qid){
         $page2 = $extra
                 . "</div><!-- .print-a4-fix -->"
                 . "<div class='print-a4-fix'>"
-                . print_header("ใบเสนอราคา","หน้า 2/2")
+                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
                 . $head;
     } else {
         $page1 = "";
@@ -105,7 +98,7 @@ function show_quote_df($qid){
     $discount = (int)$info['discount'];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $content = "<div class='print-a4-fix'>"
-            . print_header("ใบเสนอราคา",$page1)
+            . print_header("ใบเสนอราคา",$page1,"ghpp_font")
             . $head
             . "<div class='doc-dt head-color'>"
             . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
@@ -284,11 +277,10 @@ function show_mat_po($poid){
 
     $info = $db->get_info("pap_mat_po", "po_id", $poid);
     $content = "<div class='print-letter'>"
-            . print_header("ใบสั่งซื้อ");
+            . print_header("ใบสั่งซื้อ",null,'ghpp_font');
 
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ร้านค้า : </div>"
             . print_sup_info($info['supplier_id'])
             . "</div>"
             . "<div class='doc-date'>"
@@ -333,11 +325,10 @@ function show_process_po($poid){
 
     $info = $db->get_info("pap_process_po", "po_id", $poid);
     $content = "<div class='print-letter'>"
-            . print_header("ใบสั่งผลิต");
+            . print_header("ใบสั่งผลิต",null,"ghpp_font");
 
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ร้านค้า : </div>"
             . print_sup_info($info['supplier_id'])
             . "</div>"
             . "<div class='doc-date'>"
@@ -381,20 +372,18 @@ function show_deli($did){
     $tb = new mytable();
 
     $info = $rp->rp_deli_info($did);
-    $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
-    $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
+    if(isset($info['customer_id'])){
+        $cid = $info['customer_id'];
+    } else {
+        $acid = explode(",",$info['acid']);
+        $cid = $acid[0];
+    }
+    $cus = $db->get_meta("pap_customer_meta", "customer_id", $cid);
     $aoid = explode(",",$info['aoid']);
 
     $docinfo = "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ลูกค้า : </div>"
-            . print_cus_info($info['customer_id'],$info['address'])
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ติดต่อ : </div>"
-            . "<div class='sup-info'>"
-            . $ct['contact_name']. " (". $ct['contact_tel'].")"
-            . "</div><!-- .sup-info -->"
+            . print_cus_info($cid,$info['address'],true,$info['contact'])
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".  thai_date($info['date'])."</div>"
@@ -427,7 +416,7 @@ function show_deli($did){
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     if(ceil($row/2)<11){
         $content = "<div class='print-letter'>"
-            . print_header("ใบส่งของ/ใบแจ้งหนี้")
+            . print_header("ใบส่งของ/ใบแจ้งหนี้",null,"ghpp_font")
             . $docinfo
             . "<div class='doc-dt'>"
             . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",10-ceil($row/2))
@@ -435,7 +424,7 @@ function show_deli($did){
             . "</div><!-- .doc-dt -->";
     } else {
         $content = "<div class='print-letter'>"
-            . print_header("ใบส่งของ/ใบแจ้งหนี้","หน้า 1/2")
+            . print_header("ใบส่งของ/ใบแจ้งหนี้","หน้า 1/2","ghpp_font")
             . $docinfo
             . "<div class='doc-dt'>"
             . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount)
@@ -483,25 +472,22 @@ function show_tdeli($tdid){
     $tb = new mytable();
 
     $info = $rp->rp_tdeli_info($tdid);
-
-    $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
-    $cus = $db->get_meta("pap_customer_meta", "customer_id", $ct['customer_id']);
+    if(isset($info['customer_id'])){
+        $cid = $info['customer_id'];
+    } else {
+        $acid = explode(",",$info['acid']);
+        $cid = $acid[0];
+    }
+    $cus = $db->get_meta("pap_customer_meta", "customer_id", $cid);
     $aoid = explode(",",$info['aoid']);
 
     $content = "<div class='print-letter'>"
             . "<div class='c-head'>"
-            . "<div class='doc-name-center'><span>ใบส่งของชั่วคราว</span></div>"
+            . "<div class='doc-name-center'><span class='ghpp_font'>ใบส่งของชั่วคราว</span></div>"
             . "</div>";
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ลูกค้า : </div>"
-            . print_cus_info($info['customer_id'],$info['address'],false)
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ติดต่อ : </div>"
-            . "<div class='sup-info'>"
-            . $ct['contact_name']. " (". $ct['contact_tel'].")"
-            . "</div><!-- .sup-info -->"
+            . print_cus_info($cid,$info['address'],false,$info['contact'])
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".  thai_date($info['date'])."</div>"
@@ -554,20 +540,19 @@ function show_pbill($bid){
     $tb = new mytable();
 
     $info = $rp->rp_pbill_info($bid);
+    if(isset($info['customer_id'])){
+        $cid = $info['customer_id'];
+    } else {
+        $acid = explode(",",$info['acid']);
+        $cid = $acid[0];
+    }
     $thdate = thai_date($info['date']);
-    $ct = $db->get_info("pap_contact", "contact_id", $info['contact']);
+
     $content = "<div class='print-letter'>"
-            . print_header("ใบวางบิล");
+            . print_header("ใบวางบิล",null,"ghpp_font");
     $content .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ลูกค้า : </div>"
-            . print_cus_info($info['customer_id'])
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ติดต่อ : </div>"
-            . "<div class='sup-info'>"
-            . $ct['contact_name']. " (". $ct['contact_tel'].")"
-            . "</div><!-- .sup-info -->"
+            . print_cus_info($cid,0,true,$info['contact'])
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".$thdate."</div>"
@@ -613,14 +598,7 @@ function show_invoice($ivid){
             . print_header("ต้นฉบับ<br/>ใบกำกับภาษี");
     $doc = "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ลูกค้า : </div>"
             . print_cus_info($info['customer_id'])
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
-            //. "<div class='float-left doc-600'>ติดต่อ : </div>"
-            //. "<div class='sup-info'>"
-            //. $ct['contact_name']. " (". $ct['contact_tel'].")"
-            //. "</div><!-- .sup-info -->"
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".$thdate."</div>"
@@ -672,14 +650,7 @@ function show_receipt($rcid){
 
     $doc .= "<div class='doc-info'>"
             . "<div class='doc-to'>"
-            . "<div class='float-left doc-600'>ลูกค้า : </div>"
             . print_cus_info($info['customer_id'])
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
-            //. "<div class='float-left doc-600'>ติดต่อ : </div>"
-            //. "<div class='sup-info'>"
-            //. $ct['contact_name']. " (". $ct['contact_tel'].")"
-            //. "</div><!-- .sup-info -->"
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>วันที่/Date : </span>".$thdate."</div>"
@@ -694,7 +665,7 @@ function show_receipt($rcid){
     $discount = 0;
     $tax = ($info['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",10)
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",9,"ghpp-tb")
             . "<span style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี่จะใช้ได้ต่อเมื่อสามารถเรียกเก็บเงินได้ตามเช็คแล้วเท่านั้น</span>"
             . "</div><!-- .doc-dt -->";
     //signature
@@ -737,46 +708,53 @@ function print_sup_info($sid){
     global $rpdb;
     $db = $rpdb;
     $sinfo = $db->get_info("pap_supplier", "id", $sid);
-    $sup = "<div class='sup-info'>"
-        . $sinfo['name']."<br/>"
-        . $sinfo['address']."<br/>"
-        . "Tel: ".$sinfo['tel']."<br/>"
-        . "<span class='c-tax'>Tax ID: ".$sinfo['taxid']."</span>"
-        . "</div><!-- .sup-info -->";
+    $sup = "<h3>SUPPLIER'S NAME</h3>"
+            . "<div class='cus-info-left'>Company : </div>"
+            . "<div class='cus-info-right'>".$sinfo['name']."</div>"
+            . "<div class='cus-info-left'>Address : </div>"
+            . "<div class='cus-info-right'>".$sinfo['address']." Tel.".$sinfo['tel']."</div>"
+            . "<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['taxid']."</div>";
     return $sup;
 }
-function print_cus_info($cid,$aid=0,$showtax=true){
+function print_cus_info($cid,$aid=0,$showtax=true,$ctid=null){
     global $rpdb;
     $db = $rpdb;
     $sinfo = $db->get_info("pap_customer", "customer_id", $cid);
     $contact = "";
+    if(isset($ctid)){
+        $ct = $db->get_info("pap_contact", "contact_id", $ctid);
+        $contact .= "<div class='cus-info-left'>ติดต่อ : </div>"
+                . "<div class='cus-info-right'>".$ct['contact_name']. " (". $ct['contact_tel'].")</div>";
+    }
     if($aid>0){
         $ainfo = $db->get_info("pap_cus_ad", "id", $aid);
-        $address = $ainfo['name']."<br/>"
-            . $ainfo['address']."<br/>";
+        $name = $ainfo['name'];
+        $address = $ainfo['address'];
     } else {
-        $address =  $sinfo['customer_name']."<br/>"
-        . $sinfo['customer_address']."<br/>"
-        . "Tel: ".$sinfo['customer_tel']."<br/>";
+        $name =  $sinfo['customer_name'];
+        $address = $sinfo['customer_address']
+        . " Tel. ".$sinfo['customer_tel'];
     }
-    $tax = ($showtax?"<span class='c-tax'>Tax ID: ".$sinfo['customer_taxid']."</span>":"");
-    $sup = "<div class='sup-info'>"
-        . $address
-        . $tax
-        . $contact
-        . "</div><!-- .sup-info -->";
+    $tax = ($showtax?"<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['customer_taxid']."</div>":"");
+    $sup = "<h3>CUSTOMER'S NAME</h3>"
+            . "<div class='cus-info-left'>Company : </div>"
+            . "<div class='cus-info-right'>".$name."</div>"
+            . "<div class='cus-info-left'>Address : </div>"
+            . "<div class='cus-info-right'>".$address."</div>"
+            . $contact
+            . $tax;
     return $sup;
 }
 function print_header($docname,$page=null,$font=null){
     global $rpdb;
     $db = $rpdb;
-    $f = (isset($font)?$font:"");
+    $f = (isset($font)?$font:"ghpp-font");
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
     $clogo = "<img src='".ROOTS.$cinfo['c_logo']."'/>";
     $header = "<span class='c-name'>".$cinfo['name']."</span><br/>"
-            . $cinfo['address']."<br/>"
-            . "Tel: ".$cinfo['tel']." Fax: ".$cinfo['fax']."<br/>"
-            . "<span class='c-tax'>Tax ID: ".$cinfo['tax_id']."</span>";
+            . $cinfo['address']
+            . "  Tel. ".$cinfo['tel']."  Fax. ".$cinfo['fax']."<br/>"
+            . "<span class='c-tax'>เลขประจำตัวผู้เสียภาษีอากร ".$cinfo['tax_id']."</span>";
     $head = "<div class='c-head $f'>"
             . "<div class='c-logo'>$clogo</div>"
             . "<div class='c-info'>$header</div>"
@@ -902,7 +880,7 @@ function show_invoice_ghpp($ivid){
 
     $info = $rp->rp_invoice_info($ivid);
     $deliinfo = $db->get_info("pap_delivery", "id", $info['adid']);
-    $ct = $db->get_info("pap_contact", "contact_id", $deliinfo['contact']);
+    //$ct = $db->get_info("pap_contact", "contact_id", $deliinfo['contact']);
     //deli info
     $dinfo = $rp->rp_deli_info($deliinfo['id']);
     $aoid = explode(",",$dinfo['aoid']);
@@ -930,23 +908,14 @@ function show_invoice_ghpp($ivid){
             . print_header("ใบกำกับภาษี",null,"ghpp_font");
     $sinfo = $db->get_info("pap_customer", "customer_id", $info['customer_id']);
     $address = $sinfo['customer_address']."<br/>"
-        . "Tel: ".$sinfo['customer_tel']."<br/>"
-        . "<span class='c-tax'>Tax ID: ".$sinfo['customer_taxid']."</span>";
+        . "Tel: ".$sinfo['customer_tel']."<br/>";
     $doc = "<div class='doc-info ghpp-doc-info'>"
             . "<div class='doc-to'>"
-            . "<h3>CUSTOMER'S NAME</h3>"
-            . "<div class='float-left doc-600' style='width:1in'>Company : </div>"
-            . "<div class='float-left'>".$sinfo['customer_name']."</div>"
-            . "<div class='float-left doc-600' style='clear:left;width:1in;'>Address : </div>"
-            . "<div class='float-left'>".$address."</div>"
-            . "<div class='float-left doc-600' style='clear:left;width:1in;'>ติดต่อ : </div>"
-            . "<div class='float-left'>".$ct['contact_name']. " (". $ct['contact_tel'].")"
-            . "</div><!-- .doc-to -->"
-            . "<div class='doc-to'>"
+            . print_cus_info($info['customer_id'])
             . "</div><!-- .doc-to -->"
             . "<div class='doc-date'>"
             . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
-            . "<div class='doc-600'> <span class='float-left'>INVOICE NO. : </span>".  $info['no']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Invoice No. : </span>".  $info['no']."</div>"
             . "<div class='doc-600'> <span class='float-left'>Sale Representative : </span>". $info['user_login']."</div>"
             . "<div class='doc-600'> <span class='float-left'>เงื่อนไขการชำระเงิน : </span>". $pay."</div>"
             . "</div>"
@@ -957,22 +926,109 @@ function show_invoice_ghpp($ivid){
     $discount = $info['discount'];
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
     $doc .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",10,"ghpp-tb")
+            . $tb->show_tb_wtax($head,$recs,"tb-rp",$tax,$discount,"",9,"ghpp-tb")
             . "<span style='font-size:11pt;'>ได้รับสินค้า, ต้นฉบับใบกำกับภาษี และรับทราบข้อตกลงอื่นๆตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
     $doc .= "<div class='ghpp-sign'>"
-            . "<div class='col-50'>"
+            . "<table>"
+            . "<tr><td>"
             . "<p>ผู้รับสินค้า.........................................................</p>"
             . "<p>(............................................................)</p>"
             . "<p>วันที่......./......../........</p>"
-            . "</div><!-- .col-50 -->"
-            . "<div class='col-50'>"
+            . "</td>"
+            . "<td>"
             . "<p>ผู้ส่งสินค้า.........................................................</p>"
             . "<p>(............................................................)</p>"
             . "<p>วันที่......./......../........</p>"
-            . "</div><!-- .col-50 -->"
+            . "</td>"
+            . "</tr>"
+            . "</table>"
             . "</div><!-- .ghpp-sign -->";
 
     $doc .= "</div><!-- .print-letter -->";
     return $original.$doc;
+}
+function show_rc_ghpp($rcid){
+    global $rpdb;
+    global $op_type_unit;
+    $db = $rpdb;
+
+    __autoload("pdo_report");
+    __autoloada("table");
+    $rp = new reportPDO();
+    $tb = new mytable();
+
+    $info = $rp->rp_receipt_info($rcid);
+    $thdate = thai_date($info['date']);
+    $user = (isset($info['user_login'])?$info['user_login']:"-");
+    
+    $dinfo = $rp->rp_deli_info($info['adeli']);
+    $aoid = explode(",",$dinfo['aoid']);
+    $pay = "";
+    $i= 0;
+    if($aoid[0]==0){
+        //manual
+        $credit = explode(",",$dinfo['credit']);
+        $cd = max($credit);
+        $pay = ($cd>0?"เครดิต $cd วัน":"ชำระเป็นเงินสด");
+    } else {
+        //normal
+        foreach($aoid as $oid){
+            $oinfo = $rp->rp_order($oid);
+            $pay .= ($i==0?"":"<br/>");
+            $pay .= ($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด");
+            $i++;
+        }
+    }
+    
+    $doc = "<div class='print-letter'>"
+            . print_header("ใบเสร็จรับเงิน",null,"ghpp_font");
+    $doc .= "<div class='doc-info ghpp-doc-info'>"
+            . "<div class='doc-to'>"
+            . print_cus_info($info['customer_id'])
+            . "</div><!-- .doc-to -->"
+            . "<div class='doc-date'>"
+            . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
+            . "<div class='doc-600'> <span class='float-left'>REC No. : </span>".  $info['no']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Sale Representative: </span>". $user."</div>"
+            . "<div class='doc-600'> <span class='float-left'>เงื่อนไขการชำระเงิน : </span>".  $pay."</div>"
+            . "</div>"
+            . "</div>";
+    $ivinfo = $db->get_info("pap_invoice", "id", $info['ivid']);
+    $tax = ($info['tax_exclude']=="yes"?1:1.07);
+    $head = array("ลำดับ","เลขที่ใบกำกับ","ลงวันที่","จำนวนเงิน");
+    $recs = array(array(1,$info['invoiceno'],  thai_date($ivinfo['date'], true),  $ivinfo['total']*$tax));
+    $discount = 0;
+ 
+    $doc .= "<div class='doc-dt'>"
+            . $tb->show_tb_bill_o($head,$recs,"tb-rp",6)
+            . "</div><!-- .doc-dt -->";
+    $dot = str_repeat(".",50);
+    $doc .= "<div class='ghpp-pay'>"
+            . "<table>"
+            . "<tr>"
+            . "<td rowspan='4'>การขำระเงิน</td>"
+            . "<td><span class='square-check'></span>เงินสด</td>"
+            . "</tr>"
+            . "<tr><td><span class='square-check'></span>เช็คธนาคาร.$dot.สาขา.$dot.</td></tr>"
+            . "<tr><td><span class='square-check blank'></span>เช็คเลขที่.$dot.ลงวันที่.$dot.</td></tr>"
+            . "<tr><td><span class='square-check'></span>โอนเงิน จากบัญชีธนาคาร.$dot.เลขที่บัญชี.$dot.</td></tr>"
+            . "</table>"
+            . "<p style='font-size:11pt;'>โปรดจ่ายเช็คในนาม \"บริษัท กู๊ดเฮด พริ้นท์ติ้ง แอนด์ แพคเกจจิ้ง กรุ๊ป จำกัด\" ทุกครั้ง</p>"
+            . "<p style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์ต่อเมื่อ บริษัทฯได้เรียกเก็บเงินตามเช็คหรือจากบัญชีเรียบร้อยแล้ว และปรากฎลายเซนต์ของผู้รับเงิน</p>"
+            . "</div><!-- .ghpp-pay -->";
+    $doc .= "<div class='ghpp-sign'>"
+            . "<table>"
+            . "<tr><td>&nbsp;</td>"
+            . "<td>"
+            . "<p>ผู้รับเงิน.........................................................</p>"
+            . "<p>(............................................................)</p>"
+            . "<p>วันที่......./......../........</p>"
+            . "</td>"
+            . "</tr>"
+            . "</table>"
+            . "</div><!-- .ghpp-sign -->";
+
+    $doc .= "</div><!-- .print-letter -->";
+    return $doc;
 }

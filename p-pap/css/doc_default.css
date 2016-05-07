@@ -1,8 +1,7 @@
 /*------------------------------------------------------------------- for print ---------------------------------------------------------*/
 .print-a4 {
     box-sizing:border-box;
-    width:7.8in;
-    padding:0.2in;
+    width:8in;
     margin-left:auto;
     margin-right:auto;
     color:#222;
@@ -11,9 +10,8 @@
 }
 .print-a4-fix {
     box-sizing:border-box;
-    width:7.8in;
+    width:8in;
     height:11.2in;
-    padding:0.2in;
     margin-left:auto;
     margin-right:auto;
     color:#222;
@@ -105,7 +103,7 @@
     bottom:0in;
     right:0.1in;
     display:inline-block;
-    width:25%;
+    width:22%;
     text-align:center;
     font-size:11pt;
     font-weight:600;
@@ -140,7 +138,7 @@
 }
 .doc-to {
     display:inline-block;
-    width:67%;
+    width:5in;
 }
 .sup-info {
     float:left;
@@ -325,12 +323,13 @@
     font-weight: normal;
     font-style: normal;
 }
+.ghpp_font,
 .ghpp_font .c-info,
 .ghpp_font .c-info span,
 .ghpp_font .doc-name span{
     font-family: 'Conv_supermarket_1' !important;
     line-height:0.6cm;
-    font-size:14pt;
+    font-size:12.5pt;
 }
 .doc-info.ghpp-doc-info{
     border:none;
@@ -339,7 +338,7 @@
     font-size:11.5pt;
     background-color:#BAD68E;
 }
-#tb-rp.ghpp-tb tr.tb-data{
+#tb-rp.ez-table tr.tb-data{
     border-bottom:none;
     border-top:none;
 }
@@ -347,6 +346,42 @@
     padding-top:0.5cm;
     text-align:center;
 }
+.ghpp-sign table{
+    width:100%;
+}
+.ghpp-sign table td{
+    width:50%;
+}
 .ghpp-sign p{
     padding-top:0.2cm;
+}
+.ghpp-pay table {
+    margin-bottom:0.2cm;
+}
+.ghpp-pay table td{
+    vertical-align: top;
+    font-size:11pt;
+    padding-right:0.5cm;
+    padding-top:0.2cm;
+}
+.square-check {
+    display:inline-block;
+    border:1px solid #444;
+    width:0.5cm;
+    height:0.4cm;
+    margin-right:0.3cm;
+    border-radius:3px;
+}
+.square-check.blank {
+    border:1px solid #fff;
+}
+.cus-info-left {
+    float:left;
+    clear:left;
+    width:1in;
+    font-weight:600;
+}
+.cus-info-right {
+    float:left;
+    width:4in;
 }

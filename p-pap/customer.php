@@ -123,11 +123,11 @@ if($action=="add"){
             . "<script>select_option_byval('pay');"
             . "select_option_byval('bill');"
             . "select_option_byval('cheque');"
-            . "format_id('taxid');"
+            //. "format_id('taxid');"
             . "view_more_section('cus_ct');"
             . "</script>";
             
-    $form->addformvalidate("ez-msg", array('name','address','tel',"cname_0","ctel_0"),null,null,array("cat"));
+    $form->addformvalidate("ez-msg", array('name','address','tel'),null,null,array("cat"));
     $content .= $form->submitscript("$('#papform').submit();")
             . "</div><!-- .col-100 -->";
 } else if(isset($cid)) {
@@ -350,7 +350,7 @@ if($action=="add"){
                 . $form->show_hidden("redirect","redirect",$redirect)
                 . "<script>"
                 . "select_option_byval('pay');"
-                . "format_id('taxid');"
+                //. "format_id('taxid');"
                 . "add_contact($arrname);"
                 . "select_option_byval('bill');"
                 . "select_option_byval('cheque');"
