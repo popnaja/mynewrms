@@ -293,7 +293,7 @@ function show_mat_po($poid){
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_mat_po($poid);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",12)
+            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",9)
             . "</div><!-- .doc-dt -->";
 
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
@@ -341,7 +341,7 @@ function show_process_po($poid){
     $head = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
     $rec = $rp->rp_process_po($poid);
     $content .= "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",12)
+            . $tb->show_tb_wtax($head,$rec,"tb-rp",0.07,0,"",9)
             . "</div><!-- .doc-dt -->";
 
     $pay = ($info['po_payment']>0?"เครดิต ".$info['po_payment']." วัน":"ชำระเป็นเงินสด");
@@ -419,7 +419,7 @@ function show_deli($did){
             . print_header("ใบส่งของ/ใบแจ้งหนี้",null,"ghpp_font")
             . $docinfo
             . "<div class='doc-dt'>"
-            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",10-ceil($row/2))
+            . $tb->show_tb_wtax($head,$recs[0],"tb-rp",$tax,$discount,"",9-ceil($row/2))
             . "<span style='font-size:11pt;'>ได้รับสินค้า และรับทราบข้อตกลงอื่นๆ ตามรายการข้างต้นไว้ถูกต้องเรียบร้อยแล้ว</span>"
             . "</div><!-- .doc-dt -->";
     } else {
@@ -712,7 +712,7 @@ function print_sup_info($sid){
             . "<div class='cus-info-left'>Company : </div>"
             . "<div class='cus-info-right'>".$sinfo['name']."</div>"
             . "<div class='cus-info-left'>Address : </div>"
-            . "<div class='cus-info-right'>".$sinfo['address']." Tel.".$sinfo['tel']."</div>"
+            . "<div class='cus-info-right'>".$sinfo['address']."<br/>Tel.".$sinfo['tel']."</div>"
             . "<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['taxid']."</div>";
     return $sup;
 }
@@ -733,7 +733,7 @@ function print_cus_info($cid,$aid=0,$showtax=true,$ctid=null){
     } else {
         $name =  $sinfo['customer_name'];
         $address = $sinfo['customer_address']
-        . " Tel. ".$sinfo['customer_tel'];
+        . "<br/>Tel. ".$sinfo['customer_tel'];
     }
     $tax = ($showtax?"<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['customer_taxid']."</div>":"");
     $sup = "<h3>CUSTOMER'S NAME</h3>"

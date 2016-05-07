@@ -384,4 +384,5 @@
 .cus-info-right {
     float:left;
     width:4in;
+    word-break:normal !important;
 }
