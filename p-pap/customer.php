@@ -47,6 +47,7 @@ $tb = new mytable();
 
 $sale = array("-1"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");
 if($action=="add"){
+/*-----------------------------------------------------------------------------ADD ------------------------------------------------*/
     //check
     if($pauth<=1){
         header("location:$redirect");
@@ -60,6 +61,7 @@ if($action=="add"){
             . "<div class='col-50'>"
             . $form->show_text("name","name","","","ชื่อบริษัท $req","","label-3070")
             . $form->show_text("taxid","taxid","","","เลขทะเบียนการค้า (Tax ID)","","label-3070")
+            . $form->show_text("branch","branch","สำนักงานใหญ่","","สำนักงาน","","label-3070")
             . $form->show_select("ntax",array("no"=>"ไม่ได้รับการยกเว้นภาษี","yes"=>"ยกเว้นภาษี"),"label-3070","องค์กรณ์ที่ได้รับการยกเว้นภาษี",null)
             . $form->show_select("cat",$cats,"label-3070","กลุ่มลูกค้า $req",null)
             . $form->show_select("status",$op_cus_status,"label-3070","สถานะลูกค้า",null)
@@ -123,7 +125,7 @@ if($action=="add"){
             . "<script>select_option_byval('pay');"
             . "select_option_byval('bill');"
             . "select_option_byval('cheque');"
-            //. "format_id('taxid');"
+            . "format_id('taxid');"
             . "view_more_section('cus_ct');"
             . "</script>";
             
@@ -272,6 +274,7 @@ if($action=="add"){
                 . $form->show_text("code","code",$info['customer_code'],"","รหัสลูกค้า","","label-3070 readonly",null,"readonly")
                 . $form->show_text("name","name",$info['customer_name'],"","ชื่อบริษัท $req","","label-3070")
                 . $form->show_text("taxid","taxid",$info['customer_taxid'],"","เลขทะเบียนการค้า (Tax ID)","","label-3070")
+                . $form->show_text("branch","branch",$info['c_branch'],"","สำนักงาน","","label-3070")
                 . $form->show_select("ntax",$tax_ex,"label-3070","องค์กรณ์ที่ได้รับการยกเว้นภาษี",$info['tax_exclude'])
                 . $form->show_select("cat",$cats,"label-3070","กลุ่มลูกค้า",$tax['tax_id'])
                 . $form->show_hidden("ori_cat","ori_cat",$tax['tax_id'])
@@ -350,7 +353,7 @@ if($action=="add"){
                 . $form->show_hidden("redirect","redirect",$redirect)
                 . "<script>"
                 . "select_option_byval('pay');"
-                //. "format_id('taxid');"
+                . "format_id('taxid');"
                 . "add_contact($arrname);"
                 . "select_option_byval('bill');"
                 . "select_option_byval('cheque');"

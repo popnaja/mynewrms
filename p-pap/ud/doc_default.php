@@ -719,7 +719,7 @@ function print_sup_info($sid){
 function print_cus_info($cid,$aid=0,$showtax=true,$ctid=null){
     global $rpdb;
     $db = $rpdb;
-    $sinfo = $db->get_info("pap_customer", "customer_id", $cid);
+    $sinfo = $db->get_info("pap_customer", "customer_id", $cid)+$db->get_meta("pap_customer_meta", "customer_id", $cid);
     $contact = "";
     if(isset($ctid)){
         $ct = $db->get_info("pap_contact", "contact_id", $ctid);
@@ -735,7 +735,7 @@ function print_cus_info($cid,$aid=0,$showtax=true,$ctid=null){
         $address = $sinfo['customer_address']
         . "<br/>Tel. ".$sinfo['customer_tel'];
     }
-    $tax = ($showtax?"<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['customer_taxid']."</div>":"");
+    $tax = ($showtax?"<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['customer_taxid']." ".$sinfo['c_branch']."</div>":"");
     $sup = "<h3>CUSTOMER'S NAME</h3>"
             . "<div class='cus-info-left'>Company : </div>"
             . "<div class='cus-info-right'>".$name."</div>"

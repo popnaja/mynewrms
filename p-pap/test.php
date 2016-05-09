@@ -18,3 +18,11 @@ foreach($pid as $k=>$v){
 }
  * 
  */
+/* update customer meta
+ * 
+ * 
+ */
+$cus = $db->get_keypair("pap_customer", "customer_id", "customer_code");
+foreach($cus AS $k=>$v){
+    $db->update_meta("pap_customer_meta", "customer_id", $k, array("c_branch"=>"สำนักงานใหญ๋"));
+}

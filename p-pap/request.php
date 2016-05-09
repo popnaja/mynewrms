@@ -415,6 +415,13 @@ if($req == "login"){
     $code = $db->check_cus_code($_POST['cat']);
     //insert
     $cid = $db->insert_data("pap_customer", array(null,$code,$_POST['name'],$_POST['taxid'],$_POST['address'],$_POST['url'],$_POST['email'],$_POST['tel'],$_POST['fax'],$_POST['pay'],$_POST['credit_day'],$_POST['credit'],$_POST['bill'],$_POST['cheque'],pap_now(),$_POST['status']));
+    
+    //meta
+    $meta = array(
+        "tax_exclude" => $_POST['ntax'],
+        "c_branch" => $_POST['branch']
+    );
+
     //image
     if(isset($_POST['media'])){
         __autoloada("media");
@@ -431,10 +438,7 @@ if($req == "login"){
     } else {
         $meta['picture'] = "";
     }
-    //meta
-    $meta = array(
-        "tax_exclude" => $_POST['ntax']
-    );
+    
     if($_POST['bill']=="day"){
         $meta['bill_day'] = $_POST['bill_day'];
     } else if($_POST['bill']=="dofw"){
@@ -500,6 +504,12 @@ if($req == "login"){
     $db->delete_data("pap_customer_cat", "customer_id", $cid);
     $db->insert_data("pap_customer_cat", array($_POST['cat'],$cid));
 
+    //meta
+    $meta = array(
+        "tax_exclude" => $_POST['ntax'],
+        "c_branch" => $_POST['branch']
+    );
+    
     //image
     $ori_media = explode(",",$_POST['ori_media']);
     $code = $_POST['code'];
@@ -522,8 +532,6 @@ if($req == "login"){
     } else {
         $meta['picture'] = "";
     }
-    //meta
-    $meta["tax_exclude"] = $_POST['ntax'];
     
     if($_POST['bill']=="day"){
         $meta['bill_day'] = $_POST['bill_day'];
