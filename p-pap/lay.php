@@ -44,6 +44,7 @@ $form = new myform("lay","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $sid = filter_input(INPUT_GET,'sid',FILTER_SANITIZE_STRING);
 if($action=="add"){
+/*--------------------------------------------------------------  ADD NEW ----------------------------------------------------------*/
     //check
     if($pauth<=1){
         header("location:$redirect");
@@ -84,29 +85,34 @@ if($action=="add"){
     $content .= "<div id='lay-guide' class='col-50'>"
             . "<h3>Lay Guide</h3>"
             . $form->show_num("cover_thick",1,0.01,"","สันปก+ปีก (cm)","","label-3070")
-            //. $form->show_num("grip_size",$grip,0.01,"","ขนาดกริบ (cm)","","label-3070")
-            //. $form->show_select("grip_double",array("no"=>"No","yes"=>"Yes"),"label-3070","กริบสองด้าน",null)
+            . $form->show_num("grip1",$grip,0.01,"","ขนาดกริบ1 (cm)","","label-3070")
+            . $form->show_num("grip2",0,0.01,"","ขนาดกริบ2 (cm)","","label-3070")
             . show_layguide($form,$paper_info,$grip);
             
     $content .= $form->show_hidden("request","request","add_job_size")
             . $form->show_hidden("redirect","redirect",$redirect);
     $form->addformvalidate("ez-msg", array('name','height','width','cover_lay','inside_lay'));
     $content .= $form->submitscript("$('#lay').submit();")
-            . "<script>lay_guide($pinfo,$grip,$bleed);</script>";
+            . "<script>"
+            . "lay_guide($pinfo,$grip,$bleed,0);"
+            //. "show_lay(62.5,90.17,29.9,21.4,8,1,0);"
+            . "</script>";
 } else if(isset($sid)) {
+/*--------------------------------------------------------------  EDIT ----------------------------------------------------------*/
     //check
     if($pauth<=1){
         header("location:$redirect");
         exit();
     }
     //load
-    $info = $db->get_info("pap_size","size_id",$sid);
+    $info = $db->get_info("pap_size","size_id",$sid)+$db->get_meta("pap_size_meta", "size_id", $sid);
     //edit
     $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
     $paper_info = $db->get_paper_size();
     $pinfo = json_encode(array_values($paper_info));
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
-    $grip = (float)$cinfo['grip_size'];
+    $grip1 = (isset($info['grip1'])?$info['grip1']:(float)$cinfo['grip_size']);
+    $grip2 = (isset($info['grip2'])?$info['grip2']:0);
     $bleed = (float)$cinfo['bleed_size'];
     $content .= "<h1 class='page-title'>แก้ไขการ Lay</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
@@ -137,8 +143,8 @@ if($action=="add"){
     $content .= "<div id='lay-guide' class='col-50'>"
             . "<h3>Lay Guide</h3>"
             . $form->show_num("cover_thick",$info['cover_thick'],0.01,"","สันปก+ปีก (cm)","","label-3070")
-            //. $form->show_num("grip_size",$info['grip_size'],0.01,"","ขนาดกริบ (cm)","","label-3070")
-            //. $form->show_select("grip_double",array("no"=>"No","yes"=>"Yes"),"label-3070","กริบสองด้าน",$info['grip_double'])
+            . $form->show_num("grip1",$grip1,0.01,"","ขนาดกริบ1 (cm)","","label-3070")
+            . $form->show_num("grip2",$grip2,0.01,"","ขนาดกริบ2 (cm)","","label-3070")
             . show_layguide($form,$paper_info);
     $content .= $form->show_hidden("request","request","edit_job_size")
             . $form->show_hidden("sid","sid",$sid)
@@ -146,9 +152,10 @@ if($action=="add"){
     $form->addformvalidate("ez-msg", array('name','height','width','cover_lay','inside_lay'));
     $content .= $form->submitscript("$('#new').submit();")
             . "<script>"
-            . "lay_guide($pinfo,$grip,$bleed);"
+            . "lay_guide($pinfo,$grip1,$bleed,$grip2);"
             . "</script>";
 } else {
+/*--------------------------------------------------------------  VIEW ----------------------------------------------------------*/
     __autoload("pdo_tb");
     $tbpdo = new tbPDO();
     $tb = new mytable();

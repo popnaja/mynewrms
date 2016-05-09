@@ -1603,6 +1603,7 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT op_id,op_name,op_value AS psize FROM pap_option WHERE op_type='paper_size'
+ORDER BY op_name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();

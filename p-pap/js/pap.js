@@ -18,8 +18,9 @@ $(document).ready(function(){
     }
 });
 }
-function lay_guide(paper,grip,bleed){
+function lay_guide(paper,grip1,bleed,grip2){
     $(document).ready(function(){
+        var grip = grip1+grip2;
         var cbleed = 0.3;
         var input = $(".lay-input input");
         var rim = 1;
@@ -49,6 +50,13 @@ function lay_guide(paper,grip,bleed){
             box.removeClass("box-active");
             cal_guide();
         });
+        var grip_input = $("#grip1,#grip2");
+        grip_input.on("change",function(){
+            grip1 = parseFloat($("#grip1").val());
+            grip2 = parseFloat($("#grip2").val());
+            grip = grip1+grip2;
+            cal_guide();
+        });
         cal_guide();
         function cal_guide(){
             var h = parseFloat($("#height").val());
@@ -68,11 +76,11 @@ function lay_guide(paper,grip,bleed){
                     var pid = paper[i]['op_id'];
                     var pdiv = cut.eq(i).val();
                     if(pdiv==2){
-                        mw = master.length/pdiv*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป 1cm
+                        mw = master.length/pdiv*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป
                         ml = master.width*in_to_cm;
                         divname = master.width+"x"+master.length+"(ผ่าครึ่ง)";
                     } else {
-                        mw = master.width*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป 1cm
+                        mw = master.width*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป
                         ml = master.length*in_to_cm;
                         divname = master.width+"x"+master.length;
                     }
@@ -80,7 +88,7 @@ function lay_guide(paper,grip,bleed){
                     ctg.eq(i).html("("+Math.floor(mw/ch)+"x"+Math.floor(ml/cw)+") "+clay);
                     trem = (1-clay*(ch*cw)/(mw*ml))*100
                     lay_c_rem.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,ch,cw,clay,grip];
+                    info = [mw,ml,ch,cw,clay,grip1,grip2];
                     selinfo = [divname,pid,pdiv,clay];
                     $(".lay-box-c").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
                     
@@ -88,7 +96,7 @@ function lay_guide(paper,grip,bleed){
                     itg.eq(i).html("("+Math.floor(mw/ih)+"x"+Math.floor(ml/iw)+") "+ilay);
                     trem = (1-ilay*(ih*iw)/(mw*ml))*100
                     lay_i_rem.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,ih,iw,ilay,grip];
+                    info = [mw,ml,ih,iw,ilay,grip1,grip2];
                     selinfo = [divname,pid,pdiv,ilay];
                     $(".lay-box-i").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
                     
@@ -97,7 +105,7 @@ function lay_guide(paper,grip,bleed){
                     rc.eq(i).html("("+Math.floor(mw/cw)+"x"+Math.floor(ml/ch)+") "+clay);
                     trem = (1-clay*(ch*cw)/(mw*ml))*100
                     lay_c_remr.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,cw,ch,clay,grip];
+                    info = [mw,ml,cw,ch,clay,grip1,grip2];
                     selinfo = [divname,pid,pdiv,clay];
                     $(".lay-box-cr").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
                     
@@ -105,7 +113,7 @@ function lay_guide(paper,grip,bleed){
                     ri.eq(i).html("("+Math.floor(mw/iw)+"x"+Math.floor(ml/ih)+") "+ilay);
                     trem = (1-ilay*(ih*iw)/(mw*ml))*100
                     lay_i_remr.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,iw,ih,ilay,grip];
+                    info = [mw,ml,iw,ih,ilay,grip1,grip2];
                     selinfo = [divname,pid,pdiv,ilay];
                     $(".lay-box-ir").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
                 }
@@ -138,19 +146,20 @@ function lay_guide(paper,grip,bleed){
                     $("#cover_lay").val(data[3]);
                 });
             }
-            show_lay(parseFloat(da[0]),parseFloat(da[1]),parseFloat(da[2]),parseFloat(da[3]),parseFloat(da[4]),parseFloat(da[5]));
+            show_lay(parseFloat(da[0]),parseFloat(da[1]),parseFloat(da[2]),parseFloat(da[3]),parseFloat(da[4]),parseFloat(da[5]),parseFloat(da[6]));
         });
     });
 }
-function show_lay(mh,mw,h,w,no,gr){
+function show_lay(mh,mw,h,w,no,gr,gr2){
     var tg = $("#show-lay");
     var pw = tg.outerWidth();
     var rto = pw/mw;
-    var ph,nh,nw,ngr;
+    var ph,nh,nw,ngr,ngr2;
     ph = (mh+gr)*rto;
     nh = h*rto;
     nw = w*rto;
     ngr = gr*rto;
+    ngr2 = gr2*rto;
     //var data = [mh,mw,h,w,no,gr,pw,ph,nh,nw,ngr];
     //console.log(data.toString());
     
@@ -161,6 +170,10 @@ function show_lay(mh,mw,h,w,no,gr){
     tg.append("<div class='paper-grip'></div>");
     var grip = $(".paper-grip");
     grip.outerWidth(pw).outerHeight(ngr);
+    //grip2
+    tg.append("<div class='paper-grip2'></div>");
+    var grip2 = $(".paper-grip2");
+    grip2.outerWidth(pw).outerHeight(ngr2);
     //page
     for(var i=0;i<no;i++){
         tg.append("<div class='page-lay'></div>");

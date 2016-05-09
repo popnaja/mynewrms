@@ -384,9 +384,15 @@ if($req == "login"){
             $_POST['cover_div'],
             $_POST['inside_div']
         );
-        $db->insert_data("pap_size", $data);
+        $sid = $db->insert_data("pap_size", $data);
+        //meta
+        $meta = array(
+            "grip1" => $_POST['grip1'],
+            "grip2" => $_POST['grip2']
+        );
+        $db->update_meta("pap_size_meta", "size_id", $sid, $meta);
         $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-        header("Location:".$_POST['redirect']);
+        //header("Location:".$_POST['redirect']);
     }
 } else if($req == "edit_job_size"){
     $sid = filter_input(INPUT_POST,"sid",FILTER_SANITIZE_NUMBER_INT);
@@ -408,8 +414,14 @@ if($req == "login"){
             "inside_div" => $_POST['inside_div']
         );
         $db->update_data("pap_size", "size_id", $sid, $arrinfo);
+        //meta
+        $meta = array(
+            "grip1" => $_POST['grip1'],
+            "grip2" => $_POST['grip2']
+        );
+        $db->update_meta("pap_size_meta", "size_id", $sid, $meta);
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-        header("Location:".$_POST['redirect']);
+        //header("Location:".$_POST['redirect']);
     }
 } else if($req =="add_customer"){
     $code = $db->check_cus_code($_POST['cat']);
