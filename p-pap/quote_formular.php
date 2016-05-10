@@ -1,6 +1,6 @@
 <?php
 include_once(dirname(dirname(__FILE__))."/p-admin/myfunction.php");
-function cal_quote($info,$comps,$layinfo){
+function cal_quote($info,$comps){
     global $op_comp_type;
     global $op_print_toplate;
     __autoload("pappdo");
@@ -10,7 +10,7 @@ function cal_quote($info,$comps,$layinfo){
     $processes = $db->get_keypair("pap_process", "process_id", "process_name");
     //calculate
 
-    $units = unit_cal($info, $layinfo, $comps);
+    $units = unit_cal($info, $comps);
     //var_dump($units);
     $res['ออกแบบ'] = array();
     $res['ทำเพลต'] = array();
@@ -22,6 +22,9 @@ function cal_quote($info,$comps,$layinfo){
   
     $ex = explode(",",$info['exclude']);
     $num = count($units);
+    foreach($op_comp_type AS $k=>$v){
+        $run[$k] = 0;
+    }
     for($i=0;$i<$num;$i++){
         $unit = $units[$i];
         if($unit['type']==9){
@@ -56,11 +59,9 @@ function cal_quote($info,$comps,$layinfo){
         //var_dump($unit['round']);
         $com = $comps[$i];
         //name
-        if($num==2){
-            $cname = "ชิ้นงาน";
-        } else {
-            $cname = ($unit['type']==0?"ปก":"เนื้อใน".($num>3?"($i)":""));
-        }
+        $type = $unit['type'];
+        $run[$type]++;
+        $cname = $op_comp_type[$unit['type']].($run[$type]>1?" ($run[$type])":"");
         
         //ทำเพลต
         if(!in_array("1",$ex)){
@@ -187,7 +188,7 @@ function plate_div($num){
     $res[2] = ceil($t*4)/4;
     return $res;
 }
-function unit_cal($quote,$lay,$comps){
+function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
@@ -199,16 +200,14 @@ function unit_cal($quote,$lay,$comps){
     foreach($comps as $k=>$comp){
         $color = $op_print_color[$comp['comp_print_id']];
         $allo = $res[$k]['allo'] = $comp['comp_paper_allowance'];
-        $paper_size = ($comp['comp_type']==0?$lay['cover_paper']:$lay['inside_paper']);
-        $paper_lay = ($comp['comp_type']==0?$lay['cover_lay']:$lay['inside_lay']);
-        $paper_cut = ($comp['comp_type']==0?$lay['cover_div']:$lay['inside_div']);
+        $paper_lay = $comp['comp_paper_lay'];
+        $paper_cut = $comp['comp_paper_cut'];
         $res[$k]['type'] = $comp['comp_type'];
         $page = $res[$k]['page'] = $comp['comp_page'];
         $frame = $page/$paper_lay;
         
         $res[$k]['ff'] = $frame;
-        $pinfo = $db->get_paper($comp['comp_paper_type'],$paper_size, $comp['comp_paper_weight']);
-        $res[$k]['paper_id'] = $pinfo['mat_id'];
+        $res[$k]['paper_id'] = $comp['comp_paper_id'];
         $res[$k]['paper_lay'] = $paper_lay;
         $res[$k]['paper_cut'] = $paper_cut;
         $res[$k]['print_id'] = $comp['comp_print_id'];

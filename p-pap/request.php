@@ -3,6 +3,8 @@ session_start();
 include_once(dirname(dirname(__FILE__))."/p-admin/myfunction.php");
 include_once("p-option.php");
 __autoload("pappdo");
+__autoloada("form");
+$form = new myform();
 if(!$_POST){
     header("location:".ROOTS);
 }
@@ -637,22 +639,32 @@ if($req == "login"){
     $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
     $allowance = cal_allo($adata, $_POST['amount']);
     for($i=0;$i<$n;$i++){
-        if($_POST['paper_type'][$i]>0&&$_POST['page'][$i]>0&&$_POST['paper_gram'][$i]>0){
-            if($_POST['comp_type'][$i]=="0"){
-                $post = (isset($_POST['post'])?implode(",",$_POST['post']):"");
+        if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
+            $type = $_POST['comp_type'][$i];
+            if($type=="1"){ //ปก
                 $page = $page_cover = ($_POST['print2'][$i]>0?2:1);
+                //ปกปีก
+                $meta['cwing'] = $_POST['cwing'][$i];
+                if($_POST['cwing'][$i]=="1"){
+                    $meta['fwing'] = $_POST['fwing'][$i];
+                    $meta['bwing'] = $_POST['bwing'][$i];
+                }
             } else {
                 $page_inside += $page = $_POST['page'][$i];
-                if($_POST['other'][$i]=="1"){
-                    $ii = $i-1;
-                    $post = (isset($_POST["post_$ii"])?implode(",",$_POST["post_$ii"]):"");
-                } else {
-                    $post = "";
-                }
+            }
+            //แผ่นพับ
+            if($_POST['type']==11&&$type==3){
+                $meta['folding'] = $_POST['folding'][$i];
+            }
+            //ไดคัท
+            if($_POST['other'][$i]=="1"){
+                $post = (isset($_POST["post_$i"])?implode(",",$_POST["post_$i"]):"");
+            } else {
+                $post = "";
             }
             //add comp
-            $print2 = (isset($_POST['print2'][$i])?$_POST['print2'][$i]:0);
-            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$_POST['paper_type'][$i],$_POST['paper_gram'][$i],$allowance,$_POST['coating'][$i],$_POST['print'][$i],$print2,$post));
+            $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
+            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allowance,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
         }
     }
     //คำนวนหลายยอดพิมพ์
@@ -663,9 +675,8 @@ if($req == "login"){
             array_push($arramount,$amount);
         }
     }
-
     //update meta
-    $meta = array(
+    $meta += array(
         "remark" => $_POST['remark'],
         "exclude" => $exclude,
         "packing" => (isset($_POST['pack'])?implode(",",$_POST['pack']):""),
@@ -676,29 +687,18 @@ if($req == "login"){
         "contact_id" => $_POST['cusct'],
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
-        "cal_amount" => implode(",",$arramount),
-        "cwing" => $_POST['cwing']
+        "cal_amount" => implode(",",$arramount)
     );
-    //cover wing
-    if($_POST['cwing']=="1"){
-        $meta['fwing'] = $_POST['fwing'];
-        $meta['bwing'] = $_POST['bwing'];
-    }
-    //แผ่นพับ
-    if($_POST['type']==11){
-        $meta['folding'] = $_POST['folding'][0];
-    }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
     //calculate cost and detail price
     include_once("quote_formular.php");
     $info = $db->get_quote_allinfo($qid);
     $comps = $db->get_comp($qid);
-    $layinfo = $db->get_layinfo($info['job_size_id']);
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
     $margin = $cinfo['margin'];
 
-    $res = cal_quote($info, $comps, $layinfo);
+    $res = cal_quote($info, $comps);
     $total_cost = 0;
     $pricelist = array();
     foreach($res as $k=>$v){
@@ -714,7 +714,7 @@ if($req == "login"){
     $calinfo = array();
     foreach($arramount as $namount){
         $info['amount'] = $namount;
-        $res = cal_quote($info, $comps, $layinfo);
+        $res = cal_quote($info, $comps);
         $tt = 0;
         foreach($res as $k=>$v){
             foreach($v as $key=>$val){
@@ -741,7 +741,7 @@ if($req == "login"){
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?qid=".$qid);
+    //header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
     $qid = filter_input(INPUT_POST,"qid",FILTER_SANITIZE_NUMBER_INT);
     $status = (int)filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);
@@ -779,23 +779,36 @@ if($req == "login"){
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;
+    $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
+    $allowance = cal_allo($adata, $_POST['amount']);
     for($i=0;$i<$n;$i++){
-        if($_POST['paper_type'][$i]>0&&$_POST['page'][$i]>0&&$_POST['paper_gram'][$i]>0){
-            if($_POST['comp_type'][$i]=="0"){
-                $post = (isset($_POST['post'])?implode(",",$_POST['post']):"");
+        if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
+            $type = $_POST['comp_type'][$i];
+            if($type=="1"){ //ปก
                 $page = $page_cover = ($_POST['print2'][$i]>0?2:1);
+                //ปกปีก
+                $meta['cwing'] = $_POST['cwing'][$i];
+                if($_POST['cwing'][$i]=="1"){
+                    $meta['fwing'] = $_POST['fwing'][$i];
+                    $meta['bwing'] = $_POST['bwing'][$i];
+                }
             } else {
                 $page_inside += $page = $_POST['page'][$i];
-                if($_POST['other'][$i]=="1"){
-                    $ii = $i-1;
-                    $post = (isset($_POST["post_$ii"])?implode(",",$_POST["post_$ii"]):"");
-                } else {
-                    $post = "";
-                }
+            }
+            //แผ่นพับ
+            if($_POST['type']==11&&$type==3){
+                $meta['folding'] = $_POST['folding'][$i];
+            }
+            //ไดคัท
+            if($_POST['other'][$i]=="1"){
+                $post = (isset($_POST["post_$i"])?implode(",",$_POST["post_$i"]):"");
+            } else {
+                $post = "";
             }
             //add comp
-            $print2 = (isset($_POST['print2'][$i])?$_POST['print2'][$i]:0);
-            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$_POST['paper_type'][$i],$_POST['paper_gram'][$i],$_POST['allowance'][$i],$_POST['coating'][$i],$_POST['print'][$i],$print2,$post));
+            $allo = (isset($_POST['allowance'][$i])?$_POST['allowance'][$i]:$allowance);
+            $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
+            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allo,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
         }
     }
     //คำนวนหลายยอดพิมพ์
@@ -828,7 +841,7 @@ if($req == "login"){
     }
 
      //update meta
-    $meta = array(
+    $meta += array(
         "remark" => $_POST['remark'],
         "exclude" => $exclude,
         "packing" => (isset($_POST['pack'])?implode(",",$_POST['pack']):""),
@@ -841,18 +854,9 @@ if($req == "login"){
         "page_inside" => $page_inside,
         "cal_amount" => implode(",",$arramount),
         "detail_price" => json_encode($detail_price),
-        "multi_quote_info" => json_encode($mquote),
-        "cwing" => $_POST['cwing']
+        "multi_quote_info" => json_encode($mquote)
     );
-    //cover wing
-    if($_POST['cwing']=="1"){
-        $meta['fwing'] = $_POST['fwing'];
-        $meta['bwing'] = $_POST['bwing'];
-    }
-    //แผ่นพับ
-    if($_POST['type']==11){
-        $meta['folding'] = $_POST['folding'][0];
-    }
+
     //ต่อรองราคา
     if($status==4){
         $meta['n_price'] = $_POST['n_price'];
@@ -863,8 +867,7 @@ if($req == "login"){
     include_once("quote_formular.php");
     $info = $db->get_quote_allinfo($qid);
     $comps = $db->get_comp($qid);
-    $layinfo = $db->get_layinfo($info['job_size_id']);
-    $res = cal_quote($info, $comps, $layinfo);
+    $res = cal_quote($info, $comps);
     $total_cost = 0;
     foreach($res as $k=>$v){
         foreach($v as $key=>$val){
@@ -898,7 +901,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");
@@ -1014,17 +1017,18 @@ if($req == "login"){
     $res = $db->find_customer($_POST['f'],($_POST['pauth']>3?null:$_POST['uid']));
     echo json_encode($res);
 } else if($req == "filter_paper"){
-    $res = $db->filter_paper($_POST['sid']);
+    $res = $db->filter_paper($_POST['sid'],$_POST['index']);
     echo json_encode($res);
+} else if($req == "filter_papern"){
+    $i = $_POST['index'];
+    $c_ptype = array("0"=>"--กระดาษ--") + $db->get_paper_keypair("mat_type", $_POST['size']);
+    $html = $form->show_select("paper_type_$i",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
+    echo json_encode($html);
 } else if($req == "filter_gram"){
-    __autoloada("form");
-    $form = new myform();
     $gram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight", $_POST['size'], $_POST['type']);
-    $res = $form->show_select("paper_gram_n",$gram,"label-3070 in_pgram","แกรม",null,"","paper_gram[]");
+    $res = $form->show_select("paper_gram_".$_POST['index'],$gram,"label-3070","แกรม",null,"","paper_gram[]");
     echo json_encode($res);
 } else if($req == "get_selcontact"){
-    __autoloada("form");
-    $form = new myform();
     $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$_POST['cid']);
     $res = $form->show_select("cusct", $contacts, "label-3070", "ผู้ติดต่อ", null);
     echo json_encode(array("html_replace","cus_ct",$res));

@@ -12,7 +12,6 @@ function prep_order($qid){
     } 
     $comps = $db->get_comp($qid);
     $info = $db->get_info("pap_quotation","quote_id",$qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
-    $layinfo = $db->get_layinfo($info['job_size_id']);
     $catinfo = $db->get_info("pap_option", "op_id", $info['cat_id']);
     
     //$order_no = $db->check_order_no();
@@ -21,7 +20,7 @@ function prep_order($qid){
     
     $plist = explode(",",$catinfo['op_value']);
     $exclude = explode(",",$info['exclude']);
-    $unit = unit_cal($info,$layinfo,$comps);
+    $unit = unit_cal($info,$comps);
     $n = count($comps);
     $amount = $info['amount'];
     //loop component

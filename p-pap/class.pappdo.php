@@ -58,12 +58,11 @@ class PAPdb extends myDB{
         try {
             $whsql = (isset($iscover)?($iscover?"AND comp_type='0'":"AND comp_type='1'"):"");
             $sql = <<<END_OF_TEXT
-SELECT pap_quote_comp.*,
-po.op_name AS weight,
+SELECT comp.*,mat.mat_type,mat.mat_size,mat.mat_weight,
 pm.meta_value AS coating
-FROM pap_quote_comp
-LEFT JOIN pap_option AS po ON po.op_id=comp_paper_weight
+FROM pap_quote_comp AS comp
 LEFT JOIN pap_process_meta AS pm ON pm.process_id=comp_coating AND pm.meta_key='cost'
+LEFT JOIN pap_mat AS mat ON mat.mat_id=comp.comp_paper_id
 WHERE quote_id=:qid $whsql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -677,7 +676,7 @@ END_OF_TEXT;
 SELECT
 CONCAT(size_name,"(",size_width,"x",size_height,")"),size_id
 FROM pap_size
-WHERE CONCAT(size_name,"(",size_width,"x",size_height,")") like :find
+WHERE CONCAT(size_name,"(",size_width,"x",size_height,")") COLLATE UTF8_GENERAL_CI LIKE :find
 ORDER BY size_height ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -764,14 +763,15 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function filter_paper($sid){
+    public function filter_paper($sid,$i){
         try {
             __autoloada("form");
             $form = new myform();
             $sql = <<<END_OF_TEXT
 SELECT
 cover_paper,po.op_name AS cover_size,
-inside_paper,po1.op_name AS inside_size
+inside_paper,po1.op_name AS inside_size,
+cover_lay,inside_lay,cover_div,inside_div
 FROM pap_size
 LEFT JOIN pap_option AS po ON po.op_id=cover_paper
 LEFT JOIN pap_option AS po1 ON po1.op_id=inside_paper
@@ -781,14 +781,13 @@ END_OF_TEXT;
             $stmt->bindParam(":sid",$sid);
             $stmt->execute();
             $size = $stmt->fetch(PDO::FETCH_ASSOC);
-            $res[0] = array($size['cover_size'],$size['inside_size']);
-            $res[3] = array($size['cover_paper'],$size['inside_paper']);
+            $res[0] = $size;
             //cover
             $c_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['cover_paper']);
-            $res[1] = $form->show_select("paper_type",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
+            $res[1] = $form->show_select("paper_type_$i",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
             //inside
             $i_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['inside_paper']);
-            $res[2] = $form->show_select("paper_type_n",$i_ptype,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]");
+            $res[2] = $form->show_select("paper_type_$i",$i_ptype,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]");
             return $res;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);

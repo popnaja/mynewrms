@@ -351,11 +351,13 @@ $(document).ready(function(){
     }
 });
 }
-function quote_function(cp,ip){
+function quote_function(){
 $(document).ready(function(){
+/*
     //hide cover
     var title = $("#sel-name");
     var but = $("#view-more-but");
+
     hid_cover();
     $("#type").on("change",function(){
        hid_cover();
@@ -381,29 +383,52 @@ $(document).ready(function(){
                 fold.parent().addClass("form-hide");
             }
        }
-    }
-    //fix paper
-    if($.type(cp)!=="undefined"){
-        //gram
-        var ctype = $("#paper_type");
-        ctype.on("change",function(){
-            var t = $(this).val();
-            if(t!=="0"){
-                filter_gram(".tg_c_pgram",cp,t);
-            }
-        });
-
-        //filter gram inside
-        var itype = $(".in_ptype").children("select");
-        itype.on("change",function(){
-            var i = itype.index($(this));
-            var t = $(this).val();
-            if(t!=="0"){
-                filter_gram(".tg_i_pgram",ip,t,i);
-            }
-        });
-    }
-
+    }*/
+    //filter paper
+    var comp = $("[name='comp_type[]']");
+    var size_sel = $("[name='paper_size[]']");
+    comp.on("change",function(){
+        //check select job size
+        var size = $("#sid").val();
+        var ctype = $(this).val();
+        var index = comp.index($(this));
+        if($.inArray(parseInt(ctype),[1,2,3])!=-1&&size==0){
+            pg_dialog("คำเตือน","โปรดเลือกขนาดชิ้นงานก่อน");
+            $(this).val("0").trigger("change");
+        } else if($.inArray(parseInt(ctype),[0,4,5])!=-1){
+            
+        } else {
+            filter_paper(size,ctype,index);
+        }
+    });
+    //paper size change
+    var ori_size;
+    size_sel.on("click",function(){
+        ori_size = $(this).val();
+    })
+    size_sel.on("change",function(){
+        var i = size_sel.index($(this));
+        var ctype = comp.eq(i).val();
+        var size = $(this).val();
+        if($.inArray(parseInt(ctype),[1,2,3])!=-1){
+            pg_dialog("คำเตือน","ขนาดกระดาษตาม Master Lay ไม่สามารถเปลี่ยนได้");
+            $(this).val(ori_size);
+        } else {
+            filter_papern(size,i);
+        }
+    });
+    
+    //paper type change
+    var sel_type =  $("[name='paper_type[]']");
+    sel_type.on("change",function(){
+        var index = sel_type.index($(this));
+        var size = size_sel.eq(index).val();
+        var type = $(this).val();
+        if(type!=0){
+            filter_gram(".tg_pweight",size,type,index);
+        }
+    });
+    
     //show margin
     var qprice = $("#q_price");
     qprice.on("change",function(){
@@ -421,15 +446,16 @@ $(document).ready(function(){
     });
     price.on("change",function(){
         peru.val($(this).val()/$("#amount").val());
-    })
+    });
 });
 }
-function filter_paper(sid){
+function filter_papern(size,index){
     var t;
     var data = {};
-    data['request'] = "filter_paper";
-    data['sid'] = sid;
     var url = $("form").attr("action");
+    data['request'] = "filter_papern";
+    data['size']  = size;
+    data['index'] = index;
     pg_loading(true);
     $.ajax({
         url:url,
@@ -439,36 +465,73 @@ function filter_paper(sid){
         success: function(res) {
             pg_loading(false);
             //console.log(res);
-            //show size
-            $("#csize").val(res[0][0]);
-            $("input[name^='isize']").val(res[0][1]);
-
             //type
-            var sel_ctype = $(".tg_c_ptype");
-            sel_ctype.html(res[1]);
-            //filter type inside
-            var sel_itype = $(".tg_i_ptype");
-            sel_itype.html(res[2]);
-
+            $(".tg_ptype").eq(index).html(res);
 
             //gram
-            var ctype = $("#paper_type");
+            var ctype = $("#paper_type_"+index);
             ctype.off("change");
             ctype.on("change",function(){
                 t = $(this).val();
+                var size = $("#paper_size_"+index).val();
                 if(t!=="0"){
-                    filter_gram(".tg_c_pgram",res[3][0],t);
+                    filter_gram(".tg_pweight",size,t,index);
                 }
             });
+        },
+        error: function(err){
+            console.log("ERROR"+JSON.stringify(err));
+            pg_loading(false);
+        }
+    });
+}
+function filter_paper(sid,type,index){
+    var t;
+    var data = {};
+    data['request'] = "filter_paper";
+    data['sid'] = sid;
+    data['index'] = index;
+    var url = $("form").attr("action");
+    pg_loading(true);
+    $.ajax({
+        url:url,
+        type:'POST',
+        dataType:"json",
+        data:data,
+        success: function(res) {
+            pg_loading(false);
+            var size_sel = $("[name='paper_size[]']");
+            var lay = $("[name='paper_lay[]']");
+            var cut = $("[name='paper_cut[]']");
+            var psize,play,pcut,sel_type;
+            //console.log(res);
+            //show size,lay,cut
+            if(type==1){
+                psize = res[0]['cover_paper'];
+                play = res[0]['cover_lay'];
+                pcut = res[0]['cover_div'];
+                sel_type = res[1];
+            } else {
+                psize = res[0]['inside_paper'];
+                play = res[0]['inside_lay'];
+                pcut = res[0]['inside_div'];
+                sel_type = res[2];
+            }
+            size_sel.eq(index).val(psize);
+            lay.eq(index).val(play);
+            cut.eq(index).val(pcut);
+            //type
+            $(".tg_ptype").eq(index).html(sel_type);
 
-            //filter gram inside
-            var itype = $(".in_ptype").children("select");
-            itype.off("change");
-            itype.on("change",function(){
-                var i = itype.index($(this));
+
+            //gram
+            var ctype = $("#paper_type_"+index);
+            ctype.off("change");
+            ctype.on("change",function(){
                 t = $(this).val();
+                var size = $("#paper_size_"+index).val();
                 if(t!=="0"){
-                    filter_gram(".tg_i_pgram",res[3][1],t,i);
+                    filter_gram(".tg_pweight",size,t,index);
                 }
             });
         },
@@ -483,6 +546,7 @@ function filter_gram(cl,size,type,i){
     data['request'] = "filter_gram";
     data['size'] = size;
     data['type'] = type;
+    data['index'] = i;
     var url = $("form").attr("action");
     pg_loading(true);
     $.ajax({
@@ -563,7 +627,6 @@ $(document).ready(function(){
         } else {
             target.val(ele.attr("cid"));
             $("#"+id).val(ele.text());
-            filter_paper(ele.attr("cid"));
         }
     }
 });
