@@ -84,8 +84,9 @@ pc1.process_name AS color,
 pc.process_name AS coating,
 cc.comp_postpress
 FROM pap_quote_comp AS cc
-LEFT JOIN pap_option AS po ON po.op_id=comp_paper_weight
-LEFT JOIN pap_option AS po1 ON po1.op_id=comp_paper_type
+LEFT JOIN pap_mat AS mat ON mat.mat_id=cc.comp_paper_id
+LEFT JOIN pap_option AS po ON po.op_id=mat.mat_weight
+LEFT JOIN pap_option AS po1 ON po1.op_id=mat.mat_type
 LEFT JOIN pap_process AS pc ON pc.process_id=comp_coating
 LEFT JOIN pap_process AS pc1 ON pc1.process_id=comp_print_id
 WHERE quote_id=:qid

@@ -465,9 +465,9 @@ function special_comp($info=null,$comps=null){
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
                 . "</div>"
                 . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
-                . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070","min=0","page[]")
-                . "</div><!-- .sel-compt$i-2-5 -->"
-                . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อกรอบ)","","label-3070","min=0","allowance[]")
+                . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
+                . "</div><!-- .sel-compt$i-2 -->"
+        . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อกรอบ)","","label-3070","min=0","allowance[]")
                 . "</div><!-- .form-section -->"
                 . "<script>"
                 . "select_option('sother_$i');"
@@ -507,8 +507,8 @@ function special_comp($info=null,$comps=null){
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")
                 . "</div>"
                 . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
-                . $form->show_num("page_$i","",1,"","จำนวนหน้า","","label-3070","min=0","page[]")
-                . "</div><!-- .sel-compt$i-2-5 -->"
+                . $form->show_num("page_$i",1,1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
+                . "</div><!-- .sel-compt$i-2 -->"
                 . "</div><!-- .form-section -->"
                 . "<script>"
                 . "select_option('sother_$i');"

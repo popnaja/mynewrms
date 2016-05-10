@@ -638,19 +638,22 @@ if($req == "login"){
     $page_inside = 0;
     $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
     $allowance = cal_allo($adata, $_POST['amount']);
+    $meta['cwing'] = 0;
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
             if($type=="1"){ //ปก
-                $page = $page_cover = ($_POST['print2'][$i]>0?2:1);
+                $page = $page_cover = 1;
                 //ปกปีก
                 $meta['cwing'] = $_POST['cwing'][$i];
                 if($_POST['cwing'][$i]=="1"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else {
+            } else if($type==2){
                 $page_inside += $page = $_POST['page'][$i];
+            } else {
+                $page = $_POST['page'][$i];
             }
             //แผ่นพับ
             if($_POST['type']==11&&$type==3){
@@ -781,19 +784,22 @@ if($req == "login"){
     $page_inside = 0;
     $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
     $allowance = cal_allo($adata, $_POST['amount']);
+    $meta['cwing'] = 0;
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
             if($type=="1"){ //ปก
-                $page = $page_cover = ($_POST['print2'][$i]>0?2:1);
+                $page = $page_cover = 1;
                 //ปกปีก
                 $meta['cwing'] = $_POST['cwing'][$i];
                 if($_POST['cwing'][$i]=="1"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else {
+            } else if($type==2){
                 $page_inside += $page = $_POST['page'][$i];
+            } else {
+                $page = $_POST['page'][$i];
             }
             //แผ่นพับ
             if($_POST['type']==11&&$type==3){

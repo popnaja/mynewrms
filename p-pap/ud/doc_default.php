@@ -777,7 +777,7 @@ function job_dttb($data){
     return $dttb;
 }
 function job_detail($qid){
-    global $rpdb;
+    global $rpdb,$op_comp_type;
     $db = $rpdb;
     $info = $db->get_quote_info($qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
     $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
@@ -803,20 +803,15 @@ function job_detail($qid){
     if($info['binding_id']>0){
         array_push($data['บริการงานพิมพ์'],"เข้าเล่ม : ".$process[$info['binding_id']]);
     }
-    $cno = 1;
+    foreach($op_comp_type AS $k=>$v){
+        $run[$k] = 0;
+    }
     foreach($comps as $k=>$v){
         $post = explode(",",$v['comp_postpress']);
-        if($info['cat_id']==10||$info['cat_id']==69){
-            if($v['comp_type']==1){
-                $cname = "เนื้อใน ";
-                $cname .= (count($comps)>2?"($cno)":"");
-                $cno++;
-            } else {
-                $cname = "ปก";
-            }
-        } else {
-            $cname = "ลักษณะชิ้นงาน";
-        }
+        //name
+        $type = $v['comp_type'];
+        $run[$type]++;
+        $cname = $op_comp_type[$type].($run[$type]>1?" ($run[$type])":"");
         $data[$cname] = array(
             $v['paper'],
             $v['weight']." แกรม",
@@ -827,11 +822,11 @@ function job_detail($qid){
             array_push($data[$cname],$v['coating']);
         }
         //cwing
-        if($info['cwing']==1&&$v['comp_type']==0){
+        if($info['cwing']==1&&$type==1){
             array_push($data[$cname],"ปีกปกหน้า ".$info['fwing']." cm","ปีกปกหลัง ".$info['bwing']." cm");
         }
         //แผ่นพับ show พับกี่ส่วน
-        if($info['cat_id']==11){
+        if($info['cat_id']==11&&$type==3){
             array_push($data[$cname],$process[$info['folding']]);
         }
         //ไดคัท

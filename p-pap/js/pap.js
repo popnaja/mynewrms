@@ -353,45 +353,35 @@ $(document).ready(function(){
 }
 function quote_function(){
 $(document).ready(function(){
-/*
-    //hide cover
-    var title = $("#sel-name");
-    var but = $("#view-more-but");
-
-    hid_cover();
+    //hide binding
     $("#type").on("change",function(){
        hid_cover();
     });
     function hid_cover(){
         var type = parseInt($("#type").val());
         var bind = $("#bind-sec");
-        var fold = $("#folding_0");
         if(type===10||type===69){
-            title.html("เนื้อใน");
-            but.show();
             bind.show();
-            fold.parent().addClass("form-hide");
        } else {
-            $("#paper_type").val("0");
-            title.html("ชิ้นงาน");
-            but.hide();
-            $("#binding").val("0");
             bind.hide();
-            if(type===11){
-                fold.parent().removeClass("form-hide");
-            } else {
-                fold.parent().addClass("form-hide");
-            }
+            $("#binding").val(0);
        }
-    }*/
+    }
+    
     //filter paper
     var comp = $("[name='comp_type[]']");
     var size_sel = $("[name='paper_size[]']");
+    var label = $(".comp-page label");
+    $.each(label,function(i,v){
+        var type = comp.eq(i).val();
+        change_pagelabel(type,i);
+    });
     comp.on("change",function(){
         //check select job size
         var size = $("#sid").val();
         var ctype = $(this).val();
         var index = comp.index($(this));
+        change_pagelabel(ctype,index);
         if($.inArray(parseInt(ctype),[1,2,3])!=-1&&size==0){
             pg_dialog("คำเตือน","โปรดเลือกขนาดชิ้นงานก่อน");
             $(this).val("0").trigger("change");
@@ -401,6 +391,13 @@ $(document).ready(function(){
             filter_paper(size,ctype,index);
         }
     });
+    function change_pagelabel(ctype,index){
+        if($.inArray(parseInt(ctype),[3,4,5])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด
+            label.eq(index).html("จำนวน(แผ่น)");
+        } else {
+            label.eq(index).html("จำนวน(หน้า)");
+        }
+    }
     //paper size change
     var ori_size;
     size_sel.on("click",function(){

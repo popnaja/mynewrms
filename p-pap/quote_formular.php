@@ -204,85 +204,88 @@ function unit_cal($quote,$comps){
         $paper_cut = $comp['comp_paper_cut'];
         $res[$k]['type'] = $comp['comp_type'];
         $page = $res[$k]['page'] = $comp['comp_page'];
-        $frame = $page/$paper_lay;
         
-        $res[$k]['ff'] = $frame;
+        
+        
         $res[$k]['paper_id'] = $comp['comp_paper_id'];
         $res[$k]['paper_lay'] = $paper_lay;
         $res[$k]['paper_cut'] = $paper_cut;
         $res[$k]['print_id'] = $comp['comp_print_id'];
         $res[$k]['print_id2'] = $comp['comp_print2'];
         
-        //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1
-        if($comp['comp_print2']>0&&$comp['comp_print2']!=$comp['comp_print_id']){
-            $color2 = $op_print_color[$comp['comp_print2']];
-            $res[$k]['frame'] = array($comp['comp_print_id']=>1,$comp['comp_print2']=>1);
-            $res[$k]['sheet'] = $amount*(1/$paper_lay)+$allo;
-            $res[$k]['cut'] = $amount+$allo;
-            $res[$k]['set'] = $amount+$allo;
-            $name = "2,กลับนอก,$color/$color2,".$res[$k]['sheet'];
-            $res[$k]['round'] = array(array($name,2*$res[$k]['sheet']));
-            $res[$k]['color'] = $color."/".$color2;
-            continue;
-        }
-        //case สมุด
-        if($quote['cat_id']==69&&$comp['comp_type']==1){
-            $res[$k]['frame'] = array($comp['comp_print_id']=>1);
-            $res[$k]['sheet'] = $amount*$page/2/$paper_lay+$allo;
-            $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-            $res[$k]['cut'] = $div/2*$res[$k]['sheet'];
-            $res[$k]['set'] = ($amount*ceil($page/2/$paper_lay)+$allo)*$div;
-            $name = "1,กลับใน,$color/$color,".$res[$k]['sheet'];
-            $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
-            $res[$k]['color'] = $color."/$color";
-            continue;
-        }
         
-        $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
-        $set = plate_div($frame);
-        
-        if($page>1){
-            $i = 1;
-            $sheet = 0;
-            $cut = 0;
-            $yok = 0;
-            //$tt_set = $set[0]/2+ceil($set[1])+ceil($set[2]);
-            $res[$k]['color'] = $color."/$color";
-            $res[$k]['round'] = array();
-            foreach($set as $key=>$s){
-                if($s>0){
-                    if($key==0){
-                        $sheet += $temp = ($amount+$allo)*$s/2;
-                        $round = $tsheet = $amount+$allo;
-                        $name = "$s,กลับนอก,$color/$color,".$tsheet;
-                        array_push($res[$k]['round'],array($name,$s*$round));
-                        $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-                        $cut += ($div>1?$div/2*$temp:0);
-                        $yok += $div*$temp;
-                    } else {
-                        $ss = ($s>0.5?1:$s);
-                        $sheet += $tsheet = $amount*$ss/2+$allo;
-                        $round = $tsheet*2;
-                        $name = "$s,กลับใน,$color/$color,".$tsheet;
-                        array_push($res[$k]['round'],array($name,$round));
-                        $div = (is_int($paper_lay*$s/2/8)&&$paper_lay*$s/2/8>=2?$paper_lay*$s/2/8:1);
-                        $cut += $div*($amount+$allo);
-                        $yok += $div*($amount+$allo);
-                        $i++;
+        $type = $comp['comp_type'];
+        if($type==2){                   //เนื้อใน
+            $frame = $page/$paper_lay;
+            if($quote['cat_id']==69){   //case สมุด
+                $res[$k]['frame'] = array($comp['comp_print_id']=>1);
+                $res[$k]['sheet'] = $amount*$page/2/$paper_lay+$allo;
+                $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
+                $res[$k]['cut'] = $div/2*$res[$k]['sheet'];
+                $res[$k]['set'] = ($amount*ceil($page/2/$paper_lay)+$allo)*$div;
+                $name = "1,กลับใน,$color/$color,".$res[$k]['sheet'];
+                $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
+                $res[$k]['color'] = $color."/$color";
+            } else {                    //case หนังสือทั่วไป
+                $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
+                $set = plate_div($frame);
+                $i = 1;
+                $sheet = 0;
+                $cut = 0;
+                $yok = 0;
+                $res[$k]['color'] = $color."/$color";
+                $res[$k]['round'] = array();
+                foreach($set as $key=>$s){
+                    if($s>0){
+                        if($key==0){
+                            $sheet += $temp = ($amount+$allo)*$s/2;
+                            $round = $tsheet = $amount+$allo;
+                            $name = "$s,กลับนอก,$color/$color,".$tsheet;
+                            array_push($res[$k]['round'],array($name,$s*$round));
+                            $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
+                            $cut += ($div>1?$div/2*$temp:0);
+                            $yok += $div*$temp;
+                        } else {
+                            $ss = ($s>0.5?1:$s);
+                            $sheet += $tsheet = $amount*$ss/2+$allo;
+                            $round = $tsheet*2;
+                            $name = "$s,กลับใน,$color/$color,".$tsheet;
+                            array_push($res[$k]['round'],array($name,$round));
+                            $div = (is_int($paper_lay*$s/2/8)&&$paper_lay*$s/2/8>=2?$paper_lay*$s/2/8:1);
+                            $cut += $div*($amount+$allo);
+                            $yok += $div*($amount+$allo);
+                            $i++;
+                        }
                     }
                 }
+                $res[$k]['sheet'] = $sheet;
+                $res[$k]['cut'] = $cut;
+                $res[$k]['set'] = $yok;
             }
-            $res[$k]['sheet'] = $sheet;
-            $res[$k]['cut'] = $cut;
-            $res[$k]['set'] = $yok;
-        } else {
-            $sheet = $res[$k]['sheet'] = $amount*$frame+$allo;
-            $name = "$frame,หน้าเดียว,$color/0,".$res[$k]['sheet'];
-            $res[$k]['round'] = array(array($name,$res[$k]['sheet']));
-            $res[$k]['cut'] = $amount+$allo;
-            $res[$k]['set'] = $amount+$allo;
-            $res[$k]['color'] = $color."/0";
+        } else {            //อื่นๆ ปก ใบพาด แจ็คเก็ด
+            $piece = $page;
+            $sheet = $res[$k]["sheet"] = $amount*$piece/$paper_lay+$allo;
+            $res[$k]['cut'] = $sheet*$paper_lay;
+            $res[$k]['set'] = $sheet*$paper_lay;
+            $frame = $page*($comp['comp_print2']>0?2:1)/$paper_lay;
+            $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
+            if($comp['comp_print2']==0){            //พิมพ์ด้านเดียว
+                $name = "$frame,หน้าเดียว,$color/0,".$res[$k]['sheet'];
+                $res[$k]['round'] = array(array($name,$res[$k]['sheet']));
+                $res[$k]['color'] = $color."/0";    //พิมพ์สองด้านสีเดียวกัน
+            } else if($comp['comp_print2']==$comp['comp_print_id']){
+                $name = "$frame,กลับใน,$color/$color,".$res[$k]['sheet'];
+                $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
+                $res[$k]['color'] = $color."/".$color;
+            } else {                                //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1
+                $res[$k]['frame'][$comp['comp_print2']] = 1;
+                $color2 = $op_print_color[$comp['comp_print2']];
+                $name = "2,กลับนอก,$color/$color2,".$res[$k]['sheet'];
+                $res[$k]['round'] = array(array($name,$res[$k]['sheet']));
+                $res[$k]['color'] = $color."/".$color2;
+            }
         }
+        $res[$k]['ff'] = $frame;
     }
     //collect total unit info
     $tinfo = array(
@@ -297,10 +300,11 @@ function unit_cal($quote,$comps){
     //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];
+        $set = (in_array($unit['type'],array(1,2,3))?$unit['set']:0);
         if($quote['binding_id']==1){
-            $tinfo['set'] += ($unit['type']==0?0:$unit['set']);
+            $tinfo['set'] += ($unit['type']==1?0:$set);
         } else {
-            $tinfo['set'] += $unit['set'];
+            $tinfo['set'] += $set;
         }
         $tinfo['frame'] += ceil($unit['ff']);
     }
