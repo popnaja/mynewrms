@@ -14,6 +14,7 @@ $menu->__autoloadall("form");
 $menu->__autoloadall("table");
 $menu->pap_menu();
 $menu->pageTitle = "PAP | Process";
+$menu->ascript[] = $root."js/pap.js";
 $menu->extrascript = <<<END_OF_TEXT
 <style>
 .but-right {
@@ -53,7 +54,7 @@ if($action=="add"){
             . $form->show_text("name","name","","","ชื่อกระบวนการ","","label-3070")
             . $form->show_select("show",$show,"label-3070","แสดง",null)
             . $form->show_select("cat",$process_cat,"label-3070","กลุ่มกระบวนการ",null)
-            . $form->show_select("unit",$op_unit,"label-3070","หน่วย",null,"")
+            . $form->show_select("unit",array("0"=>"--หน่วย--")+$op_unit,"label-3070","หน่วย",null,"")
             . $form->show_select("source",$op_process_source,"label-3070","แหล่งผลิต",null,"")
             . "<div class='sel-source-0'>"
             . $form->show_num("setup_min","",1,"","ตั้งเครื่อง","(นาที)","label-3070")
@@ -68,8 +69,9 @@ if($action=="add"){
         $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($op_unit));
         $hid = ($i===0?"":"form-hide");
         $costt .= "<div class='tab-section cost-cond $hid'>"
-                . $form->show_num("cost_$i","",0.01,"","บาท/หน่วยผลิต","","left-50 label-inline","min=0","cost[]")
-                . $form->show_num("min_$i","",0.01,"","ขั้นต่ำ (บาท)","","right-50 label-inline","min=0","min[]")
+                . $form->show_num("fcost_$i","",0.01,"","ต้นทุนคงที่ (บาท)","","label-inline","min=0","fcost[]")
+                . $form->show_num("cost_$i","",0.01,"","ต้นทุนแปรผัน (บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline","min=0","cost[]")
+                . $form->show_num("min_$i","",0.01,"","ขั้นต่ำ (บาท)","","label-inline","min=0","min[]")
                 . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",null,"","cond[]")
                 . "<div class='sel-cond_$i-0'>"
                 . "</div>"
@@ -105,9 +107,10 @@ if($action=="add"){
             . "<script>"
             . "select_option('source');"
             . "view_more_section('cost-cond');"
+            . "unit_label();"
             . "</script>"
             . "</div><!-- .col-100 -->";
-    $form->addformvalidate("ez-msg", array('name'));
+    $form->addformvalidate("ez-msg", array('name'),null,null,array('unit'));
     $content .= $form->submitscript("$('#new').submit();");
 } else if(isset($pid)) {
     //check
@@ -128,7 +131,7 @@ if($action=="add"){
             . $form->show_text("name","name",$info['process_name'],"","ชื่อกระบวนการ","","label-3070")
             . $form->show_select("show",$show,"label-3070","แสดง",$meta['pc_show'],"")
             . $form->show_select("cat",$process_cat,"label-3070","กลุ่มกระบวนการ",$info['process_cat_id'])
-            . $form->show_select("unit",$op_unit,"label-3070","หน่วย",$info['process_unit'],"")
+            . $form->show_select("unit",array("0"=>"--หน่วย--")+$op_unit,"label-3070","หน่วย",$info['process_unit'],"")
             . $form->show_select("source",$op_process_source,"label-3070","แหล่งผลิต",$info['process_source'],"")
             . "<div class='sel-source-0'>"
             . $form->show_num("setup_min",$info['process_setup_min'],1,"","เวลาตั้งเครื่อง(นาที)","","label-3070")
@@ -145,15 +148,16 @@ if($action=="add"){
         $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($op_criteria));
         $hid = ($i<$show?"":"form-hide");
         $costt .= "<div class='form-section cost-cond $hid'>"
-                . $form->show_num("cost_$i",(isset($cost[$i])?$cost[$i]['cost']:""),0.01,"","บาท/หน่วยผลิต","","left-50 label-inline","min=0","cost[]")
-                . $form->show_num("min_$i",(isset($cost[$i])?$cost[$i]['min']:""),0.01,"","ขั้นต่ำ (บาท)","","right-50 label-inline","min=0","min[]")
-                . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",(isset($cost[$i])?$cost[$i]['cond']:""),"","cond[]")
-                . "<div class='$otherc'>"
-                . $form->show_num("btw_$i",(isset($cost[$i])?$cost[$i]['btw']:""),1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")
-                . $form->show_num("to_$i",(isset($cost[$i])?$cost[$i]['to']:""),1,"","ถึง","","right-50 label-inline","min=0","to[]")
-                . "</div><!-- .otherc -->"
-                . "</div><!-- .cost-cond -->"
-                . "<script>select_option_byval('cond_$i');</script>";
+        . $form->show_num("fcost_$i",(isset($cost[$i]['fcost'])?$cost[$i]['fcost']:0),0.01,"","ต้นทุนคงที่","","label-inline","min=0","fcost[]")
+        . $form->show_num("cost_$i",(isset($cost[$i])?$cost[$i]['cost']:""),0.01,"","ต้นทุนแปรผัน(บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline","min=0","cost[]")
+        . $form->show_num("min_$i",(isset($cost[$i])?$cost[$i]['min']:""),0.01,"","ต้นทุนขั้นต่ำ(บาท)","","label-inline","min=0","min[]")
+        . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",(isset($cost[$i])?$cost[$i]['cond']:""),"","cond[]")
+        . "<div class='$otherc'>"
+        . $form->show_num("btw_$i",(isset($cost[$i])?$cost[$i]['btw']:""),1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")
+        . $form->show_num("to_$i",(isset($cost[$i])?$cost[$i]['to']:""),1,"","ถึง","","right-50 label-inline","min=0","to[]")
+        . "</div><!-- .otherc -->"
+        . "</div><!-- .cost-cond -->"
+        . "<script>select_option_byval('cond_$i');</script>";
     }
     $costt .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขต้นทุน' style='width:100%'/>";
     
@@ -190,9 +194,10 @@ if($action=="add"){
             . "<script>"
             . "select_option('source');"
             . "view_more_section('cost-cond');"
+            . "unit_label();"
             . "</script>"
             . "</div><!-- .col-100 -->";
-    $form->addformvalidate("ez-msg", array('name'));
+    $form->addformvalidate("ez-msg", array('name'),null,null,array('unit'));
     $content .= $form->submitscript("$('#new').submit();");
 } else {
     __autoload("pdo_tb");

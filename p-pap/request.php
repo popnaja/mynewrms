@@ -231,6 +231,7 @@ if($req == "login"){
         for($i=0;$i<$n;$i++){
             if($_POST['cost'][$i]>0){
                 $cost_ele = array(
+                    "fcost" => $_POST['fcost'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
                     "cond" => $_POST['cond'][$i],
@@ -283,6 +284,7 @@ if($req == "login"){
         for($i=0;$i<$n;$i++){
             if($_POST['cost'][$i]>0){
                 $cost_ele = array(
+                    "fcost" => $_POST['fcost'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
                     "cond" => $_POST['cond'][$i],
@@ -387,14 +389,23 @@ if($req == "login"){
             $_POST['inside_div']
         );
         $sid = $db->insert_data("pap_size", $data);
+        //custom lay
+        $clay = array();
+        for($i=0;$i<count($_POST['clay']);$i++){
+            if($_POST['clay'][$i]>0){
+                $clay[$i] = array($_POST['ctype'][$i],$_POST['cpaper'][$i],$_POST['cdiv'][$i],$_POST['clay'][$i]);
+            }
+        }
         //meta
         $meta = array(
             "grip1" => $_POST['grip1'],
-            "grip2" => $_POST['grip2']
+            "grip2" => $_POST['grip2'],
+            "custom_lay" => json_encode($clay)
         );
+        
         $db->update_meta("pap_size_meta", "size_id", $sid, $meta);
         $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-        //header("Location:".$_POST['redirect']);
+        header("Location:".$_POST['redirect']);
     }
 } else if($req == "edit_job_size"){
     $sid = filter_input(INPUT_POST,"sid",FILTER_SANITIZE_NUMBER_INT);
@@ -416,14 +427,22 @@ if($req == "login"){
             "inside_div" => $_POST['inside_div']
         );
         $db->update_data("pap_size", "size_id", $sid, $arrinfo);
+        //custom lay
+        $clay = array();
+        for($i=0;$i<count($_POST['clay']);$i++){
+            if($_POST['clay'][$i]>0){
+                $clay[$i] = array($_POST['ctype'][$i],$_POST['cpaper'][$i],$_POST['cdiv'][$i],$_POST['clay'][$i]);
+            }
+        }
         //meta
         $meta = array(
             "grip1" => $_POST['grip1'],
-            "grip2" => $_POST['grip2']
+            "grip2" => $_POST['grip2'],
+            "custom_lay" => json_encode($clay)
         );
         $db->update_meta("pap_size_meta", "size_id", $sid, $meta);
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-        //header("Location:".$_POST['redirect']);
+        header("Location:".$_POST['redirect']);
     }
 } else if($req =="add_customer"){
     $code = $db->check_cus_code($_POST['cat']);
@@ -855,7 +874,7 @@ if($req == "login"){
         "distance" => $_POST['distance'],
         "discount" => $_POST['discount'],
         "adj_margin" => implode(",",$_POST['adj_margin']),
-        "contact_id" => $_POST['cusct'],
+        "contact_id" => (isset($_POST['cusct'])?$_POST['cusct']:0),
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
         "cal_amount" => implode(",",$arramount),
@@ -885,13 +904,15 @@ if($req == "login"){
     );
     //upload file
     if(isset($_POST['mdfile'])){
-        __autoloada("media");
-        $md = new mymedia();
-        $file = $_POST['mdfile'];
-        $ono = $info['quote_no'];
-        $des = dirname(__FILE__)."/image/quote_sign/$ono".".".pathinfo($file,PATHINFO_EXTENSION);
-        $md->move_file(RDIR.$file, $des);
-        $exmeta['quote_sign'] = "/p-pap/image/quote_sign/$ono".".".pathinfo($file,PATHINFO_EXTENSION);
+        if($_POST['mdfile']!=$_POST['o_file']){
+            __autoloada("media");
+            $md = new mymedia();
+            $file = $_POST['mdfile'];
+            $ono = $info['quote_no'];
+            $des = dirname(__FILE__)."/image/quote_sign/$ono".".".pathinfo($file,PATHINFO_EXTENSION);
+            $md->move_file(RDIR.$file, $des);
+            $exmeta['quote_sign'] = "/p-pap/image/quote_sign/$ono".".".pathinfo($file,PATHINFO_EXTENSION);
+        }
     }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $exmeta);
 

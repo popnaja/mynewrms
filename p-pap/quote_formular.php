@@ -83,6 +83,7 @@ function cal_quote($info,$comps){
         array_push($res['กระดาษ'],array("กระดาษ $cname",$rims,$c_per_rim,$rims*$c_per_rim));
         
         //printing
+        //var_dump($unit);
         if(count($unit['frame'])>1){
             $color = explode("/",$unit['color']);
             foreach($unit['round'] as $k=>$v){
@@ -165,18 +166,17 @@ function new_pcost($pid,$arrinfo){
     $cost = json_decode($meta['cost'],true);
     $amount = $arrinfo[$info['process_unit']];
     foreach($cost AS $k=>$value){
-        if((float)$value['cost']>0){
-            if(isset($op_unit[$value['cond']])){
-                $check = $arrinfo[$value['cond']];
-                if($check>=$value['btw']&&$check<=($value['to']>0?$value['to']:INF)){
-                    $cinfo = max($value['cost']*$amount,$value['min']);
-                    $cost_per_u = $value['cost'];
-                    break;
-                }
-            } else {
-                $cinfo = max($value['cost']*$amount,$value['min']);
+        $fcost = (isset($value['fcost'])?$value['fcost']:0);
+        if(count($cost)>1){
+            $check = $arrinfo[$value['cond']];
+            if($check>=$value['btw']&&$check<=($value['to']>0?$value['to']:INF)){
+                $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
                 $cost_per_u = $value['cost'];
+                break;
             }
+        } else {
+            $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
+            $cost_per_u = $value['cost'];
         }
     }
     return array($amount,$cost_per_u,$cinfo);

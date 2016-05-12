@@ -772,24 +772,20 @@ END_OF_TEXT;
 SELECT
 cover_paper,po.op_name AS cover_size,
 inside_paper,po1.op_name AS inside_size,
-cover_lay,inside_lay,cover_div,inside_div
+cover_lay,inside_lay,cover_div,inside_div,
+meta.meta_value AS clay
 FROM pap_size
 LEFT JOIN pap_option AS po ON po.op_id=cover_paper
 LEFT JOIN pap_option AS po1 ON po1.op_id=inside_paper
-WHERE size_id=:sid
+LEFT JOIN pap_size_meta AS meta ON meta.size_id=pap_size.size_id AND meta_key='custom_lay'
+WHERE pap_size.size_id=:sid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":sid",$sid);
             $stmt->execute();
             $size = $stmt->fetch(PDO::FETCH_ASSOC);
-            $res[0] = $size;
-            //cover
-            $c_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['cover_paper']);
-            $res[1] = $form->show_select("paper_type_$i",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
-            //inside
-            $i_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['inside_paper']);
-            $res[2] = $form->show_select("paper_type_$i",$i_ptype,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]");
-            return $res;
+            $size['clay'] = (is_null($size['clay'])?"":json_decode($size['clay'],true));
+            return $size;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }

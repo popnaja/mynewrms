@@ -158,7 +158,7 @@ function prep_order($qid){
     return true;
 }
 function time_cal($pinfo,$setup,$vol){
-    if($pinfo['process_source']==0){
+    if($pinfo['process_source']==1){
         $hour = $pinfo['process_setup_min']*$setup/60+$vol/$pinfo['process_cap'];
         return round($hour,2);
     } else {

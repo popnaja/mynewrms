@@ -28,7 +28,7 @@ $op_unit = array(
     "km" => "ระยะทาง(กม)",
 );
 $op_criteria = $op_unit+array(
-    "area" => "พื้นที่(cm2)"
+    //"area" => "พื้นที่(cm2)"
 );
 $op_process_source = array(
     "1" => "ผลิตเอง",

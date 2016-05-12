@@ -38,7 +38,7 @@ $(document).ready(function(){
             $("#timem").val(timem);
         }
         tab.removeClass("form-hide");
-        if($(this).attr("source")==1){
+        if($(this).attr("source")==2){
             $("#sel-machine").html("<input type='hidden' name='mcid' value='0' />");
         } else {
             var data = {};

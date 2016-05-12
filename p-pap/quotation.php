@@ -238,6 +238,7 @@ if($action=="add"){
             . "<label for='sig'>เอกสารยืนยัน</label>"
             . "<div>"
             . $md->show_uppdf("sign_doc", "sign_doc",$file)
+            . $form->show_hidden("o_file","o_file",(isset($info['quote_sign'])?$info['quote_sign']:""))
             . "</div>"
             . "</div><!-- .label-3070 -->"
             . "</div><!-- .sel-status-9 -->"
@@ -452,8 +453,8 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-1'>"
                 . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",($comp['comp_type']==1?$info['cwing']:null),"","cwing[]")
                 . "<div class='sel-cwing_$i-1'>"
-                . $form->show_num("fwing_$i",($comp['comp_type']==1?$info['fwing']:0),0.01,"","ปีกปกหน้า(cm)","","label-3070","min=0","fwing[]")
-                . $form->show_num("bwing_$i",($comp['comp_type']==1?$info['bwing']:0),0.01,"","ปีกปกหลัง(cm)","","label-3070","min=0","bwing[]")
+                . $form->show_num("fwing_$i",($comp['comp_type']==1&&isset($info['fwing'])?$info['fwing']:0),0.01,"","ปีกปกหน้า(cm)","","label-3070","min=0","fwing[]")
+                . $form->show_num("bwing_$i",($comp['comp_type']==1&&isset($info['bwing'])?$info['bwing']:0),0.01,"","ปีกปกหลัง(cm)","","label-3070","min=0","bwing[]")
                 . "</div><!-- .sel-cwing_$i-1 -->"
                 . "</div><!-- .sel-compt$i-1 -->"
                 . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",$comp['comp_coating'],"","coating[]")
