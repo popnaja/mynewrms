@@ -1283,7 +1283,7 @@ LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
 LEFT JOIN pap_machine AS mach ON mach.id=cpro.machine_id
 WHERE comp.order_id=:oid AND process_cat_id BETWEEN 3 AND 11
-ORDER BY cpro.comp_id ASC, process_cat_id ASC
+ORDER BY cpro.comp_id ASC, process_cat_id ASC, cpro.name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":oid",$oid);

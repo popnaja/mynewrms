@@ -1823,13 +1823,27 @@ if($req == "login"){
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="edit_cpro"){
-    $arrinfo = array(
-        "process_id" => $_POST['process'],
-        "name" => $_POST['name'],
-        "volume" => $_POST['amount'],
-        "est_time_hour" => $_POST['prodtime']
-    );
-    $db->update_data("pap_comp_process", "id", $_POST['cproid'], $arrinfo);
+    if($_POST['leveling']>0){
+        $lv = $_POST['leveling'];
+        $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
+        //insert new process
+        $aname = explode(",",$info['name']);
+        $aname[0] = $aname[0]/$lv;
+        $nname = implode(",",$aname);
+        for($i=0;$i<$lv;$i++){
+            $db->insert_data("pap_comp_process", array(null,$info['comp_id'],$info['process_id'],$nname,$info['volume']/$lv,$info['est_time_hour']/$lv,null,null,null,null,null,null,null));
+        }
+        //del ori
+        $db->delete_data("pap_comp_process", "id", $_POST['cproid']);
+    } else {
+        $arrinfo = array(
+            "process_id" => $_POST['process'],
+            "name" => $_POST['name'],
+            "volume" => $_POST['amount'],
+            "est_time_hour" => $_POST['prodtime']
+        );
+        $db->update_data("pap_comp_process", "id", $_POST['cproid'], $arrinfo);
+    }
     $_SESSION['message'] = "ปรับข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="edit_job_result"){
