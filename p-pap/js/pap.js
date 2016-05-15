@@ -426,19 +426,20 @@ $(document).ready(function(){
         }
     }
     //paper size change
-    var ori_size;
-    size_sel.on("click",function(){
-        ori_size = $(this).val();
-    })
     size_sel.on("change",function(){
         var i = size_sel.index($(this));
         var ctype = comp.eq(i).val();
         var size = $(this).val();
         if($.inArray(parseInt(ctype),[1,2,3])!=-1){
-            pg_dialog("คำเตือน","ขนาดกระดาษตาม Master Lay ไม่สามารถเปลี่ยนได้");
-            $(this).val(ori_size);
+            confirm_dialog("คำเตือน","ต้องการเปลี่ยนขาดกระดาษจาก Master Lay ใช่หรือไม่",sel_ok,sel_cancel);
         } else {
             filter_papern(size,i);
+        }
+        function sel_ok(){
+            filter_papern(size,i);
+        }
+        function sel_cancel(){
+            filter_paper($("#sid").val(),ctype,i);
         }
     });
     

@@ -89,7 +89,7 @@ a.icon-delete-circle {
 .pg-dialog p {
     color:#444;
     font-size:14px;
-    padding: 15px 10px;
+    padding: 5px 10px;
 }
 .pg-dialog .ok-but{
     position:absolute;
@@ -99,6 +99,17 @@ a.icon-delete-circle {
 }
 .pg-dialog .ok-but input{
     display:inline-block;
+}
+.confirm-dialog .ui-button-text {
+    font-weight:500;
+    font-size:14px;
+}
+.confirm-dialog .ui-dialog-content {
+    font-weight:500;
+    font-size:15px;
+}
+.confirm-dialog .ui-dialog-titlebar-close {
+    display: none;
 }
 /*------------------------------------------------------ pg dialog END-------------------------------------------------------------- */
 .noselect {

@@ -103,7 +103,26 @@ function close_dialog(){
     $(".pg-dialog").remove();
     $("body").removeClass("pg-loading");
 }
-
+//confirm dialog
+function confirm_dialog(title,msg,ok,cancel){
+    $('<div title="' + title + '">' + msg + '</div>').dialog({
+      resizable: false,
+      width: 300,
+      maxHeight: 500,
+      modal: true,
+      dialogClass: "confirm-dialog",
+      buttons: {
+        "OK" : function() {
+          $( this ).dialog( "close" );
+          ok();
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+          cancel();
+        }
+      }
+    });
+}
 //my pg loading use with css in form.css
 function pg_loading(st,title,msg){
     //change text
