@@ -27,43 +27,43 @@ function show_mobilem(){
     });
 }
 function flex_menu(){
-    var mh,wh,ch,ph,sc;
-    $(document).ready(function(){
-        var menu = $("#mymenu");
-        var panel = $("#panel");
-        var ct = $("#content");
-        mh = menu.outerHeight();
-        wh = $(window).height()-44;
-        ct.height("auto");
-        ch = ct.height();
-        ph = panel.height();
-        if(mh>wh){
+var mh,wh,ch,ph,sc;
+$(document).ready(function(){
+    var menu = $("#mymenu");
+    var panel = $("#panel");
+    var ct = $("#content");
+    mh = menu.outerHeight();
+    wh = $(window).height()-44;
+    ct.height("auto");
+    ch = ct.height();
+    ph = panel.height();
+    if(mh>wh){
+        $(document).off("scroll");
+        panel.addClass("panel-ab");
+        if(ch<mh){
             $(document).off("scroll");
-            panel.addClass("panel-ab");
-            if(ch<mh){
-                $(document).off("scroll");
-                ct.height(mh);
-            } else {
-                check_sc();
-                $(document).on("scroll",function(){
-                    check_sc();
-                });
-            }
+            ct.height(mh);
         } else {
-            $(document).off("scroll");
+            check_sc();
+            $(document).on("scroll",function(){
+                check_sc();
+            });
+        }
+    } else {
+        $(document).off("scroll");
+        panel.removeClass("panel-ab");
+    }
+    function check_sc(){
+        sc = $(document).scrollTop();
+        if(wh+sc>mh){
             panel.removeClass("panel-ab");
+            panel.css({"top":"auto"});
+        } else {
+            panel.addClass("panel-ab");
+            panel.css({"top":"44px"});
         }
-        function check_sc(){
-            sc = $(document).scrollTop();
-            if(wh+sc>mh){
-                panel.removeClass("panel-ab");
-                panel.css({"top":"auto"});
-            } else {
-                panel.addClass("panel-ab");
-                panel.css({"top":"44px"});
-            }
-        }
-    });
+    }
+});
 }
 function user_log(uid,url){
     $(document).ready(function(){
