@@ -1828,8 +1828,12 @@ if($req == "login"){
         $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
         //insert new process
         $aname = explode(",",$info['name']);
-        $aname[0] = $aname[0]/$lv;
-        $nname = implode(",",$aname);
+        if($aname[0]>0){
+            $aname[0] = $aname[0]/$lv;
+            $nname = implode(",",$aname);
+        } else {
+            $nname = $aname[0];
+        }
         for($i=0;$i<$lv;$i++){
             $db->insert_data("pap_comp_process", array(null,$info['comp_id'],$info['process_id'],$nname,$info['volume']/$lv,$info['est_time_hour']/$lv,null,null,null,null,null,null,null));
         }

@@ -32,13 +32,14 @@ $form = new myform("papform","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $mid = filter_input(INPUT_GET,'mid',FILTER_SANITIZE_STRING);
 if($action=="add"){
+/*--------------------------------------------------------------  ADD ------------------------------------------------------------------*/
     //check
     if($pauth<=1){
         header("location:$redirect");
         exit();
     }
     //add
-    $process = array("0"=>"--กระบวนการผลิต--")+$db->get_keypair("pap_process", "process_id", "process_name","WHERE process_source=0 ORDER BY process_cat_id ASC, process_name ASC");
+    $process = array("0"=>"--กระบวนการผลิต--")+$db->get_keypair("pap_process", "process_id", "process_name","WHERE process_source=1 ORDER BY process_cat_id ASC, process_name ASC");
     $users = $db->get_userpair(68);
     $content .= "<h1 class='page-title'>เพิ่ม$pagename</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
@@ -67,6 +68,7 @@ if($action=="add"){
     $form->addformvalidate("ez-msg", array('name','setup_min',"capacity"));
     $content .= $form->submitscript("$('#papform').submit();");
 } else if(isset($mid)) {
+/*--------------------------------------------------------------  EDIT ------------------------------------------------------------------*/
     //check
     if($pauth<=1){
         header("location:$redirect");
@@ -76,7 +78,7 @@ if($action=="add"){
     $info = $db->get_info("pap_machine","id",$mid);
     $pinfo = $db->get_info("pap_process","process_id",$info['process_id']);
     
-    $process = array("0"=>"--กระบวนการผลิต--")+$db->get_keypair("pap_process", "process_id", "process_name","WHERE process_source=0 ORDER BY process_cat_id ASC, process_name ASC");
+    $process = array("0"=>"--กระบวนการผลิต--")+$db->get_keypair("pap_process", "process_id", "process_name","WHERE process_source=1 ORDER BY process_cat_id ASC, process_name ASC");
     $users = $db->get_userpair(68);
     $user_checked = $db->get_mm_arr("pap_mach_user", "user_id", "mach_id", $mid);
     $checked_users = $form->checked_array($users, $user_checked);
