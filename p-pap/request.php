@@ -229,9 +229,10 @@ if($req == "login"){
         $n = count($_POST['cost']);
         $arrcost = array();
         for($i=0;$i<$n;$i++){
-            if($_POST['cost'][$i]>0){
+            if($_POST['cost'][$i]>0||$_POST['fcost'][$i]>0||$_POST['min'][$i]>0){
                 $cost_ele = array(
                     "fcost" => $_POST['fcost'][$i],
+                    "vunit" => $_POST['vunit'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
                     "cond" => $_POST['cond'][$i],
@@ -241,6 +242,7 @@ if($req == "login"){
                 array_push($arrcost,$cost_ele);
             }
         }
+        /*
         $m = count($_POST['mat']);
         $arrmat = array();
         for($i=0;$i<$m;$i++){
@@ -248,11 +250,13 @@ if($req == "login"){
                 array_push($arrmat,array($_POST['mat'][$i],$_POST['usage'][$i]));
             }
         }
+         * 
+         */
         $meta = array(
             "cost" => json_encode($arrcost),
-            "detail_cost" => $_POST['usedetail'],
-            "detail_labor" => $_POST['labor'],
-            "detail_mat" =>  json_encode($arrmat),
+            //"detail_cost" => $_POST['usedetail'],
+            //"detail_labor" => $_POST['labor'],
+            //"detail_mat" =>  json_encode($arrmat),
             "pc_show" => $_POST['show']
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
@@ -282,9 +286,10 @@ if($req == "login"){
         $n = count($_POST['cost']);
         $arrcost = array();
         for($i=0;$i<$n;$i++){
-            if($_POST['cost'][$i]>0){
+            if($_POST['cost'][$i]>0||$_POST['fcost'][$i]>0||$_POST['min'][$i]>0){
                 $cost_ele = array(
                     "fcost" => $_POST['fcost'][$i],
+                    "vunit" => $_POST['vunit'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
                     "cond" => $_POST['cond'][$i],
@@ -294,6 +299,7 @@ if($req == "login"){
                 array_push($arrcost,$cost_ele);
             }
         }
+        /*
         $m = count($_POST['mat']);
         $arrmat = array();
         for($i=0;$i<$m;$i++){
@@ -301,11 +307,13 @@ if($req == "login"){
                 array_push($arrmat,array($_POST['mat'][$i],$_POST['usage'][$i]));
             }
         }
+         * 
+         */
         $meta = array(
             "cost" => json_encode($arrcost),
-            "detail_cost" => $_POST['usedetail'],
-            "detail_labor" => $_POST['labor'],
-            "detail_mat" =>  json_encode($arrmat),
+            //"detail_cost" => $_POST['usedetail'],
+            //"detail_labor" => $_POST['labor'],
+            //"detail_mat" =>  json_encode($arrmat),
             "pc_show" => $_POST['show']
         );
         $db->update_meta("pap_process_meta", "process_id", $pid, $meta);
@@ -697,6 +705,13 @@ if($req == "login"){
             array_push($arramount,$amount);
         }
     }
+    //อื่นๆ
+    $other = array();
+    for($i=0;$i<count($_POST['olist']);$i++){
+        if($_POST['olist'][$i]!=""){
+            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i]));
+        }
+    }
     //update meta
     $meta += array(
         "remark" => $_POST['remark'],
@@ -709,7 +724,8 @@ if($req == "login"){
         "contact_id" => $_POST['cusct'],
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
-        "cal_amount" => implode(",",$arramount)
+        "cal_amount" => implode(",",$arramount),
+        "other_price" => json_encode($other)
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
@@ -864,6 +880,13 @@ if($req == "login"){
           array_push($detail_price,array($_POST['pshow'][$i],$_POST['plist'][$i],$_POST['pqty'][$i],$_POST['pperu'][$i],$_POST['ptt'][$i]));
         }
     }
+    //อื่นๆ
+    $other = array();
+    for($i=0;$i<count($_POST['olist']);$i++){
+        if($_POST['olist'][$i]!=""){
+            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i]));
+        }
+    }
 
      //update meta
     $meta += array(
@@ -879,7 +902,8 @@ if($req == "login"){
         "page_inside" => $page_inside,
         "cal_amount" => implode(",",$arramount),
         "detail_price" => json_encode($detail_price),
-        "multi_quote_info" => json_encode($mquote)
+        "multi_quote_info" => json_encode($mquote),
+        "other_price" => json_encode($other)
     );
 
     //ต่อรองราคา

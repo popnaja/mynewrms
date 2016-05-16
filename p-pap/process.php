@@ -69,18 +69,19 @@ if($action=="add"){
         $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($op_unit));
         $hid = ($i===0?"":"form-hide");
         $costt .= "<div class='tab-section cost-cond $hid'>"
-                . $form->show_num("fcost_$i","",0.01,"","ต้นทุนคงที่ (บาท)","","label-inline","min=0","fcost[]")
-                . $form->show_num("cost_$i","",0.01,"","ต้นทุนแปรผัน (บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline","min=0","cost[]")
-                . $form->show_num("min_$i","",0.01,"","ขั้นต่ำ (บาท)","","label-inline","min=0","min[]")
-                . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",null,"","cond[]")
-                . "<div class='sel-cond_$i-0'>"
-                . "</div>"
-                . "<div class='$otherc'>"
-                . $form->show_num("btw_$i","",1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")
-                . $form->show_num("to_$i","",1,"","ถึง","","right-50 label-inline","min=0","to[]")
-                . "</div>"
-                . "</div><!-- .cost-cond -->"
-                . "<script>select_option_byval('cond_$i');</script>";
+        . $form->show_num("fcost_$i","",0.01,"","ต้นทุนคงที่ (บาท)","","label-inline left-50","min=0","fcost[]")
+        . $form->show_num("min_$i","",0.01,"","ขั้นต่ำ (บาท)","","label-inline right-50","min=0","min[]")
+        . $form->show_select("vunit_$i",$op_criteria,"label-inline left-50","หน่วยต้นทุนแปรผัน",null,"","vunit[]")
+        . $form->show_num("cost_$i","",0.00001,"","(บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline right-50","min=0","cost[]")
+        . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",null,"","cond[]")
+        . "<div class='sel-cond_$i-0'>"
+        . "</div>"
+        . "<div class='$otherc'>"
+        . $form->show_num("btw_$i","",1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")
+        . $form->show_num("to_$i","",1,"","ถึง","","right-50 label-inline","min=0","to[]")
+        . "</div>"
+        . "</div><!-- .cost-cond -->"
+        . "<script>select_option_byval('cond_$i');</script>";
     }
     $costt .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขต้นทุน' style='width:100%'/>";
     //detail variable cost
@@ -142,15 +143,18 @@ if($action=="add"){
             . "</div><!-- .col-50 -->";
 
     $cost = (isset($meta['cost'])?json_decode($meta['cost'],true):array());
-    $show = count($cost);
+    $n = count($cost);
     $costt = "";
     for($i=0;$i<5;$i++){
         $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($op_criteria));
-        $hid = ($i<$show?"":"form-hide");
+        $hid = ($i<$n?"":"form-hide");
+        $uname = (isset($cost[$i])?$op_criteria[$cost[$i]['vunit']]:"หน่วย");
         $costt .= "<div class='form-section cost-cond $hid'>"
-        . $form->show_num("fcost_$i",(isset($cost[$i]['fcost'])?$cost[$i]['fcost']:0),0.01,"","ต้นทุนคงที่","","label-inline","min=0","fcost[]")
-        . $form->show_num("cost_$i",(isset($cost[$i])?$cost[$i]['cost']:""),0.01,"","ต้นทุนแปรผัน(บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline","min=0","cost[]")
-        . $form->show_num("min_$i",(isset($cost[$i])?$cost[$i]['min']:""),0.01,"","ต้นทุนขั้นต่ำ(บาท)","","label-inline","min=0","min[]")
+        . $form->show_num("fcost_$i",(isset($cost[$i]['fcost'])?$cost[$i]['fcost']:0),0.01,"","ต้นทุนคงที่","","label-inline left-50","min=0","fcost[]")
+        . $form->show_num("min_$i",(isset($cost[$i])?$cost[$i]['min']:""),0.01,"","ต้นทุนขั้นต่ำ(บาท)","","label-inline right-50","min=0","min[]")
+        . $form->show_select("vunit_$i",$op_criteria,"label-inline left-50","หน่วยต้นทุนแปรผัน",(isset($cost[$i])?$cost[$i]['vunit']:""),"","vunit[]")
+        . $form->show_num("cost_$i",(isset($cost[$i])?$cost[$i]['cost']:""),0.00001,"","(บาท/<span class='prod-unit-label'>$uname</span>)","","label-inline right-50","min=0","cost[]")
+        
         . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",(isset($cost[$i])?$cost[$i]['cond']:""),"","cond[]")
         . "<div class='$otherc'>"
         . $form->show_num("btw_$i",(isset($cost[$i])?$cost[$i]['btw']:""),1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")

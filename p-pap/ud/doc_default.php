@@ -860,6 +860,11 @@ function job_detail($qid){
             }
         }
     }
+    if(isset($info['other_price'])){
+        foreach(json_decode($info['other_price'],true) as $i=>$v){
+            array_push($data["ข้อกำหนดอื่นๆ"],$v[0]);
+        }
+    }
     return $data;
 }
 

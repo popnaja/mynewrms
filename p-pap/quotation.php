@@ -119,8 +119,14 @@ if($action=="add"){
     for($x=1;$x<11;$x++){
         $multi .= $form->show_num("m_amount_$x","",1,"","ยอด $x","","label-3070","min=0","m_amount[]");
     }
+    
+    $other = "";
+    for($x=1;$x<5;$x++){
+        $other .= $form->show_text("olist_$x","olist[]","","","รายการ","","label-inline left-50")
+            . $form->show_num("o_cost_$x","",0.01,"","ราคา","","label-inline right-50","min=0","ocost[]");
+    }
 
-    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi))
+    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์","อื่นๆ"),array($detail,$pack,$multi,$other))
             . "</div><!-- .col-50 -->";
 
     $content .= "<div class='col-50'>"
@@ -329,8 +335,13 @@ if($action=="add"){
     for($x=1;$x<11;$x++){
         $multi .= $form->show_num("m_amount_$x",(isset($aamount[$x-1])?$aamount[$x-1]:""),1,"","ยอด $x","","label-3070","min=0","m_amount[]");
     }
-
-    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi),0)
+    $other = "";
+    $oinfo = (isset($info['other_price'])?json_decode($info['other_price'],true):array());
+    for($x=1;$x<5;$x++){
+        $other .= $form->show_text("olist_$x","olist[]",(isset($oinfo[$x-1])?$oinfo[$x-1][0]:""),"","รายการ","","label-inline left-50")
+        . $form->show_num("o_cost_$x",(isset($oinfo[$x-1])?$oinfo[$x-1][1]:""),0.01,"","ราคา","","label-inline right-50","min=0","ocost[]");
+    }
+    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์","อื่นๆ"),array($detail,$pack,$multi,$other),0)
             . "</div><!-- .col-50 -->";
     $content .= "<div class='col-50'>"
             . special_comp($info,$comps)

@@ -19,6 +19,7 @@ function cal_quote($info,$comps){
     $res['หลังพิมพ์'] = array();
     $res['แพ็ค'] = array();
     $res['ขนส่ง'] = array();
+    $res['อื่นๆ'] = array();
   
     $ex = explode(",",$info['exclude']);
     $num = count($units);
@@ -63,7 +64,7 @@ function cal_quote($info,$comps){
         $type = $unit['type'];
         $run[$type]++;
         $cname = $op_comp_type[$unit['type']].($run[$type]>1?" ($run[$type])":"");
-        var_dump($unit);
+
         //ทำเพลต
         if(!in_array("1",$ex)){
             $temp = array();
@@ -155,6 +156,13 @@ function cal_quote($info,$comps){
         $pcost = new_pcost($info['binding_id'], $overall);
         array_push($res['หลังพิมพ์'],array_merge(array($processes[$info['binding_id']]),$pcost));
     }
+    //อื่นๆ
+    if(isset($info['other_price'])){
+        $other = json_decode($info['other_price'],true);
+        foreach($other as $k=>$oinfo){
+            array_push($res['อื่นๆ'],array($oinfo[0],0,0,$oinfo[1]));
+        }
+    }
 
     return $res;
 }
@@ -174,10 +182,10 @@ function new_pcost($pid,$arrinfo){
     global $db;
     global $op_unit;
     $meta = $db->get_meta("pap_process_meta","process_id",$pid);
-    $info = $db->get_info("pap_process","process_id",$pid);
     $cost = json_decode($meta['cost'],true);
-    $amount = $arrinfo[$info['process_unit']];
+    //var_dump($cost);
     foreach($cost AS $k=>$value){
+        $amount = $arrinfo[$value['vunit']];
         $fcost = (isset($value['fcost'])?$value['fcost']:0);
         if(count($cost)>1){
             $check = $arrinfo[$value['cond']];
@@ -220,15 +228,16 @@ function unit_cal($quote,$comps){
         $paper_cut = $comp['comp_paper_cut'];
         $res[$k]['type'] = $comp['comp_type'];
         $page = $res[$k]['page'] = $comp['comp_page'];
-        
-        
+        $pinfo = $db->get_info("pap_mat", "mat_id", $comp['comp_paper_id']);
+        $size = $db->get_info("pap_option","op_id",$pinfo['mat_size']);
+        $sinfo = json_decode($size['op_value'],true);
         
         $res[$k]['paper_id'] = $comp['comp_paper_id'];
         $res[$k]['paper_lay'] = $paper_lay;
         $res[$k]['paper_cut'] = $paper_cut;
         $res[$k]['print_id'] = $comp['comp_print_id'];
         $res[$k]['print_id2'] = $comp['comp_print2'];
-        
+        $res[$k]["piece"] = $quote['amount'];
         
         $type = $comp['comp_type'];
         if($type==2){                   //เนื้อใน
@@ -375,6 +384,7 @@ function unit_cal($quote,$comps){
             }
         }
         $res[$k]['ff'] = $frame;
+        $res[$k]['in2'] = $res[$k]['sheet']*$sinfo['width']*$sinfo['length'];
     }
     //collect total unit info
     $tinfo = array(

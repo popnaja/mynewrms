@@ -695,11 +695,11 @@ $(document).ready(function(){
 }
 function unit_label(){
 $(document).ready(function(){
-    var sel = $("#unit");
-    $(".prod-unit-label").html(sel.children("option:selected").text());
-    $(".prod-unit-label").html();
+    var sel = $("[name='vunit[]']");
+    var label = $(".prod-unit-label");
     sel.on("change",function(){
-        $(".prod-unit-label").html($(this).children("option:selected").text());
+        var i = sel.index($(this));
+        label.eq(i).html($(this).children("option:selected").text());
     });
 });
 }
