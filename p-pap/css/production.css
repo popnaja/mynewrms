@@ -111,10 +111,13 @@
 .plan-bar.plan-out {
     height:10px;
 }
+.plan-vschedule table td{
+    position:relative;
+}
 .show-now {
     position:absolute;
     border-top:2px solid red;
-    width:100%;
+    width:100vw;
     left:0;
     z-index:3;
 }

@@ -131,7 +131,7 @@ class prodPlan{
                 if($now>=$st&&$now<$to){
                     $nowdiff = date_diff($st,$now);
                     $nowtop = $this->get_interval_ttmin($nowdiff)*$ratio;
-                    $show_now = "<span class='show-now' style='top:$top;'></span>";
+                    $show_now = "<span class='show-now' style='top:$nowtop"."px;'></span>";
                 }
                 $html .= "<td width='50' height='$r_height' class='$rclass'>$stime".$show_now."</td>";
                 foreach($mach as $k=>$v){
