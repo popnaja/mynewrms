@@ -28,6 +28,10 @@
     bottom:0;
     background-color:#EF5350;
 }
+.paper-grip2 {
+    position:relative;
+    background-color:#EF5350;
+}
 .lay-cover,
 .lay-inside,
 .lay-cover-r,

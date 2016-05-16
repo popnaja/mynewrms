@@ -58,12 +58,11 @@ class PAPdb extends myDB{
         try {
             $whsql = (isset($iscover)?($iscover?"AND comp_type='0'":"AND comp_type='1'"):"");
             $sql = <<<END_OF_TEXT
-SELECT pap_quote_comp.*,
-po.op_name AS weight,
+SELECT comp.*,mat.mat_type,mat.mat_size,mat.mat_weight,
 pm.meta_value AS coating
-FROM pap_quote_comp
-LEFT JOIN pap_option AS po ON po.op_id=comp_paper_weight
+FROM pap_quote_comp AS comp
 LEFT JOIN pap_process_meta AS pm ON pm.process_id=comp_coating AND pm.meta_key='cost'
+LEFT JOIN pap_mat AS mat ON mat.mat_id=comp.comp_paper_id
 WHERE quote_id=:qid $whsql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -85,8 +84,9 @@ pc1.process_name AS color,
 pc.process_name AS coating,
 cc.comp_postpress
 FROM pap_quote_comp AS cc
-LEFT JOIN pap_option AS po ON po.op_id=comp_paper_weight
-LEFT JOIN pap_option AS po1 ON po1.op_id=comp_paper_type
+LEFT JOIN pap_mat AS mat ON mat.mat_id=cc.comp_paper_id
+LEFT JOIN pap_option AS po ON po.op_id=mat.mat_weight
+LEFT JOIN pap_option AS po1 ON po1.op_id=mat.mat_type
 LEFT JOIN pap_process AS pc ON pc.process_id=comp_coating
 LEFT JOIN pap_process AS pc1 ON pc1.process_id=comp_print_id
 WHERE quote_id=:qid
@@ -764,32 +764,28 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function filter_paper($sid){
+    public function filter_paper($sid,$i){
         try {
             __autoloada("form");
             $form = new myform();
             $sql = <<<END_OF_TEXT
 SELECT
 cover_paper,po.op_name AS cover_size,
-inside_paper,po1.op_name AS inside_size
+inside_paper,po1.op_name AS inside_size,
+cover_lay,inside_lay,cover_div,inside_div,
+meta.meta_value AS clay
 FROM pap_size
 LEFT JOIN pap_option AS po ON po.op_id=cover_paper
 LEFT JOIN pap_option AS po1 ON po1.op_id=inside_paper
-WHERE size_id=:sid
+LEFT JOIN pap_size_meta AS meta ON meta.size_id=pap_size.size_id AND meta_key='custom_lay'
+WHERE pap_size.size_id=:sid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":sid",$sid);
             $stmt->execute();
             $size = $stmt->fetch(PDO::FETCH_ASSOC);
-            $res[0] = array($size['cover_size'],$size['inside_size']);
-            $res[3] = array($size['cover_paper'],$size['inside_paper']);
-            //cover
-            $c_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['cover_paper']);
-            $res[1] = $form->show_select("paper_type",$c_ptype,"label-3070","กระดาษ",null,"","paper_type[]");
-            //inside
-            $i_ptype = array("0"=>"--กระดาษ--") + $this->get_paper_keypair("mat_type", $size['inside_paper']);
-            $res[2] = $form->show_select("paper_type_n",$i_ptype,"label-3070 in_ptype","กระดาษ",null,"","paper_type[]");
-            return $res;
+            $size['clay'] = (is_null($size['clay'])?"":json_decode($size['clay'],true));
+            return $size;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }
@@ -1287,7 +1283,7 @@ LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
 LEFT JOIN pap_machine AS mach ON mach.id=cpro.machine_id
 WHERE comp.order_id=:oid AND process_cat_id BETWEEN 3 AND 11
-ORDER BY cpro.comp_id ASC, process_cat_id ASC
+ORDER BY cpro.comp_id ASC, process_cat_id ASC, cpro.name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":oid",$oid);
@@ -1603,6 +1599,7 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT op_id,op_name,op_value AS psize FROM pap_option WHERE op_type='paper_size'
+ORDER BY op_name ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();

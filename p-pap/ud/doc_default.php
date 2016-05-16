@@ -154,24 +154,35 @@ function show_order($oid,$edit=false){
     $comp = $rp->rp_order_comp($oid);
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
 
-    $cno = 1;
     $paper_html = "";
     $plate_html = "";
     $after = "";
+    $packing = "";
+
     foreach($comp as $k=>$com){
-        if(count($comp)>1&&$com['type']==9){
+        if($com['type']==9){
+            //packing & shipping
+            $pack = $rp->rp_order_cpro($com['id'], "(11,12)");
+            $packing .= "<tr>"
+                    . "<th colspan='2'>การห่อ</th>"
+                    . "<td colspan='5'>".(isset($pack[11])?$pack[11]:"")."</td>"
+                    . "</tr><tr>"
+                    . "<th colspan='2'>ขนส่ง</th>"
+                    . "<td colspan='5'>".(isset($pack[12])?$pack[12]:"")."</td>"
+                    . "</tr>";
             continue;
         }
-        //packing & shipping
-        $pack = $rp->rp_order_cpro($com['id'], "(11,12)");
-        $packing = "<tr>"
-                . "<th colspan='2'>การห่อ</th>"
-                . "<td colspan='5'>".(isset($pack[11])?$pack[11]:"")."</td>"
-                . "</tr><tr>"
-                . "<th colspan='2'>ขนส่ง</th>"
-                . "<td colspan='5'>".(isset($pack[12])?$pack[12]:"")."</td>"
-                . "</tr>";
-
+        if(count($comp)==1){
+            //packing & shipping
+            $pack = $rp->rp_order_cpro($com['id'], "(11,12)");
+            $packing .= "<tr>"
+                    . "<th colspan='2'>การห่อ</th>"
+                    . "<td colspan='5'>".(isset($pack[11])?$pack[11]:"")."</td>"
+                    . "</tr><tr>"
+                    . "<th colspan='2'>ขนส่ง</th>"
+                    . "<td colspan='5'>".(isset($pack[12])?$pack[12]:"")."</td>"
+                    . "</tr>";
+        }
         $cname = $com['name'];
         $div = ($com['paper_cut']>1?" (".$op_paper_div[$com['paper_cut']].")":"");
         $paper_html .= "<tr>"
@@ -182,7 +193,6 @@ function show_order($oid,$edit=false){
 
         //plate
         $print = $rp->rp_order_cpro($com['id'], "(3)");
-
         $set = explode(";",$print[3]);
         for($i=0;$i<count($set);$i++){
             $pinfo = explode(",",$set[$i]);
@@ -190,7 +200,7 @@ function show_order($oid,$edit=false){
             $tt = ceil($pinfo[0])*$pinfo[3]/($pinfo[0]>=2?2:1);
             $plate_html .= "<tr align='center'>"
                     . "<td>$cname ".$pinfo[2]."</td>"
-                    . "<td>".ceil($pinfo[0])." กรอบ<br/>".$pinfo[1]."</td>"
+                    . "<td>".$pinfo[0]." กรอบ<br/>".$pinfo[1]."</td>"
                     . "<td>".($com['paper_cut']>1?$op_paper_div[$com['paper_cut']]."<br/>".$com['print_size']:"-")."</td>"
                     . "<td>".$com['paper_lay']."</td>"
                     . "<td>".number_format($sheet,0)."</td>"
@@ -777,7 +787,7 @@ function job_dttb($data){
     return $dttb;
 }
 function job_detail($qid){
-    global $rpdb;
+    global $rpdb,$op_comp_type;
     $db = $rpdb;
     $info = $db->get_quote_info($qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
     $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
@@ -803,20 +813,15 @@ function job_detail($qid){
     if($info['binding_id']>0){
         array_push($data['บริการงานพิมพ์'],"เข้าเล่ม : ".$process[$info['binding_id']]);
     }
-    $cno = 1;
+    foreach($op_comp_type AS $k=>$v){
+        $run[$k] = 0;
+    }
     foreach($comps as $k=>$v){
         $post = explode(",",$v['comp_postpress']);
-        if($info['cat_id']==10||$info['cat_id']==69){
-            if($v['comp_type']==1){
-                $cname = "เนื้อใน ";
-                $cname .= (count($comps)>2?"($cno)":"");
-                $cno++;
-            } else {
-                $cname = "ปก";
-            }
-        } else {
-            $cname = "ลักษณะชิ้นงาน";
-        }
+        //name
+        $type = $v['comp_type'];
+        $run[$type]++;
+        $cname = $op_comp_type[$type].($run[$type]>1?" ($run[$type])":"");
         $data[$cname] = array(
             $v['paper'],
             $v['weight']." แกรม",
@@ -827,11 +832,11 @@ function job_detail($qid){
             array_push($data[$cname],$v['coating']);
         }
         //cwing
-        if($info['cwing']==1&&$v['comp_type']==0){
+        if($info['cwing']==1&&$type==1){
             array_push($data[$cname],"ปีกปกหน้า ".$info['fwing']." cm","ปีกปกหลัง ".$info['bwing']." cm");
         }
         //แผ่นพับ show พับกี่ส่วน
-        if($info['cat_id']==11){
+        if($info['cat_id']==11&&$type==3){
             array_push($data[$cname],$process[$info['folding']]);
         }
         //ไดคัท
@@ -863,6 +868,11 @@ function job_detail($qid){
             if($v>0){
                 array_push($data["ข้อกำหนดอื่นๆ"],$process[$v]);
             }
+        }
+    }
+    if(isset($info['other_price'])){
+        foreach(json_decode($info['other_price'],true) as $i=>$v){
+            array_push($data["ข้อกำหนดอื่นๆ"],$v[0]);
         }
     }
     return $data;

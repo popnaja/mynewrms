@@ -105,14 +105,16 @@ if($action=="addplan"&&isset($oid)) {
 } else if(isset($cproid)){
     $info = $db->get_info("pap_comp_process", "id", $cproid);
     $process = $db->get_keypair("pap_process", "process_id", "process_name","LEFT JOIN pap_process_cat AS cat ON cat.id=process_cat_id ORDER BY cat.id ASC, process_name ASC");
+    $pedit = $form->show_select("process",$process , "label-3070", "กระบวนการผลิต",$info['process_id'])
+            . $form->show_text("name","name",$info['name'],"","ชื่อกระบวนการ","","label-3070")
+            . $form->show_num("amount", $info['volume'], 1, "", "ยอดผลิต", "", "label-3070","min='1'")
+            . $form->show_num("prodtime", $info['est_time_hour'], 0.01, "", "เวลาผลิต(ชม)", "", "label-3070","min='0.01'");
+    $leveling = $form->show_num("leveling", 0, 2, "", "เฉลี่ยงานเป็น (ส่วน)", "", "label-3070","min='0'");
     $content .= "<h1 class='page-title'>แก้ไขกระบวนการผลิต</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
             . "<div class='col-100'>"
-            . $form->show_select("process",$process , "label-3070", "กระบวนการผลิต",$info['process_id'])
-            . $form->show_text("name","name",$info['name'],"","ชื่อกระบวนการ","","label-3070")
-            . $form->show_num("amount", $info['volume'], 1, "", "ยอดผลิต", "", "label-3070","min='1'")
-            . $form->show_num("prodtime", $info['est_time_hour'], 0.01, "", "เวลาผลิต(ชม)", "", "label-3070","min='0.01'");
+            . $form->show_tabs("edit-job-tab", array("แก้ข้อมูล","เกลี่ยงาน"), array($pedit,$leveling));
     if($pauth>2){
         $del = "<span id='del-cpro' class='red-but'>Delete</span>"
                 . "<script>del_cpro();</script>";

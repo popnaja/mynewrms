@@ -18,26 +18,19 @@ $(document).ready(function(){
     }
 });
 }
-function lay_guide(paper,grip,bleed){
+function lay_guide(paper,grip1,bleed,grip2){
     $(document).ready(function(){
+        var grip = grip1+grip2;
         var cbleed = 0.3;
         var input = $(".lay-input input");
         var rim = 1;
-        var ch,cw,ih,iw,master,clay,ilay,mw,ml,info,selinfo,divname;
+        var ch,cw,ih,iw,master,mw,ml,selinfo,divname,oh,ow,pdiv;
+        var lay,tlay,remain,sinfo,pid;
         var in_to_cm = 2.54;
-        var ctg = $(".lay-cover");
-        var itg = $(".lay-inside");
-        var rc  = $(".lay-cover-r");
-        var ri  = $(".lay-inside-r");
-        var lay_c_rem = $(".lay-c-rem");
-        var lay_i_rem = $(".lay-i-rem");
-        var lay_c_remr = $(".lay-c-rem-r");
-        var lay_i_remr = $(".lay-i-rem-r");
         var n = paper.length;
         var cover_thick = $("#cover_thick");
-        var trem;
         var cut = $("select[name='pdiv[]']");
-        var box = $(".lay-box-c, .lay-box-i, .lay-box-cr, .lay-box-ir");
+        var box = $(".lay-box-c, .lay-box-i, .lay-box-cr, .lay-box-ir, .lay-box-o, .lay-box-or");
         input.on("blur",function(){
             cal_guide();
         });
@@ -49,7 +42,70 @@ function lay_guide(paper,grip,bleed){
             box.removeClass("box-active");
             cal_guide();
         });
+        var grip_input = $("#grip1,#grip2");
+        grip_input.on("change",function(){
+            grip1 = parseFloat($("#grip1").val());
+            grip2 = parseFloat($("#grip2").val());
+            grip = grip1+grip2;
+            cal_guide();
+        });
         cal_guide();
+        //custom box
+        $(".size-custom").on("click",function(e){
+            e.preventDefault();
+            my_float_box("custom-size",true);
+            var but = $("#edit-custom");
+            but.off("click");
+            but.on("click",function(){
+                if(!valNoBlank('c_height')||!valNoBlank('c_width')){
+                    
+                } else {
+                    my_float_box("custom-size",false);
+                    oh = parseFloat($("#c_height").val());
+                    ow = parseFloat($("#c_width").val());
+                    $(".size-custom span").html(oh+" x "+ow);
+                    cal_custom();
+                }
+            });
+        });
+        function cal_custom(){
+            oh = parseFloat($("#c_height").val());
+            ow = parseFloat($("#c_width").val());
+            if(oh>0&&ow>0){
+                for(var i=0;i<n;i++){
+                    master = $.parseJSON(paper[i]['psize']);
+                    check_cut(i);
+                    check_lay(oh,ow);
+                    $(".lay-custom").eq(i).html(tlay);
+                    $(".lay-o-rem").eq(i).html(remain);
+                    $(".lay-box-o").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
+
+                    check_lay(ow,oh);
+                    $(".lay-custom-r").eq(i).html(tlay);
+                    $(".lay-o-rem-r").eq(i).html(remain);
+                    $(".lay-box-or").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
+                }
+            }
+        }
+        function check_cut(i){
+            pdiv = cut.eq(i).val();
+            if(pdiv==2){
+                mw = master.length/pdiv*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป
+                ml = master.width*in_to_cm;
+                divname = master.width+"x"+master.length+"(ผ่าครึ่ง)";
+            } else {
+                mw = master.width*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป
+                ml = master.length*in_to_cm;
+                divname = master.width+"x"+master.length;
+            }
+        }
+        function check_lay(h,w){
+            lay = Math.floor(mw/h)*Math.floor(ml/w);
+            tlay = "("+Math.floor(mw/h)+"x"+Math.floor(ml/w)+") "+lay;
+            remain = Math.round((1-lay*(h*w)/(mw*ml))*100)+"%";
+            sinfo = [mw,ml,h,w,lay,grip1,grip2];
+            selinfo = [divname,pid,pdiv,lay];
+        }
         function cal_guide(){
             var h = parseFloat($("#height").val());
             var w = parseFloat($("#width").val());
@@ -65,51 +121,30 @@ function lay_guide(paper,grip,bleed){
                 
                 for(var i=0;i<n;i++){
                     master = $.parseJSON(paper[i]['psize']);
-                    var pid = paper[i]['op_id'];
-                    var pdiv = cut.eq(i).val();
-                    if(pdiv==2){
-                        mw = master.length/pdiv*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป 1cm
-                        ml = master.width*in_to_cm;
-                        divname = master.width+"x"+master.length+"(ผ่าครึ่ง)";
-                    } else {
-                        mw = master.width*in_to_cm-grip; //คำนวณเป็นcm - กริ๊ป 1cm
-                        ml = master.length*in_to_cm;
-                        divname = master.width+"x"+master.length;
-                    }
-                    clay = Math.floor(mw/ch)*Math.floor(ml/cw);
-                    ctg.eq(i).html("("+Math.floor(mw/ch)+"x"+Math.floor(ml/cw)+") "+clay);
-                    trem = (1-clay*(ch*cw)/(mw*ml))*100
-                    lay_c_rem.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,ch,cw,clay,grip];
-                    selinfo = [divname,pid,pdiv,clay];
-                    $(".lay-box-c").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
+                    pid = paper[i]['op_id'];
+                    check_cut(i);
                     
-                    ilay = Math.floor(mw/ih)*Math.floor(ml/iw);
-                    itg.eq(i).html("("+Math.floor(mw/ih)+"x"+Math.floor(ml/iw)+") "+ilay);
-                    trem = (1-ilay*(ih*iw)/(mw*ml))*100
-                    lay_i_rem.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,ih,iw,ilay,grip];
-                    selinfo = [divname,pid,pdiv,ilay];
-                    $(".lay-box-i").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
+                    check_lay(ch,cw);
+                    $(".lay-cover").eq(i).html(tlay);
+                    $(".lay-c-rem").eq(i).html(remain);
+                    $(".lay-box-c").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
+                    check_lay(ih,iw);
+                    $(".lay-inside").eq(i).html(tlay);
+                    $(".lay-i-rem").eq(i).html(remain);
+                    $(".lay-box-i").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
                     
                     //reverse
-                    clay = Math.floor(mw/cw)*Math.floor(ml/ch);
-                    rc.eq(i).html("("+Math.floor(mw/cw)+"x"+Math.floor(ml/ch)+") "+clay);
-                    trem = (1-clay*(ch*cw)/(mw*ml))*100
-                    lay_c_remr.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,cw,ch,clay,grip];
-                    selinfo = [divname,pid,pdiv,clay];
-                    $(".lay-box-cr").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
-                    
-                    ilay = Math.floor(mw/iw)*Math.floor(ml/ih);
-                    ri.eq(i).html("("+Math.floor(mw/iw)+"x"+Math.floor(ml/ih)+") "+ilay);
-                    trem = (1-ilay*(ih*iw)/(mw*ml))*100
-                    lay_i_remr.eq(i).html(Math.round(trem)+"%**");
-                    info = [mw,ml,iw,ih,ilay,grip];
-                    selinfo = [divname,pid,pdiv,ilay];
-                    $(".lay-box-ir").eq(i).attr("data",info.toString()).attr("cdata",selinfo.toString());
+                    check_lay(cw,ch);
+                    $(".lay-cover-r").eq(i).html(tlay);
+                    $(".lay-c-rem-r").eq(i).html(remain);
+                    $(".lay-box-cr").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
+                    check_lay(iw,ih);
+                    $(".lay-inside-r").eq(i).html(tlay);
+                    $(".lay-i-rem-r").eq(i).html(remain);
+                    $(".lay-box-ir").eq(i).attr("data",sinfo.toString()).attr("cdata",selinfo.toString());
                 }
             }
+            cal_custom();
         }
         
         box.on("click",function(){
@@ -119,7 +154,7 @@ function lay_guide(paper,grip,bleed){
             //show info to select
             var seldata = $(this).attr("cdata").split(",");
             var cclass = $(this).children("span").attr("class");
-            if(cclass.search("cover")===-1){
+            if(cclass.search("inside")>0){
                 $("#show-lay-cover h4").text("เนื้อใน lay บน "+seldata[0]+" ได้ "+seldata[3]);
                 $("#lay-sel").html("<input type='button' value='เลือก' />");
                 $("#lay-sel input").on("click",function(){
@@ -128,7 +163,7 @@ function lay_guide(paper,grip,bleed){
                     $("#inside_div").val(data[2]);
                     $("#inside_lay").val(data[3]);
                 });
-            } else {
+            } else if(cclass.search("cover")>0) {
                 $("#show-lay-cover h4").text("ปก lay บน "+seldata[0]+" ได้ "+seldata[3]);
                 $("#lay-sel").html("<input type='button' value='เลือก' />");
                 $("#lay-sel input").on("click",function(){
@@ -137,20 +172,23 @@ function lay_guide(paper,grip,bleed){
                     $("#cover_div").val(data[2]);
                     $("#cover_lay").val(data[3]);
                 });
+            } else {
+                $("#show-lay-cover h4").text("Custom lay บน "+seldata[0]+" ได้ "+seldata[3]);
             }
-            show_lay(parseFloat(da[0]),parseFloat(da[1]),parseFloat(da[2]),parseFloat(da[3]),parseFloat(da[4]),parseFloat(da[5]));
+            show_lay(parseFloat(da[0]),parseFloat(da[1]),parseFloat(da[2]),parseFloat(da[3]),parseFloat(da[4]),parseFloat(da[5]),parseFloat(da[6]));
         });
     });
 }
-function show_lay(mh,mw,h,w,no,gr){
+function show_lay(mh,mw,h,w,no,gr,gr2){
     var tg = $("#show-lay");
     var pw = tg.outerWidth();
     var rto = pw/mw;
-    var ph,nh,nw,ngr;
+    var ph,nh,nw,ngr,ngr2;
     ph = (mh+gr)*rto;
     nh = h*rto;
     nw = w*rto;
     ngr = gr*rto;
+    ngr2 = gr2*rto;
     //var data = [mh,mw,h,w,no,gr,pw,ph,nh,nw,ngr];
     //console.log(data.toString());
     
@@ -161,6 +199,10 @@ function show_lay(mh,mw,h,w,no,gr){
     tg.append("<div class='paper-grip'></div>");
     var grip = $(".paper-grip");
     grip.outerWidth(pw).outerHeight(ngr);
+    //grip2
+    tg.append("<div class='paper-grip2'></div>");
+    var grip2 = $(".paper-grip2");
+    grip2.outerWidth(pw).outerHeight(ngr2);
     //page
     for(var i=0;i<no;i++){
         tg.append("<div class='page-lay'></div>");
@@ -338,59 +380,80 @@ $(document).ready(function(){
     }
 });
 }
-function quote_function(cp,ip){
+function quote_function(){
 $(document).ready(function(){
-    //hide cover
-    var title = $("#sel-name");
-    var but = $("#view-more-but");
-    hid_cover();
+    //hide binding
     $("#type").on("change",function(){
        hid_cover();
     });
     function hid_cover(){
         var type = parseInt($("#type").val());
         var bind = $("#bind-sec");
-        var fold = $("#folding_0");
         if(type===10||type===69){
-            title.html("เนื้อใน");
-            but.show();
             bind.show();
-            fold.parent().addClass("form-hide");
        } else {
-            $("#paper_type").val("0");
-            title.html("ชิ้นงาน");
-            but.hide();
-            $("#binding").val("0");
             bind.hide();
-            if(type===11){
-                fold.parent().removeClass("form-hide");
-            } else {
-                fold.parent().addClass("form-hide");
-            }
+            $("#binding").val(0);
        }
     }
-    //fix paper
-    if($.type(cp)!=="undefined"){
-        //gram
-        var ctype = $("#paper_type");
-        ctype.on("change",function(){
-            var t = $(this).val();
-            if(t!=="0"){
-                filter_gram(".tg_c_pgram",cp,t);
-            }
-        });
-
-        //filter gram inside
-        var itype = $(".in_ptype").children("select");
-        itype.on("change",function(){
-            var i = itype.index($(this));
-            var t = $(this).val();
-            if(t!=="0"){
-                filter_gram(".tg_i_pgram",ip,t,i);
-            }
-        });
+    
+    //filter paper
+    var comp = $("[name='comp_type[]']");
+    var size_sel = $("[name='paper_size[]']");
+    var label = $(".comp-page label");
+    $.each(label,function(i,v){
+        var type = comp.eq(i).val();
+        change_pagelabel(type,i);
+    });
+    comp.on("change",function(){
+        //check select job size
+        var size = $("#sid").val();
+        var ctype = $(this).val();
+        var index = comp.index($(this));
+        change_pagelabel(ctype,index);
+        if(size==0){
+            pg_dialog("คำเตือน","โปรดเลือกขนาดชิ้นงานก่อน");
+            $(this).val("0");
+        } else {
+            filter_paper(size,ctype,index);
+        }
+    });
+    function change_pagelabel(ctype,index){
+        if($.inArray(parseInt(ctype),[3,4,5])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด
+            label.eq(index).html("จำนวน(แผ่น)");
+        } else {
+            label.eq(index).html("จำนวน(หน้า)");
+        }
     }
-
+    //paper size change
+    size_sel.on("change",function(){
+        var i = size_sel.index($(this));
+        var ctype = comp.eq(i).val();
+        var size = $(this).val();
+        if($.inArray(parseInt(ctype),[1,2,3])!=-1){
+            confirm_dialog("คำเตือน","ต้องการเปลี่ยนขาดกระดาษจาก Master Lay ใช่หรือไม่",sel_ok,sel_cancel);
+        } else {
+            filter_papern(size,i);
+        }
+        function sel_ok(){
+            filter_papern(size,i);
+        }
+        function sel_cancel(){
+            filter_paper($("#sid").val(),ctype,i);
+        }
+    });
+    
+    //paper type change
+    var sel_type =  $("[name='paper_type[]']");
+    sel_type.on("change",function(){
+        var index = sel_type.index($(this));
+        var size = size_sel.eq(index).val();
+        var type = $(this).val();
+        if(type!=0){
+            filter_gram(".tg_pweight",size,type,index);
+        }
+    });
+    
     //show margin
     var qprice = $("#q_price");
     qprice.on("change",function(){
@@ -408,15 +471,16 @@ $(document).ready(function(){
     });
     price.on("change",function(){
         peru.val($(this).val()/$("#amount").val());
-    })
+    });
 });
 }
-function filter_paper(sid){
+function filter_papern(size,index){
     var t;
     var data = {};
-    data['request'] = "filter_paper";
-    data['sid'] = sid;
     var url = $("form").attr("action");
+    data['request'] = "filter_papern";
+    data['size']  = size;
+    data['index'] = index;
     pg_loading(true);
     $.ajax({
         url:url,
@@ -426,38 +490,88 @@ function filter_paper(sid){
         success: function(res) {
             pg_loading(false);
             //console.log(res);
-            //show size
-            $("#csize").val(res[0][0]);
-            $("input[name^='isize']").val(res[0][1]);
-
             //type
-            var sel_ctype = $(".tg_c_ptype");
-            sel_ctype.html(res[1]);
-            //filter type inside
-            var sel_itype = $(".tg_i_ptype");
-            sel_itype.html(res[2]);
-
+            $(".tg_ptype").eq(index).html(res);
 
             //gram
-            var ctype = $("#paper_type");
+            var ctype = $("#paper_type_"+index);
             ctype.off("change");
             ctype.on("change",function(){
                 t = $(this).val();
+                var size = $("#paper_size_"+index).val();
                 if(t!=="0"){
-                    filter_gram(".tg_c_pgram",res[3][0],t);
+                    filter_gram(".tg_pweight",size,t,index);
                 }
             });
+        },
+        error: function(err){
+            console.log("ERROR"+JSON.stringify(err));
+            pg_loading(false);
+        }
+    });
+}
+function filter_paper(sid,type,index){
+    var t;
+    var data = {};
+    data['request'] = "filter_paper";
+    data['sid'] = sid;
+    data['index'] = index;
+    var url = $("form").attr("action");
+    pg_loading(true);
+    $.ajax({
+        url:url,
+        type:'POST',
+        dataType:"json",
+        data:data,
+        success: function(res) {
+            
+            var size_sel = $("[name='paper_size[]']");
+            var lay = $("[name='paper_lay[]']");
+            var cut = $("[name='paper_cut[]']");
+            var psize,play,pcut,sel_type;
+            //console.log(res);
+            //show size,lay,cut
+            if(type==1){
+                psize = res['cover_paper'];
+                play = res['cover_lay'];
+                pcut = res['cover_div'];
+            } else if(type==2||type==3) {
+                psize = res['inside_paper'];
+                play = res['inside_lay'];
+                pcut = res['inside_div'];
+            } else {
+                if(typeof res['clay'] != "string"){
+                    $.each(res['clay'],function(k,v){
+                        if(v[0]==type){
+                            psize = v[1];
+                            play = v[3];
+                            pcut = v[2];
+                            return false;
+                        }
+                    });
+                } else {
+                    psize = 0;
+                    play = "";
+                    pcut = 0;
+                }
+            }
+            size_sel.eq(index).val(psize);
+            lay.eq(index).val(play);
+            cut.eq(index).val(pcut);
+            //type
+            filter_papern(psize,index);
 
-            //filter gram inside
-            var itype = $(".in_ptype").children("select");
-            itype.off("change");
-            itype.on("change",function(){
-                var i = itype.index($(this));
+            //gram
+            var ctype = $("#paper_type_"+index);
+            ctype.off("change");
+            ctype.on("change",function(){
                 t = $(this).val();
+                var size = $("#paper_size_"+index).val();
                 if(t!=="0"){
-                    filter_gram(".tg_i_pgram",res[3][1],t,i);
+                    filter_gram(".tg_pweight",size,t,index);
                 }
             });
+            pg_loading(false);
         },
         error: function(err){
             console.log("ERROR"+JSON.stringify(err));
@@ -470,6 +584,7 @@ function filter_gram(cl,size,type,i){
     data['request'] = "filter_gram";
     data['size'] = size;
     data['type'] = type;
+    data['index'] = i;
     var url = $("form").attr("action");
     pg_loading(true);
     $.ajax({
@@ -550,7 +665,6 @@ $(document).ready(function(){
         } else {
             target.val(ele.attr("cid"));
             $("#"+id).val(ele.text());
-            filter_paper(ele.attr("cid"));
         }
     }
 });
@@ -577,5 +691,15 @@ $(document).ready(function(){
    sel.on("change",function(){
         tg.val($(this).val());
    });
+});
+}
+function unit_label(){
+$(document).ready(function(){
+    var sel = $("[name='vunit[]']");
+    var label = $(".prod-unit-label");
+    sel.on("change",function(){
+        var i = sel.index($(this));
+        label.eq(i).html($(this).children("option:selected").text());
+    });
 });
 }

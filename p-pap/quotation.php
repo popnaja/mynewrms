@@ -119,78 +119,32 @@ if($action=="add"){
     for($x=1;$x<11;$x++){
         $multi .= $form->show_num("m_amount_$x","",1,"","ยอด $x","","label-3070","min=0","m_amount[]");
     }
+    
+    $other = "";
+    for($x=1;$x<5;$x++){
+        $other .= $form->show_text("olist_$x","olist[]","","","รายการ","","label-inline left-50")
+            . $form->show_num("o_cost_$x","",0.01,"","ราคา","","label-inline right-50","min=0","ocost[]");
+    }
 
-    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi))
+    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์","อื่นๆ"),array($detail,$pack,$multi,$other))
             . "</div><!-- .col-50 -->";
 
     $content .= "<div class='col-50'>"
-            . "<div class='sel-type-10 sel-type-69'>"
-            . "<div class='form-section'>"
-            . "<h4>ปก</h4>"
-            . $form->show_hidden("comp_type","comp_type[]","0")
-            . $form->show_text("csize","csize","","","กระดาษ","","label-3070 readonly",null,"readonly")
-            . "<div class='tg_c_ptype'>"
-                . $form->show_select("paper_type",$paper,"label-3070","ชนิด",null,"","paper_type[]")
-            . "</div>"
-            . "<div class='tg_c_pgram'>"
-                . $form->show_select("paper_gram",$gram,"label-3070","แกรม",null,"","paper_gram[]")
-            . "</div>"
-            . $form->show_select("print",$print,"label-3070","ปกนอก",null,"","print[]")
-            . $form->show_select("print2",array("0"=>"--ไม่มี--")+$print,"label-3070","ปกใน",null,"","print2[]")
-            . $form->show_select("coating",$coating,"label-3070","เคลือบผิว",null,"","coating[]")
-            . $form->show_select("other",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
-            . "<div class='sel-other-1'>"
-            . $form->show_checkbox("post","post",$after,"ไดคัท และอื่นๆ","label-3070")
-            . "</div><!-- .sel-other-1 -->"
-            . $form->show_select("cwing",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",null,"","cwing")
-            . "<div class='sel-cwing-1'>"
-            . $form->show_num("fwing","",0.01,"","ปีกปกหน้า(cm)","","label-3070")
-            . $form->show_num("bwing","",0.01,"","ปีกปกหลัง(cm)","","label-3070")
-            . "</div><!-- .sel-cwing-1 -->"
-            . $form->show_hidden("page","page[]",1)
-            . "</div><!-- .form-section -->"
-            . "</div><!-- .sel-type-10 -->"
-            . "<script>"
-            . "select_option('other');"
-            . "select_option('cwing');"
-            . "</script>";
-    for($i=0;$i<5;$i++){
-        $hid = ($i==0?"":"form-hide");
-        $content .= "<div class='form-section quote-comp $hid'>"
-            . "<h4 id='sel-name'>เนื้อใน</h4>"
-            . $form->show_hidden("comp_type_$i","comp_type[]","1")
-            . $form->show_text("isize_$i","isize[]","","","กระดาษ","","label-3070 readonly",null,"readonly")
-            . "<div class='tg_i_ptype'>"
-                . $form->show_select("paper_type_$i",$paper,"label-3070 in_ptype","ชนิด",null,"","paper_type[]")
-            . "</div>"
-            . "<div class='tg_i_pgram'>"
-                . $form->show_select("paper_gram_$i",$gram,"label-3070 in_pgram","แกรม",null,"","paper_gram[]")
-            . "</div>"
-            . $form->show_select("print_$i",$print,"label-3070","สี",null,"","print[]")
-            . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",null,"","coating[]")
-            . $form->show_select("other_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
-            . "<div class='sel-other_$i-1'>"
-            . $form->show_checkbox("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
-            . "</div>"
-            . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",null,"","folding[]")
-            . $form->show_num("page_$i","",1,"","จำนวนหน้า","","label-3070","min=0","page[]")
-            . "</div><!-- .form-section -->"
-            . "<script>select_option('other_$i');</script>";
-    }
-    $content .= "<input id='view-more-but' type='button' value='เพิ่มเนื้อใน' style='width:100%'/>"
+            . special_comp()
+            . "<input id='view-more-but' type='button' value='เพิ่มส่วนประกอบ' style='width:100%'/>"
             . "</div><!-- .col-50 -->";
 
     $content .= $form->show_submit("submit","สร้าง","but-right")
             . $form->show_hidden("request","request","add_quote")
             . $form->show_hidden("redirect","redirect",$redirect)
             . $form->show_hidden("pauth","pauth",$pauth)
+            . $form->show_hidden("ajax_req","ajax_req",$root."request_ajax.php")
             . $form->show_hidden("uid","uid",$uid);
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
-            . "select_option_byval('type');"
             . "quote_function();"
             . "search_customer();"
             . "search_size('$ajax');"
@@ -215,26 +169,12 @@ if($action=="add"){
 
     $comps = $db->get_comp($qid);
     $layinfo = $db->get_layinfo($info['job_size_id']);
-
     $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$info['customer_id']);
-    $cover = $db->get_comp($qid,true);
-    $inside = $db->get_comp($qid,false);
-    if(isset($cover[0])){
-        $cover_post = explode(",",$cover[0]['comp_postpress']);
-        $sel_c_pgram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight",$layinfo['cover_paper'],$cover[0]['comp_paper_type']);
-        $show_c_post = ($cover_post[0]>0?1:0);
-    } else {
-        $cover_post = array();
-        $sel_c_pgram = array("0"=>"--แกรม--");
-        $show_c_post = 0;
-    }
+
     $prepress_checked = $form->checked_array($prepress, explode(",",$info['prepress']));
-    $post_checked = $form->checked_array($after, $cover_post);
     $ex_checked = $form->checked_array($op_quote_ex, explode(",",$info['exclude']));
     $pack_checked = $form->checked_array($packing, (isset($info['packing'])?explode(",",$info['packing']):array()));
     $ship_checked = $form->checked_array($shipping, (isset($info['shipping'])?explode(",",$info['shipping']):array()));
-    $sel_c_ptype = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type",$layinfo['cover_paper']);
-    $sel_i_ptype = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type",$layinfo['inside_paper']);
 
     //show tb-cost
     if($pauth==4){
@@ -248,7 +188,7 @@ if($action=="add"){
         $x = 0;
         foreach($aamount AS $am){
             $tinfo['amount'] = $am;
-            $res = cal_quote($tinfo, $comps, $layinfo);
+            $res = cal_quote($tinfo, $comps);
             if($x==0){
                 $num = 0;
                 foreach($res as $k=>$v){
@@ -304,6 +244,7 @@ if($action=="add"){
             . "<label for='sig'>เอกสารยืนยัน</label>"
             . "<div>"
             . $md->show_uppdf("sign_doc", "sign_doc",$file)
+            . $form->show_hidden("o_file","o_file",(isset($info['quote_sign'])?$info['quote_sign']:""))
             . "</div>"
             . "</div><!-- .label-3070 -->"
             . "</div><!-- .sel-status-9 -->"
@@ -394,83 +335,17 @@ if($action=="add"){
     for($x=1;$x<11;$x++){
         $multi .= $form->show_num("m_amount_$x",(isset($aamount[$x-1])?$aamount[$x-1]:""),1,"","ยอด $x","","label-3070","min=0","m_amount[]");
     }
-
-    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์"),array($detail,$pack,$multi),0)
-            . "</div><!-- .col-50 -->";
-
-    $content .= "<div class='col-50'>"
-        . "<div class='sel-type-10 sel-type-69'>"
-        . "<div class='form-section'>"
-        . "<h4>ปก</h4>"
-        . $form->show_hidden("comp_type","comp_type[]","0")
-        . $form->show_text("csize","csize",$layinfo['csize'],"","กระดาษ","","label-3070 readonly",null,"readonly")
-        . "<div class='tg_c_ptype'>"
-        . $form->show_select("paper_type",$sel_c_ptype,"label-3070","ชนิด",(isset($cover[0])?$cover[0]['comp_paper_type']:null),"","paper_type[]")
-        . "</div>"
-        . "<div class='tg_c_pgram'>"
-        . $form->show_select("paper_gram",$sel_c_pgram,"label-3070","แกรม",(isset($cover[0])?$cover[0]['comp_paper_weight']:null),"","paper_gram[]")
-        . "</div>"
-        . $form->show_num("allowance",(isset($cover[0])?$cover[0]['comp_paper_allowance']:null),1,"","เผื่อกระดาษเสีย(แผ่น)","","label-3070","min=0","allowance[]")
-        . $form->show_select("print",$print,"label-3070","ปกนอก",(isset($cover[0])?$cover[0]['comp_print_id']:null),"","print[]")
-        . $form->show_select("print2",array("0"=>"--ไม่มี--")+$print,"label-3070","ปกใน",(isset($cover[0])?$cover[0]['comp_print2']:null),"","print2[]")
-        . $form->show_select("coating",$coating,"label-3070","เคลือบผิว",(isset($cover[0])?$cover[0]['comp_coating']:null),"","coating[]")
-        . $form->show_select("other",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$show_c_post,"","other[]")
-        . "<div class='sel-other-1'>"
-        . $form->show_checkbox("post","post",$post_checked,"ไดคัท และอื่นๆ","label-3070")
-        . "</div>"
-        . $form->show_select("cwing",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",$info['cwing'],"","cwing")
-        . "<div class='sel-cwing-1'>"
-        . $form->show_num("fwing",(isset($info['fwing'])?$info['fwing']:""),0.01,"","ปีกปกหน้า(cm)","","label-3070")
-        . $form->show_num("bwing",(isset($info['bwing'])?$info['bwing']:""),0.01,"","ปีกปกหลัง(cm)","","label-3070")
-        . "</div><!-- .sel-cwing-1 -->"
-        . $form->show_hidden("page","page[]",(isset($cover[0])?$cover[0]['comp_page']:1))
-        . "</div><!-- .form-section -->"
-        . "</div><!-- .sel-type-10 -->"
-        . "<script>"
-        . "select_option('other');"
-        . "select_option('cwing');"
-        . "</script>";
-
-    $show = count($inside);
-
-    for($i=0;$i<5;$i++){
-        $hid = ($i<$show?"":"form-hide");
-        if(isset($inside[$i])){
-            $ipost = explode(",",$inside[$i]['comp_postpress']);
-            $other = ($ipost[0]>0?"1":"0");
-            $pi_checked = $form->checked_array($after, $ipost);
-        } else {
-            $other = "0";
-            $pi_checked = $after;
-        }
-        if(isset($inside[$i])){
-            $sel_i_pgram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight", $layinfo['inside_paper'], $inside[$i]['comp_paper_type']);
-        } else {
-            $sel_i_pgram = array("0"=>"--แกรม--");
-        }
-        $content .= "<div class='form-section quote-comp $hid'>"
-        . "<h4 id='sel-name'>เนื้อใน</h4>"
-        . $form->show_hidden("comp_type_$i","comp_type[]","1")
-        . $form->show_text("isize_$i","isize[]",$layinfo['isize'],"","กระดาษ","","label-3070 readonly",null,"readonly")
-        . "<div class='tg_i_ptype'>"
-            . $form->show_select("paper_type_$i",$sel_i_ptype,"label-3070 in_ptype","ชนิด",(isset($inside[$i])?$inside[$i]['comp_paper_type']:null),"","paper_type[]")
-        . "</div>"
-        . "<div class='tg_i_pgram'>"
-        . $form->show_select("paper_gram_$i",$sel_i_pgram,"label-3070 in_pgram","แกรม",(isset($inside[$i])?$inside[$i]['comp_paper_weight']:null),"","paper_gram[]")
-        . "</div>"
-        . $form->show_num("allowance_$i",(isset($inside[$i])?$inside[$i]['comp_paper_allowance']:null),1,"","เผื่อกระดาษเสีย(แผ่น)","","label-3070","min=0","allowance[]")
-        . $form->show_select("print_$i",$print,"label-3070","สี",(isset($inside[$i])?$inside[$i]['comp_print_id']:null),"","print[]")
-        . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",(isset($inside[$i])?$inside[$i]['comp_coating']:null),"","coating[]")
-        . $form->show_select("other_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$other,"","other[]")
-        . "<div class='sel-other_$i-1'>"
-        . $form->show_checkbox("post_$i","post_$i",$pi_checked,"ไดคัท และอื่นๆ","label-3070")
-        . "</div>"
-        . $form->show_select("folding_$i",$fold,"label-3070 form-hide","พับ",(isset($info['folding'])?$info['folding']:null),"","folding[]")
-        . $form->show_num("page_$i",(isset($inside[$i])?$inside[$i]['comp_page']:""),1,"","จำนวนหน้า","","label-3070","min=0","page[]")
-        . "</div><!-- .form-section -->"
-        . "<script>select_option('other_$i');</script>";
+    $other = "";
+    $oinfo = (isset($info['other_price'])?json_decode($info['other_price'],true):array());
+    for($x=1;$x<5;$x++){
+        $other .= $form->show_text("olist_$x","olist[]",(isset($oinfo[$x-1])?$oinfo[$x-1][0]:""),"","รายการ","","label-inline left-50")
+        . $form->show_num("o_cost_$x",(isset($oinfo[$x-1])?$oinfo[$x-1][1]:""),0.01,"","ราคา","","label-inline right-50","min=0","ocost[]");
     }
-    $content .= "<input id='view-more-but' type='button' value='เพิ่มเนื้อใน' style='width:100%'/>"
+    $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์","อื่นๆ"),array($detail,$pack,$multi,$other),0)
+            . "</div><!-- .col-50 -->";
+    $content .= "<div class='col-50'>"
+            . special_comp($info,$comps)
+            . "<input id='view-more-but' type='button' value='เพิ่มส่วนประกอบ' style='width:100%'/>"
             . "</div><!-- .col-50 -->";
 
     $content .= $del
@@ -484,7 +359,7 @@ if($action=="add"){
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
             . "select_option_byval('type');"
-            . "quote_function(".$layinfo['cover_paper'].",".$layinfo['inside_paper'].");"
+            . "quote_function();"
             . "</script>"
             . "</div><!-- .col-100 -->";
 } else {
@@ -549,3 +424,110 @@ if($action=="add"){
 
 $content .= ($action=="print"?"":$menu->showfooter());
 echo $content;
+
+function special_comp($info=null,$comps=null){
+    global $db;
+    global $op_comp_type,$op_paper_div;
+    global $form,$paper,$after,$print,$coating,$fold;
+    $size = array("0"=>"--ขนาดกระดาษ--")+$db->get_paper_keypair("mat_size");
+    $html = "";
+    for($i=0;$i<5;$i++){
+        if(isset($comps[$i])){
+            $hid = "";
+            $comp = $comps[$i];
+            $c_ptype = array("0"=>"--กระดาษ--") + $db->get_paper_keypair("mat_type", $comp['mat_size']);
+            $gram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight", $comp['mat_size'], $comp['mat_type']);
+            if($comp['comp_postpress']!=""){
+                $selpost = 1;
+                $post = $form->checked_array($after,explode(",",$comp['comp_postpress']));
+            } else {
+                $selpost = 0;
+                $post = $after;
+            }
+            $html .= "<div class='form-section quote-comp $hid'>"
+                . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",$comp['comp_type'],"","comp_type[]")
+                . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",$comp['mat_size'],"","paper_size[]")
+                . "<div class='sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_num("paper_lay_$i",$comp['comp_paper_lay'],1,"","Lay","","label-3070","min=0","paper_lay[]")
+                . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า",$comp['comp_paper_cut'],"","paper_cut[]")
+                . "</div><!-- .sel-compt$i-3 -->"
+                . "<div class='tg_ptype'>"
+                . $form->show_select("paper_type_$i",$c_ptype,"label-3070","กระดาษ",$comp['mat_type'],"","paper_type[]")
+                . "</div>"
+                . "<div class='tg_pweight'>"
+                . $form->show_select("paper_gram_$i",$gram,"label-3070","แกรม",$comp['mat_weight'],"","paper_gram[]")
+                . "</div>"
+                . $form->show_select("print_$i",$print,"label-3070","สี",$comp['comp_print_id'],"","print[]")
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",$comp['comp_print2'],"","print2[]")
+                . "</div><!-- .sel-compt$i-1 -->"
+                . "<div class='sel-compt$i-1'>"
+                . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",($comp['comp_type']==1?$info['cwing']:null),"","cwing[]")
+                . "<div class='sel-cwing_$i-1'>"
+                . $form->show_num("fwing_$i",($comp['comp_type']==1&&isset($info['fwing'])?$info['fwing']:0),0.01,"","ปีกปกหน้า(cm)","","label-3070","min=0","fwing[]")
+                . $form->show_num("bwing_$i",($comp['comp_type']==1&&isset($info['bwing'])?$info['bwing']:0),0.01,"","ปีกปกหลัง(cm)","","label-3070","min=0","bwing[]")
+                . "</div><!-- .sel-cwing_$i-1 -->"
+                . "</div><!-- .sel-compt$i-1 -->"
+                . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",$comp['comp_coating'],"","coating[]")
+                . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
+                . "<div class='sel-sother_$i-1'>"
+                . $form->show_checkbox("post_$i","post_$i",$post,"ไดคัท และอื่นๆ","label-3070")
+                . "</div>"
+                . "<div class='sel-compt$i-3'>"
+                . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
+                . "</div>"
+                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
+                . "</div><!-- .sel-compt$i-2 -->"
+        . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อกรอบ)","","label-3070","min=0","allowance[]")
+                . "</div><!-- .form-section -->"
+                . "<script>"
+                . "select_option('sother_$i');"
+                . "select_option('cwing_$i');"
+                . "select_option_byval('compt$i');"
+                . "</script>";
+        } else {
+            $hid = ($i==0?"":"form-hide");
+            $html .= "<div class='form-section quote-comp $hid'>"
+                . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",null,"","comp_type[]")
+                . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",null,"","paper_size[]")
+                . "<div class='sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_num("paper_lay_$i","",1,"","Lay","","label-3070","min=0","paper_lay[]")
+                . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า", null,null,"paper_cut[]")
+                . "</div><!-- .sel-compt$i-3 -->"
+                . "<div class='tg_ptype'>"
+                . "</div>"
+                . "<div class='tg_pweight'>"
+                . "</div>"
+                . $form->show_select("print_$i",$print,"label-3070","สี",null,"","print[]")
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",null,"","print2[]")
+                . "</div><!-- .sel-compt$i-1 -->"
+                . "<div class='sel-compt$i-1'>"
+                . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",null,"","cwing[]")
+                . "<div class='sel-cwing_$i-1'>"
+                . $form->show_num("fwing_$i","",0.01,"","ปีกปกหน้า(cm)","","label-3070","min=0","fwing[]")
+                . $form->show_num("bwing_$i","",0.01,"","ปีกปกหลัง(cm)","","label-3070","min=0","bwing[]")
+                . "</div><!-- .sel-cwing_$i-1 -->"
+                . "</div><!-- .sel-compt$i-1 -->"
+                . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",null,"","coating[]")
+                . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
+                . "<div class='sel-sother_$i-1'>"
+                . $form->show_checkbox("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
+                . "</div>"
+                . "<div class='sel-compt$i-3'>"
+                . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")
+                . "</div>"
+                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . $form->show_num("page_$i",1,1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
+                . "</div><!-- .sel-compt$i-2 -->"
+                . "</div><!-- .form-section -->"
+                . "<script>"
+                . "select_option('sother_$i');"
+                . "select_option('cwing_$i');"
+                . "select_option_byval('compt$i');"
+                . "</script>";
+        }
+    }
+    return $html;
+}
