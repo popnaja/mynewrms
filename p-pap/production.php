@@ -30,7 +30,7 @@ $content .= $menu->pappanel("ฝ่ายผลิต",$pagename);
 
 $db = new PAPdb(DB_PAP);
 $tb = new mytable();
-$form = new myform("process","",PAP."request.php");
+$form = new myform("papform","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $oid = filter_input(INPUT_GET,'oid',FILTER_SANITIZE_STRING);
 $compid = filter_input(INPUT_GET,'compid',FILTER_SANITIZE_NUMBER_INT);
@@ -50,7 +50,7 @@ if($action=="addplan"&&isset($oid)) {
     $rec1 = array(array(
         $info['order_no'].":<br/>".$info['name'],
         $info['cat'],
-        $info['amount'],
+        number_format($info['amount'],0),
         $info['pages'],
         $info['size'],
         thai_date($info['plan_delivery'],true),
@@ -109,7 +109,7 @@ if($action=="addplan"&&isset($oid)) {
             . $form->show_text("name","name",$info['name'],"","ชื่อกระบวนการ","","label-3070")
             . $form->show_num("amount", $info['volume'], 1, "", "ยอดผลิต", "", "label-3070","min='1'")
             . $form->show_num("prodtime", $info['est_time_hour'], 0.01, "", "เวลาผลิต(ชม)", "", "label-3070","min='0.01'");
-    $leveling = $form->show_num("leveling", 0, 2, "", "เฉลี่ยงานเป็น (ส่วน)", "", "label-3070","min='0'");
+    $leveling = $form->show_num("leveling", 0, 1, "", "เฉลี่ยงานเป็น (ส่วน)", "", "label-3070","");
     $content .= "<h1 class='page-title'>แก้ไขกระบวนการผลิต</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()

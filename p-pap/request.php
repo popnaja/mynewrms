@@ -277,9 +277,9 @@ if($req == "login"){
             "process_cat_id" => $_POST['cat'],
             "process_unit" => $_POST['unit'],
             "process_source" => $_POST['source'],
-            "process_setup_min" => ($source==0?$_POST['setup_min']:0),
-            "process_cap" => ($source==0?$_POST['capacity']:0),
-            "process_std_leadtime_hour" => ($source==1?$_POST['std_lt']:0)
+            "process_setup_min" => ($source==1?$_POST['setup_min']:0),
+            "process_cap" => ($source==1?$_POST['capacity']:0),
+            "process_std_leadtime_hour" => ($source==2?$_POST['std_lt']:0)
         );
         $db->update_data("pap_process", "process_id", $pid, $arrinfo);
         //update meta

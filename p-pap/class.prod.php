@@ -107,6 +107,7 @@ class prodPlan{
         $html = "<div class='plan-vschedule'>"
                 . "<table cellpadding='0' cellspacing='0'>";
         $st = new DateTime($this->date,new DateTimeZone("Asia/Bangkok"));
+        $now = new DateTime(pap_now(),new DateTimeZone("Asia/Bangkok"));
         $oidclass = array();
         $x=0;
         $o=0;
@@ -123,10 +124,17 @@ class prodPlan{
                     $rclass = ($min=="00"?"plan-full":"plan-half-hr");
                 }
                 $stime = ($min=="00"?$time:"&nbsp;");
-                $html .= "<td width='50' height='$r_height' class='$rclass'>$stime</td>";
+                $to = new DateTime($st->format("Y-m-d H:i:s"),new DateTimeZone("Asia/Bangkok"));
+                $to->add(new DateInterval("PT".$interval."M"));
+                //show current
+                $show_now = "";
+                if($now>=$st&&$now<$to){
+                    $nowdiff = date_diff($st,$now);
+                    $nowtop = $this->get_interval_ttmin($nowdiff)*$ratio;
+                    $show_now = "<span class='show-now' style='top:$top;'></span>";
+                }
+                $html .= "<td width='50' height='$r_height' class='$rclass'>$stime".$show_now."</td>";
                 foreach($mach as $k=>$v){
-                    $to = new DateTime($st->format("Y-m-d H:i:s"),new DateTimeZone("Asia/Bangkok"));
-                    $to->add(new DateInterval("PT".$interval."M"));
                     $plan = "&nbsp;";
                     if(isset($data[$k])){
                         foreach($data[$k] as $info){

@@ -80,6 +80,7 @@
     position:relative;
 }
 .plan-bar {
+    box-sizing:border-box;
     position:absolute;
     top:7px;
     height:26px;
@@ -90,7 +91,7 @@
     position:absolute;
     display:none;
     top:40px;
-    left:20px;
+    left:100%;
     width:auto;
     padding:10px 15px;
     background-color:#2196F3;
@@ -110,15 +111,22 @@
 .plan-bar.plan-out {
     height:10px;
 }
+.show-now {
+    position:absolute;
+    border-top:2px solid red;
+    width:100%;
+    left:0;
+    z-index:3;
+}
 /*=============================================================   BAR COLOR  =================================================================*/
-.bar-color-0{background-color:#F44336;}
-.bar-color-1{background-color:#9C27B0;}
-.bar-color-2{background-color:#673AB7;}
-.bar-color-3{background-color:#673AB7;}
-.bar-color-4{background-color:#3F51B5;}
-.bar-color-5{background-color:#2196F3;}
-.bar-color-6{background-color:#03A9F4;}
-.bar-color-7{background-color:#00BCD4;}
+.bar-color-0{background-color:#9fe1e7;border:1px solid #0BBCB2;}
+.bar-color-1{background-color:#fbd75b;border:1px solid #0BBCB2;}
+.bar-color-2{background-color:#a4bdfc;border:1px solid #0BBCB2;}
+.bar-color-3{background-color:#46d6db;border:1px solid #0BBCB2;}
+.bar-color-4{background-color:#5484ed;border:1px solid #0BBCB2;}
+.bar-color-5{background-color:#ffb878;border:1px solid #0BBCB2;}
+.bar-color-6{background-color:#dbadff;border:1px solid #0BBCB2;}
+.bar-color-7{background-color:#e1e1e1;border:1px solid #0BBCB2;}
 .bar-color-8{background-color:#009688;}
 .bar-color-9{background-color:#4CAF50;}
 .bar-color-10{background-color:#8BC34A;}
