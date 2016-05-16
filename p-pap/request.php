@@ -779,7 +779,7 @@ if($req == "login"){
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']."?qid=".$qid);
+    header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
     $qid = filter_input(INPUT_POST,"qid",FILTER_SANITIZE_NUMBER_INT);
     $status = (int)filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);
@@ -952,7 +952,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");

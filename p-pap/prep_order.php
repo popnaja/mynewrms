@@ -1,7 +1,7 @@
 <?php
 include_once("p-option.php");
 function prep_order($qid){
-    global $op_print_toplate;
+    global $op_comp_type;
     __autoload("pappdo");
     include_once("quote_formular.php");
     $db = new PAPdb(DB_PAP);
@@ -26,24 +26,19 @@ function prep_order($qid){
     //loop component
     $name = null;
     $in=1;
+    foreach($op_comp_type AS $k=>$v){
+        $run[$k] = 0;
+    }
     foreach($unit AS $ku=>$u){
         if($u['type']==9){
             $tt = $u;
             continue;
         }
         $comp = $comps[$ku];
-        if($n==1){
-            $type = 9;
-            $cname = "ชิ้นงาน";
-        } else {
-            $type = $u['type'];
-            if($type==0){
-                $cname = "ปก";
-            } else {
-                $cname = "เนื้อใน".($n>2?"($in)":"");
-                $in++;
-            }
-        }
+        //name
+        $type = $u['type'];
+        $run[$type]++;
+        $cname = $op_comp_type[$u['type']].($run[$type]>1?" ($run[$type])":"");
         $pinfo = $db->get_info("pap_mat","mat_id",$u['paper_id']);
         $pz = $db->get_info("pap_option","op_id",$pinfo['mat_size']);
         if($u['paper_cut']==2){
@@ -118,7 +113,7 @@ function prep_order($qid){
     }
     //loop job
     if($n>1){
-        $comp_id = $db->insert_data("pap_order_comp", array(null,9,"ชิ้นงาน",$oid,null,0,0,0,"",0,0,""));
+        $comp_id = $db->insert_data("pap_order_comp", array(null,9,"รวมเล่ม",$oid,null,0,0,0,"",0,0,""));
     }
     foreach($plist as $k=>$v){
         $process = $db->get_mm_arr("pap_process", "process_id", "process_cat_id", $v);
