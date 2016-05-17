@@ -1365,6 +1365,42 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_result($date,$acat=null){
+        try {
+            $st = new DateTime($date,new DateTimeZone("Asia/Bangkok"));
+            $start = $st->format("Y-m-d H:i:s");
+            $en = new DateTime($date,new DateTimeZone("Asia/Bangkok"));
+            $en->add(new DateInterval("P3D"));
+            $end = $en->format("Y-m-d H:i:s");
+            $sql = <<<END_OF_TEXT
+SELECT
+cpro.machine_id AS mcid,com.order_id,cpro.id,
+ROUND(TIMESTAMPDIFF(MINUTE,start,end)/60,2)-IF(start<:st,ROUND(TIMESTAMPDIFF(MINUTE,start,:st)/60,2),0) AS time_hour,
+IF(start<:st,:st,start) AS start,
+CONCAT_WS("<br/>",CONCAT("ยอดผลิต",result),CONCAT(IF(TIMESTAMPDIFF(MINUTE,plan_end,end)>0,"+",""),TIMESTAMPDIFF(MINUTE,plan_end,end)," นาที")) AS name
+FROM pap_comp_process as cpro
+LEFT JOIN pap_order_comp AS com ON com.id=cpro.comp_id
+LEFT JOIN pap_order AS job ON job.order_id=com.order_id
+LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+WHERE start IS NOT NULL AND end IS NOT NULL AND end>:st AND start<:en
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":st",$start);
+            $stmt->bindParam(":en",$end);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $res1 = array();
+            foreach($res as $k=>$v){
+                if(!isset($res1[$v['mcid']])){
+                    $res1[$v['mcid']] = array();
+                }
+                array_push($res1[$v['mcid']],array($v['start'],$v['order_id'],$v['id'],$v['time_hour'],$v['name']));
+            }
+            return $res1;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function check_schedule($mid,$st,$en,$cpid=null){
         try {
             $filter = (isset($cpid)?" AND id<>$cpid":"");

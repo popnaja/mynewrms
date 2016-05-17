@@ -104,7 +104,6 @@
 .plan-bar:hover+.plan-bar-info {
     display:block;
 }
-
 .plan-schedule .plan-out td {
     height:auto;
 }
@@ -166,7 +165,7 @@
 .plan-header.plan-fixed{
     position: fixed;
     top: 44px;
-    z-index:3;
+    z-index:4;
 }
 .plan-vschedule {
     position:relative;
@@ -205,6 +204,22 @@
     left:25%;
     z-index:2;
     cursor:pointer;
+}
+.plan-vbar-res {
+    position:absolute;
+    width:50%;
+    left:25%;
+    z-index:3;
+    cursor:pointer;
+    background-image:url("pattern/strip2.png");
+    background-repeat:repeat;
+}
+.plan-vbar-res.plan-out {
+    width:6px;
+    box-sizing:border-box;
+}
+.plan-vbar-res:hover+.plan-bar-info {
+    display:block;
 }
 .plan-vbar.plan-out {
     width:5px;

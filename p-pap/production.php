@@ -99,8 +99,9 @@ if($action=="addplan"&&isset($oid)) {
     //show plan
     $mach = $db->get_mach();
     $schedule = $db->get_schedule($date);
+    $result = $db->get_result($date);
     $content .= "<div id='my-plan-div'>"
-            . $plan->show_vplan($mach,$schedule)
+            . $plan->show_vplan($mach,$schedule,$result)
             . "</div><!-- #my-plan-div -->";
 } else if(isset($cproid)){
     $info = $db->get_info("pap_comp_process", "id", $cproid);
@@ -154,12 +155,12 @@ if($action=="addplan"&&isset($oid)) {
 /*----------------------------------------------------- SHOW PLAN -------------------------------------------------------------------*/
     $mach = $db->get_mach();
     $schedule = $db->get_schedule($date);
-    //var_dump($mach);
+    $result = $db->get_result($date);
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . "<div id='my-plan-div'>"
-            . $plan->show_vplan($mach,$schedule)
+            . $plan->show_vplan($mach,$schedule,$result)
             . "</div><!-- #my-plan-div -->";
 }
     

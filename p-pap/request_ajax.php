@@ -247,7 +247,8 @@ if($req=="show_pic"){
     $plan = new prodPlan($_POST['date'], $_POST['type']);
     $mach = $db->get_mach();
     $schedule = $db->get_schedule($_POST['date']);
-    $html = $plan->show_vplan($mach, $schedule);
+    $result = $db->get_result($_POST['date']);
+    $html = $plan->show_vplan($mach, $schedule,$result);
     echo json_encode(array("html_replace","my-plan-div",$html));
 } else if($req == "get_mach"){
     $mach = $db->get_keypair("pap_machine", "id", "name", "WHERE process_id=".$_POST['pid']);
@@ -350,15 +351,19 @@ if($req=="show_pic"){
 } else if($req == "get_start_status"){
     $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
     $planst = (is_null($info['plan_start'])?"":thai_dt($info['plan_start']));
-    $now = new DateTime(null,new DateTimeZone("Asia/Bangkok"));
+    if(isset($info['start'])){
+        $date = new DateTime($info['start'],new DateTimeZone("Asia/Bangkok"));
+    } else {
+        $date = new DateTime(null,new DateTimeZone("Asia/Bangkok"));
+    }
     $html = "<div class='col-50'>"
             . $form->show_text("pc-name","pc-name",$info['name'],"","กระบวนการ","","label-inline readonly",null,"readonly")
             . $form->show_text("pstart","pstart",$planst,"","แผนเริ่มผลิต","","label-inline readonly",null,"readonly")
             . "</div><!-- .col-50 -->"
             . "<div class='col-50'>"
-            . $form->show_text("stdate","stdate",$now->format("Y-m-d"),"","เริ่มผลิต","","label-inline left-50")
-            . $form->show_select("timeh", time_hour(), "label-inline left-25", "HH", $now->format("H"))
-            . $form->show_select("timem", time_min(), "label-inline left-25", "MM", $now->format("i"))
+            . $form->show_text("stdate","stdate",$date->format("Y-m-d"),"","เริ่มผลิต","","label-inline left-50")
+            . $form->show_select("timeh", time_hour(), "label-inline left-25", "HH", $date->format("H"))
+            . $form->show_select("timem", time_min(), "label-inline left-25", "MM", $date->format("i"))
             . $form->show_hidden("cproid","cproid",$_POST['cproid'])
             . $form->show_hidden("type","type","start")
             . "<script>$('#stdate').datepicker({dateFormat: 'yy-mm-dd'});</script>"
@@ -368,16 +373,26 @@ if($req=="show_pic"){
     $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
     $planen = (is_null($info['plan_end'])?"":thai_dt($info['plan_end']));
     $now = new DateTime(null,new DateTimeZone("Asia/Bangkok"));
+    if(isset($info['end'])){
+        $end = new DateTime($info['end'],new DateTimeZone("Asia/Bangkok"));
+        $date = $end->format("Y-m-d");
+        $h = $end->format("H");
+        $m = $end->format("i");
+    } else {
+        $date = $now->format("Y-m-d");
+        $h = $now->format("H");
+        $m = $now->format("i");
+    }
     $html = "<div class='col-50'>"
             . $form->show_text("pc-name","pc-name",$info['name'],"","กระบวนการ","","label-inline readonly",null,"readonly")
             . $form->show_text("pend","pend",$planen,"","แผนผลิตเสร็จ","","label-inline readonly",null,"readonly")
             . "</div><!-- .col-50 -->"
             . "<div class='col-50'>"
-            . $form->show_text("endate","endate",$now->format("Y-m-d"),"","ผลิตเสร็จ","","label-inline left-50")
-            . $form->show_select("timeh", time_hour(), "label-inline left-25", "HH", $now->format("H"))
-            . $form->show_select("timem", time_min(), "label-inline left-25", "MM", $now->format("i"))
-            . $form->show_num("result", "", 1, "", "ชิ้นงานสำเร็จ", "", "label-inline","min='1'")
-            . $form->show_textarea("remark", "", 4, 10, "", "หมายเหตุ", "label-inline")
+            . $form->show_text("endate","endate",$date,"","ผลิตเสร็จ","","label-inline left-50")
+            . $form->show_select("timeh",time_hour(), "label-inline left-25", "HH", $h)
+            . $form->show_select("timem",time_min(), "label-inline left-25", "MM", $m)
+            . $form->show_num("result", (isset($info['result'])?$info['result']:""), 1, "", "ชิ้นงานสำเร็จ", "", "label-inline","min='1'")
+            . $form->show_textarea("remark",(isset($info['remark'])?$info['remark']:""), 4, 10, "", "หมายเหตุ", "label-inline")
             . $form->show_hidden("cproid","cproid",$_POST['cproid'])
             . $form->show_hidden("type","type","end")
             . "<script>$('#endate').datepicker({dateFormat: 'yy-mm-dd'});</script>"

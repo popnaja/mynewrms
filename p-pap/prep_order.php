@@ -99,7 +99,7 @@ function prep_order($qid){
                     break;
                 case 7: //พับ
                     $pid = $process[0];
-                    if($type==0){
+                    if($type==1){
                         //ปก ไม่พับ
                     } else if($info['cat_id']==12||$info['cat_id']==13){
                         //ใบปลิว โปสเตอร์ไม่พับ

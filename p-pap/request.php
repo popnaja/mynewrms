@@ -1885,10 +1885,19 @@ if($req == "login"){
             "result" => $_POST['result'],
             "remark" => $_POST['remark']
         );
+        //update comp status
+        $info = $db->get_info("pap_comp_process", "id", $_POST['cproid']);
+        $compid = $info['comp_id'];
+        $pinfo = $db->get_info("pap_process","process_id",$info['process_id']);
+        $comp_status = $pinfo['process_cat_id'];
+        $db->update_data("pap_order_comp", "id", $compid, array("status"=>$comp_status));
+        //update job status
+        $cinfo = $db->get_info("pap_order_comp", "id", $compid);
+        update_job_status($cinfo['order_id']);
     }
     $db->update_data("pap_comp_process", "id", $_POST['cproid'], $arrinfo);
     $_SESSION['message'] = "ปรับข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 }
 function update_job_status($oid){
     global $db;

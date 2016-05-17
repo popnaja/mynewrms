@@ -89,7 +89,7 @@ if(isset($mid)){
     $rec1 = array(array(
         $info['order_no'].":<br/>".$info['name'],
         $info['cat'],
-        $info['amount'],
+        number_format($info['amount'],0),
         $info['pages'],
         $info['size'],
         thai_date($info['plan_delivery'],true),
@@ -99,13 +99,11 @@ if(isset($mid)){
         (isset($info['paper_received'])?thai_date($info['paper_received'],true):""),
     ));
     $inside = $form->show_st_form()
-            . "<div class='col-50'>"
             . "<div id='result-input'></div><!-- #result-input -->"
             . $form->show_submit("submit","ใส่ข้อมูล","but-right")
             . $form->show_hidden("request","request","edit_job_result")
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect."?action=edit&oid=$oid")
-            . "</div><!-- .col-50 -->"
             . $form->submitscript("$('#papform').submit();");
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"

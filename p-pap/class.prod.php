@@ -16,11 +16,11 @@ class prodPlan{
                 . "</div><!-- .my-prod -->";
         return $html;
     }
-    public function show_vplan($mach,$data){
+    public function show_vplan($mach,$data,$result=null){
         $html = "<div class='my-vprod'>"
                 . $this->plan_nav()
                 . $this->plan_vheader($mach)
-                . $this->plan_vschedule($mach,$data)
+                . $this->plan_vschedule($mach,$data,$result)
                 . "</div><!-- .my-vprod -->"
                 . "<script>"
                 . "lock_plan_head();"
@@ -98,7 +98,7 @@ class prodPlan{
                 . "</div><!-- .plan-header -->";
         return $html;
     }
-    private function plan_vschedule($mach,$data){
+    private function plan_vschedule($mach,$data,$result=null){
         $height = 40;  //1 hour height
         $interval = 30; //minute
         $row_perday = 1440/$interval;
@@ -109,6 +109,7 @@ class prodPlan{
         $st = new DateTime($this->date,new DateTimeZone("Asia/Bangkok"));
         $now = new DateTime(pap_now(),new DateTimeZone("Asia/Bangkok"));
         $oidclass = array();
+        $oidstep = array();
         $x=0;
         $o=0;
         for($d=0;$d<3;$d++){
@@ -135,25 +136,25 @@ class prodPlan{
                 }
                 $html .= "<td width='50' height='$r_height' class='$rclass'>$stime".$show_now."</td>";
                 foreach($mach as $k=>$v){
-                    $plan = "&nbsp;";
+                    $plan = "";
                     if(isset($data[$k])){
                         foreach($data[$k] as $info){
                             $ptime = new DateTime($info[0],new DateTimeZone("Asia/Bangkok"));
                             if($ptime>=$st&&$ptime<$to){
                                 if($k==0){
                                     $outsource = "plan-out";
-                                    $s = $o*6;
+                                    if(!isset($oidstep[$info[1]])){
+                                        $oidstep[$info[1]] = $o;
+                                        $o++;
+                                    }
+                                    $s = $oidstep[$info[1]]*6;
                                     $step = "left:".$s."px;";
-                                    $o++;
                                 } else {
                                     $outsource = "";
                                     $step = "";
                                 }
                                 $stdiff = date_diff($st,$ptime);
                                 $top = $this->get_interval_ttmin($stdiff)*$ratio;
-                                $ptime->add(new DateInterval("PT".round($info[3]*60)."M"));
-                                $endiff = date_diff($ptime,$to);
-                                //$bottom = $this->get_interval_ttmin($endiff)*$ratio;
                                 $hei = $info[3]*60*$ratio;
                                 if(isset($oidclass[$info[1]])){
                                     $bclass = $oidclass[$info[1]];
@@ -161,12 +162,43 @@ class prodPlan{
                                     $bclass = $oidclass[$info[1]] = "bar-color-$x";
                                     $x++;
                                 }
-                                $plan = "<div class='plan-vbar $bclass $outsource' style='top:$top"."px;height:$hei"."px;$step'>&nbsp;</div>"
+                                $plan .= "<div class='plan-vbar $bclass $outsource' style='top:$top"."px;height:$hei"."px;$step'>&nbsp;</div>"
                                         . "<div class='plan-bar-info'>$info[4]</div>";
                             }
                         }
-                    } 
-                    $html .= "<td height='$r_height' class='plan-rec-box $rclass'>$plan</td>";
+                    }
+                    $res = "";
+                    if(isset($result[$k])){
+                        foreach($result[$k] as $info){
+                            $ptime = new DateTime($info[0],new DateTimeZone("Asia/Bangkok"));
+                            if($ptime>=$st&&$ptime<$to){
+                                if($k==0){
+                                    $outsource = "plan-out";
+                                    if(!isset($oidstep[$info[1]])){
+                                        $oidstep[$info[1]] = $o;
+                                        $o++;
+                                    }
+                                    $s = $oidstep[$info[1]]*6;
+                                    $step = "left:".$s."px;";
+                                } else {
+                                    $outsource = "";
+                                    $step = "";
+                                }
+                                $stdiff = date_diff($st,$ptime);
+                                $top = $this->get_interval_ttmin($stdiff)*$ratio;
+                                $hei = $info[3]*60*$ratio;
+                                if(isset($oidclass[$info[1]])){
+                                    $bclass = $oidclass[$info[1]];
+                                } else {
+                                    $bclass = $oidclass[$info[1]] = "bar-color-$x";
+                                    $x++;
+                                }
+                                $res .= "<div class='plan-vbar-res $bclass $outsource' style='top:$top"."px;height:$hei"."px;$step'>&nbsp;</div>"
+                                        . "<div class='plan-bar-info'>$info[4]</div>";
+                            }
+                        }
+                    }
+                    $html .= "<td height='$r_height' class='plan-rec-box $rclass'>$plan".$res."</td>";
                 }
                 $html .= "</tr>";
                 $st->add(new DateInterval("PT".$interval."M"));
