@@ -971,6 +971,7 @@ function show_rc_ghpp($rcid){
     $info = $rp->rp_receipt_info($rcid);
     $thdate = thai_date($info['date']);
     $user = (isset($info['user_login'])?$info['user_login']:"-");
+    $company_info = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
     
     $dinfo = $rp->rp_deli_info($info['adeli']);
     $aoid = explode(",",$dinfo['aoid']);
@@ -1013,7 +1014,7 @@ function show_rc_ghpp($rcid){
     $doc .= "<div class='doc-dt'>"
             . $tb->show_tb_bill_o($head,$recs,"tb-rp",6)
             . "</div><!-- .doc-dt -->";
-    $dot = str_repeat(".",50);
+    $dot = str_repeat(".",45);
     $doc .= "<div class='ghpp-pay'>"
             . "<table>"
             . "<tr>"
@@ -1024,8 +1025,8 @@ function show_rc_ghpp($rcid){
             . "<tr><td><span class='square-check blank'></span>เช็คเลขที่.$dot.ลงวันที่.$dot.</td></tr>"
             . "<tr><td><span class='square-check'></span>โอนเงิน จากบัญชีธนาคาร.$dot.เลขที่บัญชี.$dot.</td></tr>"
             . "</table>"
-            . "<p style='font-size:11pt;'>โปรดจ่ายเช็คในนาม \"บริษัท กู๊ดเฮด พริ้นท์ติ้ง แอนด์ แพคเกจจิ้ง กรุ๊ป จำกัด\" ทุกครั้ง</p>"
-            . "<p style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์ต่อเมื่อ บริษัทฯได้เรียกเก็บเงินตามเช็คหรือจากบัญชีเรียบร้อยแล้ว และปรากฎลายเซนต์ของผู้รับเงิน</p>"
+            . "<p style='font-size:11pt;'>โปรดจ่ายเช็คในนาม \"".$company_info['name']."\" ทุกครั้ง</p>"
+            . "<p style='font-size:11pt;'>ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์ ต่อเมื่อบริษัทฯได้เรียกเก็บเงินตามเช็คหรือจากบัญชีเรียบร้อยแล้ว และปรากฎลายเซนต์ของผู้รับเงิน</p>"
             . "</div><!-- .ghpp-pay -->";
     $doc .= "<div class='ghpp-sign'>"
             . "<table>"

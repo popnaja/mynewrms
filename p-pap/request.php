@@ -1601,7 +1601,7 @@ if($req == "login"){
         }
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="edit_job_deli"){
     $arrdata = array(
         "date" => $_POST['date'],
@@ -1611,7 +1611,7 @@ if($req == "login"){
     );
     $db->update_data("pap_delivery", "id", $_POST['did'],$arrdata);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="edit_job_tdeli"){
     $arrdata = array(
         "date" => $_POST['date'],
