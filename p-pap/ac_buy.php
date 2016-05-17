@@ -35,14 +35,15 @@ $content .= $menu->pappanel("บัญชี",$pagename);
 /*----------------------------------------------------- VIEW ORDER -------------------------------------------------------------------*/
 $due = (isset($_GET['fil_due'])&&$_GET['fil_due']>0?$_GET['fil_due']:null);
 $s_sup = (isset($_GET['s_sup'])&&$_GET['s_sup']!=""?$_GET['s_sup']:null);
+$paid = (isset($_GET['paid'])&&$_GET['paid']!=""?$_GET['paid']:null);
 $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
 $iperpage = 20;
 
 $arrdue = $pdo_ac->get_po_due();
 //view
 $head = array("ใบสั่งซื้อ","ผู้ผลิต","วันที่รับสินค้า","กำหนดชำระ","ชำระเงิน");
-$rec = $pdo_ac->view_po_list($pauth,$due,$s_sup,$page, $iperpage);
-$all_rec = $pdo_ac->view_po_list($pauth,$due,$s_sup);
+$rec = $pdo_ac->view_po_list($pauth,$paid,$due,$s_sup,$page, $iperpage);
+$all_rec = $pdo_ac->view_po_list($pauth,$paid,$due,$s_sup);
 $max = ceil(count($all_rec)/$iperpage);
 
 //csv
@@ -57,6 +58,7 @@ $content .= "<h1 class='page-title'>$pagename </h1>"
         . $form->show_st_form()
         . $tb->show_search(current_url(), "cusid", "s_sup","ค้นหาผู้ผลิต",$s_sup)
         . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดชำระ")
+        . $tb->show_filter(current_url(), "paid", array("true"=>"ชำระแล้ว","false"=>"ค้างชำระ"), $paid,"ชำระ")
         . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
         . $tb->show_pagenav(current_url(), $page, $max)
         . $tb->show_table($head,$rec,"tb-po-list")

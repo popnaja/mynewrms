@@ -92,11 +92,15 @@ if(isset($poid)){
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . $form->show_st_form()
             . "<div class='col-100'>"
+            . "<div class='col-50'>"
             . $form->show_text("pocode","pocode",$info['po_code'],"","รหัส PO","","label-3070 readonly",null,"readonly")
             . $form->show_text("docref","docref","","","รหัสใบส่งของ $req","","label-3070")
             . $form->show_textarea("remark",$info['po_remark'],4,10,"","หมายเหตุ","label-3070")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-50'>"
             . $form->show_select("all", array("yes"=>"ใช่","no"=>"มาบางส่วน"), "label-3070", "รับตามยอดใบจ้างผลิต", null)
-            . $tb->show_table($head, $rec, "tb-receive");
+            . $tb->show_table($head, $rec, "tb-receive")
+            . "</div><!-- .col-50 -->";
 
     $content .= $form->show_submit("submit","รับของเข้า","but-right")
         . $form->show_hidden("request","request","add_process_rc")

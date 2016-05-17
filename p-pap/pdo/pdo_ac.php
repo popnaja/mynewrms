@@ -424,14 +424,15 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_po_list($auth,$due=null,$s_sup=null,$page=null,$perpage=null){
+    public function view_po_list($auth,$paid=null,$due=null,$s_sup=null,$page=null,$perpage=null){
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             $filter = "WHERE po_deliveried IS NOT NULL";
             $filter .= (isset($due)?" AND DATE_FORMAT(DATE_ADD(po_deliveried, INTERVAL po_payment DAY),'%Y-%m')='$due'":"");
             $filter .= (isset($s_sup)?" AND CONCAT(sup.code,':',sup.name) LIKE '%$s_sup%'":"");
-            if(is_null($due)&&is_null($s_sup)){
+            $filter .= (isset($paid)&&$paid=="true"?" AND po_paid IS NOT NULL":" AND po_paid IS NULL");
+            if(is_null($due)&&is_null($s_sup)&&is_null($paid)){
                 $filter .= " AND po_paid IS NULL";
             }
             $sql = <<<END_OF_TEXT
