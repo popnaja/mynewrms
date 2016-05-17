@@ -373,13 +373,26 @@ class mytable {
                 . "</script>";
         return $html;
     }
-    public function show_filter($url,$name,$arr,$current,$show){
+    public function show_date_filter($url,$name,$current,$show){
+        __autoloada("form");
+        $base = $this->prep_get_url($url, $name);
+        $form = new myform();
+        $html = "<div class='tb-filter'>"
+                . $form->show_text($name,$name,$current,"",$show,"","label-inline")
+                . "</div><!-- .tb-filter -->"
+                . "<script>"
+                . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
+                . "tb_date_filter('$name','$base')"
+                . "</script>";
+        return $html;
+    }
+    public function show_filter($url,$name,$arr,$current,$show,$label=false){
         __autoloada("form");
         $base = $this->prep_get_url($url, $name);
         $form = new myform();
         $list = (isset($arr["0"])?array("none"=>"$show")+$arr:array("0"=>"$show")+$arr);
         $html = "<div class='tb-filter'>"
-                . $form->show_select($name,$list,"label-inline",null,$current)
+                . $form->show_select($name,$list,"label-inline",($label?$show:null),$current)
                 . "</div><!-- .tb-filter -->"
                 . "<script>"
                 . "tb_filter('$name','$base')"

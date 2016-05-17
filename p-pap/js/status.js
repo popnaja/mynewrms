@@ -55,17 +55,9 @@ $(document).ready(function(){
     var sel = $("#mach");
     sel.on("change",function(){
         var mid = $(this).val();
+        var today = $("#today").val();
         if(mid!=0){
-            window.location.replace(url+"?mid="+mid);
-        }
-    });
-    var dsel = $("#date");
-    dsel.on("change",function(){
-        var mid = $("#mid").val();
-        var date = $(this).val();
-        var reg = /^\d{4}-\d{2}-\d{2}$/;
-        if(date.search(reg)===0){
-            window.location.replace(url+"?mid="+mid+"&date="+date);
+            window.location.replace(url+"?mid="+mid+"&date="+today);
         }
     });
 })

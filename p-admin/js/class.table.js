@@ -83,6 +83,14 @@ $(document).ready(function(){
     });
 });
 }
+function tb_date_filter(name,base){
+$(document).ready(function(){
+    var sel = $("input[name="+name+"]");
+    sel.on("change",function(){
+        window.location.replace(base+$(this).val());
+    });
+});
+}
 function tb_search(id,base){
     $(document).ready(function(){
         var but = $("#"+id+"-but");

@@ -1897,7 +1897,7 @@ if($req == "login"){
     }
     $db->update_data("pap_comp_process", "id", $_POST['cproid'], $arrinfo);
     $_SESSION['message'] = "ปรับข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 }
 function update_job_status($oid){
     global $db;

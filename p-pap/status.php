@@ -53,29 +53,24 @@ if(isset($mid)){
             . $form->show_submit("submit","ใส่ข้อมูล","but-right")
             . $form->show_hidden("request","request","edit_job_result")
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
-            . $form->show_hidden("redirect","redirect",$redirect."?mid=$mid")
+            . $form->show_hidden("redirect","redirect",current_url())
             . $form->show_hidden("mid","mid",$mid)
             . $form->submitscript("$('#papform').submit();");
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
+            . "<div class='col-100'>"
+            . $tb->show_filter(current_url(), "mid", $mach, $mid,"เครื่องจักร",true)
+            . $tb->show_date_filter(current_url(), "date", $date,"วันที่")
+            . "</div><!-- .col-100 -->"
             . "<div class='col-50'>"
             . "<h4>เครื่องจักร</h4>"
             . $tb->show_vtable($minfo, "tb-mach-info")
-            . "</div><!-- .col-50 -->"
-            . "<div class='col-50'>"
-            . "<div class='tab-section'>"
-            . "<h4>รายเครื่องจักร</h4>"
-            . $form->show_select("mach", $mach, "label-inline", "", $mid)
-            . $form->show_text("date","date",$date,"","วันที่","","label-inline")
-            . "</div><!-- .tab-section -->"
             . "</div><!-- .col-50 -->"
             . "<div class='col-100'>"
             . $form->my_toggle_tab("up-result", "ผลการผลิต", $inside)
             . $tb->show_table($head,$rec,"tb-job-result")
             . "<script>"
             . "status_update();"
-            . "$('#date').datepicker({dateFormat: 'yy-mm-dd'});"
-            . "mach_sel('$redirect');"
             . "</script>"
             . "</div><!-- .col-100 -->";
 } else if($action =="edit"){
@@ -136,17 +131,16 @@ if(isset($mid)){
     $all_rec = $tbpdo->view_job_status($pauth,$op_job_prod,$due,$status,$s,null,null,true);
     $max = ceil(count($all_rec)/$iperpage);
     //แสดงสถานะรายเครื่องจักร
-    /*
     $mach = array("0"=>"--เครื่องจักร--")+$db->get_keypair("pap_machine AS mach", "mach.id", "mach.name", "LEFT JOIN pap_process AS pro ON pro.process_id=mach.process_id ORDER BY pro.process_cat_id ASC,mach.name ASC");
     $selmach = "<div class='tab-section'>"
             . "<h4>รายเครื่องจักร</h4>"
             . $form->show_select("mach", $mach, "label-inline", "", null)
+            . $form->show_hidden("today","today",  pap_today())
             . "</div><!-- .tab-section -->";
-     * 
-     */
     $content .= "<h1 class='page-title'>$pagename </h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
+            . $selmach
             . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน")
             . $tb->show_filter(current_url(), "fil_status", array("-1"=>"แสดงทั้งหมด")+$op_job_prod, $status,"สถานะ")
             . $tb->show_filter(current_url(), "fil_due", $arrdue, $due,"กำหนดส่ง")
