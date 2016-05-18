@@ -182,23 +182,27 @@ function new_pcost($pid,$arrinfo){
     global $op_unit;
     $meta = $db->get_meta("pap_process_meta","process_id",$pid);
     $cost = json_decode($meta['cost'],true);
-    //var_dump($cost);
     foreach($cost AS $k=>$value){
         $amount = $arrinfo[$value['vunit']];
-        $fcost = (isset($value['fcost'])?$value['fcost']:0);
-        if(count($cost)>1){
+        if($value['cond']!="0"){
             $check = $arrinfo[$value['cond']];
             if($check>=$value['btw']&&$check<=($value['to']>0?$value['to']:INF)){
-                $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
-                $cost_per_u = $value['cost'];
+                $res = cost_formular($value,$amount,$arrinfo);
                 break;
             }
         } else {
-            $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
-            $cost_per_u = $value['cost'];
+            $res = cost_formular($value,$amount,$arrinfo);
         }
     }
-    return array($amount,$cost_per_u,$cinfo);
+    return array_unshift($res,$amount);
+}
+function cost_formular($value,$amount,$arrinfo){
+    $fcost = (isset($value['fcost'])?$value['fcost']:0);
+
+        $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
+        $cost_per_u = $value['cost'];
+    
+    return array($cost_per_u,$cinfo);
 }
 function plate_div($num){
     $res[0] = floor($num/2)*2;

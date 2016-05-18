@@ -249,6 +249,7 @@ if($req == "login"){
                     "vunit" => $_POST['vunit'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
+                    "formular" => $_POST['for'][$i],
                     "cond" => $_POST['cond'][$i],
                     "btw" => $_POST['btw'][$i],
                     "to" => $_POST['to'][$i]
@@ -306,6 +307,7 @@ if($req == "login"){
                     "vunit" => $_POST['vunit'][$i],
                     "cost" => $_POST['cost'][$i],
                     "min" => $_POST['min'][$i],
+                    "formular" => $_POST['for'][$i],
                     "cond" => $_POST['cond'][$i],
                     "btw" => $_POST['btw'][$i],
                     "to" => $_POST['to'][$i]

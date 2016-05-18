@@ -73,6 +73,7 @@ if($action=="add"){
         . $form->show_num("min_$i","",0.01,"","ขั้นต่ำ (บาท)","","label-inline right-50","min=0","min[]")
         . $form->show_select("vunit_$i",$op_criteria,"label-inline left-50","หน่วยต้นทุนแปรผัน",null,"","vunit[]")
         . $form->show_num("cost_$i","",0.00001,"","(บาท/<span class='prod-unit-label'>หน่วย</span>)","","label-inline right-50","min=0","cost[]")
+        . $form->show_text("for_$i","for[]","","","สูตรคำนวณ","","label-inline")
         . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",null,"","cond[]")
         . "<div class='sel-cond_$i-0'>"
         . "</div>"
@@ -154,7 +155,7 @@ if($action=="add"){
         . $form->show_num("min_$i",(isset($cost[$i])?$cost[$i]['min']:""),0.01,"","ต้นทุนขั้นต่ำ(บาท)","","label-inline right-50","min=0","min[]")
         . $form->show_select("vunit_$i",$op_criteria,"label-inline left-50","หน่วยต้นทุนแปรผัน",(isset($cost[$i])?$cost[$i]['vunit']:""),"","vunit[]")
         . $form->show_num("cost_$i",(isset($cost[$i])?$cost[$i]['cost']:""),0.00001,"","(บาท/<span class='prod-unit-label'>$uname</span>)","","label-inline right-50","min=0","cost[]")
-        
+        . $form->show_text("for_$i","for[]",(isset($cost[$i]['formular'])?$cost[$i]['formular']:""),"","สูตรคำนวณ","","label-inline")
         . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$op_criteria,"label-inline","ข้อกำหนด",(isset($cost[$i])?$cost[$i]['cond']:""),"","cond[]")
         . "<div class='$otherc'>"
         . $form->show_num("btw_$i",(isset($cost[$i])?$cost[$i]['btw']:""),1,"","ระหว่าง","","left-50 label-inline","min=0","btw[]")
