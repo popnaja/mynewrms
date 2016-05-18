@@ -92,22 +92,23 @@ if(isset($oid)){
     $tpic = $md->media_view($info['picture'],ROOTS,RDIR);
     $content .= "<h1 class='page-title'>แก้ไข$pagename</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
-            . "<div class='col-50'>"
             . $form->show_st_form()
+            . "<div class='col-50'>"
             . "<div class='label-inline'>"
             . "<label for='sig'>ภาพประกอบ</label>"
-            . "<div>"
-            . $md->show_input("job_pic","job_pic",$tpic)
-            . "</div>"
+            . "<div>".$md->show_input("job_pic","job_pic",$tpic)."</div>"
             . "</div><!-- .label-inline -->"
             . $form->show_hidden("ori_media","ori_media",$info['picture'])
             . $form->show_hidden("order_no","order_no",$info['order_no'])
             . $form->show_text("due","due",$info['plan_delivery'],"","กำหนดส่ง","","label-inline")
+            . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
+            . "</div><!-- .col-50 -->"
+            . "<div class='col-50'>"
             . "<div class='form-section'>"
             . "<h4>ผ่ากระดาษก่อนพิมพ์</h4>"
             . $paperhtml
             . "</div><!-- .form-section -->"
-            . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline");
+            . "</div><!-- .col-50 -->";
 
     $content .= $form->show_submit("submit","Update","but-right")
             . $form->show_hidden("request","request","edit_order")
@@ -117,8 +118,7 @@ if(isset($oid)){
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
-            . "</script>"
-            . "</div><!-- .col-50 -->";
+            . "</script>";
     //show info
     include_once("ud/doc_default.php");
     $content .= show_order($oid,true);
