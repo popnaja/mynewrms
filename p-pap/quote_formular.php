@@ -391,6 +391,7 @@ function unit_cal($quote,$comps){
         "allpage" => $quote['page_cover']*2+$quote['page_inside'],
         "page" => $quote['page_inside'],
         "km" => $quote['distance'],
+        "location" => $quote['location'],
         "piece" => $quote['amount'],
         "set" => 0,
         "frame" => 0

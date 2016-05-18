@@ -113,7 +113,8 @@ if($action=="add"){
 
     $pack = $form->show_checkbox("pack","pack",$packing,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$shipping,"การขนส่ง","label-3070")
-            . $form->show_num("distance","",0.01,"","ระยะทาง(กม)","","label-3070");
+            . $form->show_num("distance","",0.01,"","ระยะทาง(กม)","","label-3070")
+            . $form->show_num("location","",1,"","จุดส่งของ","","label-3070");
 
     $multi = "";
     for($x=1;$x<11;$x++){
@@ -327,7 +328,8 @@ if($action=="add"){
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
     $pack = $form->show_checkbox("pack","pack",$pack_checked,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$ship_checked,"การขนส่ง","label-3070")
-            . $form->show_num("distance",(isset($info['distance'])?$info['distance']:""),0.01,"","ระยะทาง(กม)","","label-3070");
+            . $form->show_num("distance",(isset($info['distance'])?$info['distance']:""),0.01,"","ระยะทาง(กม)","","label-3070")
+            . $form->show_num("location",(isset($info['location'])?$info['location']:""),1,"","จุดส่งของ","","label-3070");
 
     $aamount = (isset($info['cal_amount'])?explode(",",$info['cal_amount']):"");
     $multi = "";

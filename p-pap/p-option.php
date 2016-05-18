@@ -25,8 +25,9 @@ $op_unit = array(
     "frame" => "กรอบ",
     "set" => "ยก",
     "piece" => "ชิ้น/เล่ม",
+    "in2" => "ตารางนิ้ว",
     "km" => "ระยะทาง(กม)",
-    "in2" => "ตารางนิ้ว"
+    "location" => "จุดส่งของ"
 );
 $op_criteria = $op_unit+array(
     //"area" => "พื้นที่(cm2)"
