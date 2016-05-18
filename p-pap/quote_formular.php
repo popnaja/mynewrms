@@ -193,16 +193,37 @@ function new_pcost($pid,$arrinfo){
         } else {
             $res = cost_formular($value,$amount,$arrinfo);
         }
+        array_unshift($res,$amount);
     }
-    return array_unshift($res,$amount);
+    if(!isset($res)){
+        var_dump($pid);
+        $res = cost_formular($cost[0],$arrinfo[$cost[0]['vunit']],$arrinfo);
+        array_unshift($res,$arrinfo[$cost[0]['vunit']]);
+    }
+    return $res;
 }
 function cost_formular($value,$amount,$arrinfo){
     $fcost = (isset($value['fcost'])?$value['fcost']:0);
-
+    if(isset($value['formular'])&&$value['formular']!=""){
+        $for = $value['formular'];
+        foreach($arrinfo as $k=>$v){
+            $for = str_replace($k,$v,$for);
+        }
+        var_dump($for);
+        $cinfo = calculate_string($for);
+        $cost_per_u = $value['formular'];
+    } else {
         $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
         $cost_per_u = $value['cost'];
-    
+    }
     return array($cost_per_u,$cinfo);
+}
+function calculate_string( $mathString )    {
+    $mathString = trim($mathString);     // trim white spaces
+    // remove any non-numbers chars; exception for math operators
+    $mathString = ereg_replace ('[^0-9\+-\*\/\(\) ]', '', $mathString);
+    $compute = create_function("", "return (" . $mathString . ");" );
+    return 0 + $compute();
 }
 function plate_div($num){
     $res[0] = floor($num/2)*2;
@@ -395,7 +416,7 @@ function unit_cal($quote,$comps){
         "allpage" => $quote['page_cover']*2+$quote['page_inside'],
         "page" => $quote['page_inside'],
         "km" => $quote['distance'],
-        "location" => $quote['location'],
+        "location" => (isset($quote['location'])?$quote['location']:0),
         "piece" => $quote['amount'],
         "set" => 0,
         "frame" => 0

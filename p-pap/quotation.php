@@ -79,6 +79,7 @@ if($action=="add"||isset($qid)){
     $packing = $process_keypair[11];
     $shipping = $process_keypair[12];
     $fold = $process_keypair[7];
+    $scolor = $process_keypair[13];
 }
 
 if($action=="add"){
@@ -429,7 +430,7 @@ echo $content;
 function special_comp($info=null,$comps=null){
     global $db;
     global $op_comp_type,$op_paper_div;
-    global $form,$paper,$after,$print,$coating,$fold;
+    global $form,$paper,$after,$print,$coating,$fold,$scolor;
     $size = array("0"=>"--ขนาดกระดาษ--")+$db->get_paper_keypair("mat_size");
     $html = "";
     for($i=0;$i<5;$i++){
@@ -462,6 +463,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",$comp['comp_print2'],"","print2[]")
                 . "</div><!-- .sel-compt$i-1 -->"
+                //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
                 . "<div class='sel-compt$i-1'>"
                 . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",($comp['comp_type']==1?$info['cwing']:null),"","cwing[]")
                 . "<div class='sel-cwing_$i-1'>"
@@ -504,6 +506,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",null,"","print2[]")
                 . "</div><!-- .sel-compt$i-1 -->"
+                //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
                 . "<div class='sel-compt$i-1'>"
                 . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",null,"","cwing[]")
                 . "<div class='sel-cwing_$i-1'>"
