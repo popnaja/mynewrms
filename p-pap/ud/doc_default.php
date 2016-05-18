@@ -836,7 +836,7 @@ function job_detail($qid){
             array_push($data[$cname],"ปีกปกหน้า ".$info['fwing']." cm","ปีกปกหลัง ".$info['bwing']." cm");
         }
         //แผ่นพับ show พับกี่ส่วน
-        if($info['cat_id']==11&&$type==3){
+        if($type==3&&isset($info['folding'])){
             array_push($data[$cname],$process[$info['folding']]);
         }
         //ไดคัท

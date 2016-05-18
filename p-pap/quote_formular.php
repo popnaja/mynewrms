@@ -134,20 +134,19 @@ function cal_quote($info,$comps){
         }
     }
     //folding
-    if($info['cat_id']==11){
-        $folding_id = $info['folding'];
-    } else {
-        $folding_id = 8;
-    }
+    $fpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 7);   //cat id 7 = พับ
+    $folding_id = (isset($info['folding'])?$info['folding']:$fpro[0]);
+
     //ถ้า เป็นหนังสือ cat_id=10 แผ่นพับ cat_id=11 มีการพับ
-    if(in_array($info['cat_id'],array(10,11,69))){
+    if(in_array($info['cat_id'],array(10,11,69))||isset($info['folding'])){
         $pcost = new_pcost($folding_id, $overall);
         array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
     }
 
     //collecting
     //ถ้า เป็นหนังสือ มีการเก็บ + เข้าเล่ม
-    $collect_id = 9;
+    $cpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 8);   //cat id 8 = เก็บเล่ม
+    $collect_id = $cpro[0];
     if(in_array($info['cat_id'],array(10,69))){
         $pcost = new_pcost($collect_id, $overall);
         array_push($res['หลังพิมพ์'],array_merge(array($processes[$collect_id]),$pcost));
