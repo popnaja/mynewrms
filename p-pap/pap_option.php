@@ -36,7 +36,7 @@ $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $opid = filter_input(INPUT_GET,'opid',FILTER_SANITIZE_STRING);
 
 if(isset($opid)) {
-    //check
+/*---------------------------------------------------------------   EDIT   -----------------------------------------------------------*/
     if($pauth<=1){
         header("location:$redirect");
         exit();
@@ -50,11 +50,6 @@ if(isset($opid)) {
         $size = json_decode($info['op_value'],true);
         $value = $form->show_num("width",$size['width'],0.01,"","กว้าง(นิ้ว)","","label-3070","min='1'")
             . $form->show_num("length",$size['length'],0.01,"","ยาว(นิ้ว)","","label-3070","min='1'");
-    } else if($type=="paper_allo"){
-        $v = explode(",",$info['op_value']);
-        $name = $form->show_num("name",$info['op_name'],1,"","เผื่อกระดาษเสีย(แผ่น)","","label-3070","min='1'");
-        $value = $form->show_num("from",$v[0],1,"","จำนวนสั่งพิมพ์ ระหว่าง","","label-3070")
-                . $form->show_num("to",$v[1],1,"","ถึง","","label-3070");
     } else if($type == "product_cat"){
         $proc = explode(",",$info['op_value']);
         $value = "<div class='tab-section'>"
@@ -82,6 +77,7 @@ if(isset($opid)) {
     $form->addformvalidate("ez-msg", array('name'));
     $content .= $form->submitscript("$('#new').submit();");
 } else {
+/*---------------------------------------------------------------   ADD   -----------------------------------------------------------*/
     $content .= "<h1 class='page-title'>$submenu</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>";
     //check
@@ -92,10 +88,6 @@ if(isset($opid)) {
         if($type == "paper_size"){
             $value = $form->show_num("width","",0.01,"","กว้าง(นิ้ว)","","label-3070","min='1'")
                 . $form->show_num("length","",0.01,"","ยาว(นิ้ว)","","label-3070","min='1'");
-        } else if($type=="paper_allo"){
-            $name = $form->show_num("name","",1,"","เผื่อกระดาษเสีย(แผ่น)","","label-3070","min='1'");
-            $value = $form->show_num("from","",1,"","จำนวนสั่งพิมพ์ ระหว่าง","","label-3070")
-                    . $form->show_num("to","",1,"","ถึง","","label-3070");
         } else if($type == "product_cat"){
             $value = "<div class='tab-section'>"
                     . "<h4>ขั้นตอนการผลิต</h4>";

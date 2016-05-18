@@ -285,14 +285,25 @@ $op_weekday = array(
     "5" => "ศุกร์",
     "6" => "เสาร์"
 );
-function cal_allo($data,$amount){
-    foreach($data as $k=>$v){
-        $a = explode(",",$v);
-        if($amount>=$a[0]&&$amount<=$a[1]){
-            $res = $k;
-            break;
+function cal_allo($allo,$amount){
+    foreach($allo as $k=>$v){
+        if($v['cond']=="piece"){
+            $btw = $v['btw'];
+            $to = ($v['to']==0?INF:$v['to']);
+            if($amount>=$btw&&$amount<=$to){
+                if($v['unit']=="sheet/frame"){
+                    return $v['pallo'];
+                } else if($v['unit']=="%/piece"){
+                    return round($v['pallo']*$amount/100,0);
+                }
+            }
+        } else {
+            if($v['unit']=="sheet/frame"){
+                return $v['pallo'];
+            } else if($v['unit']=="%/round"){
+                return round($v['pallo']*$amount/100,0);
+            }
         }
     }
-    $res = (isset($res)?$res:500);
-    return $res;
+    return 0;
 }

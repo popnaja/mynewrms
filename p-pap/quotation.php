@@ -166,7 +166,6 @@ if($action=="add"){
     __autoload("pdo_tb");
     include_once("quote_formular.php");
     $tb = new mytable();
-
     $comps = $db->get_comp($qid);
     $layinfo = $db->get_layinfo($info['job_size_id']);
     $contacts = $db->get_keypair("pap_contact","contact_id","contact_name","WHERE customer_id=".$info['customer_id']);

@@ -174,6 +174,19 @@ if($req == "login"){
         header("Location:".$_POST['redirect']);
     }
 } else if($req == "update_setting"){
+    //prep paper allowance
+    $pallow = array();
+    for($i=0;$i<count($_POST['pallo']);$i++){
+        if($_POST['pallo'][$i]>0){
+            array_push($pallow,array(
+                "pallo" => $_POST['pallo'][$i],
+                "unit" => $_POST['unit'][$i],
+                "cond" => $_POST['cond'][$i],
+                "btw" => $_POST['btw'][$i],
+                "to" => $_POST['to'][$i])
+            );
+        }
+    }
     $arrinfo = array(
         "name" => $_POST['name'],
         "address" => $_POST['address'],
@@ -193,7 +206,8 @@ if($req == "login"){
         "rno_invoice" => $_POST['rno_invoice'],
         "grip_size" => $_POST['grip'],
         "bleed_size" => $_POST['bleed'],
-        "margin" => $_POST['margin']
+        "margin" => $_POST['margin'],
+        "paper_allo" => json_encode($pallow)
     );
     //move logo
     if(isset($_POST['media'])){
@@ -663,8 +677,10 @@ if($req == "login"){
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;
-    $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
-    $allowance = cal_allo($adata, $_POST['amount']);
+    //cal allowance
+    $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
+    $ainfo = json_decode($adata['paper_allo'],true);
+    $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
@@ -683,7 +699,7 @@ if($req == "login"){
                 $page = $_POST['page'][$i];
             }
             //แผ่นพับ
-            if($_POST['type']==11&&$type==3){
+            if($type==3){
                 $meta['folding'] = $_POST['folding'][$i];
             }
             //ไดคัท
@@ -817,8 +833,10 @@ if($req == "login"){
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;
-    $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='paper_allo'");
-    $allowance = cal_allo($adata, $_POST['amount']);
+    //cal allowance
+    $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
+    $ainfo = json_decode($adata['paper_allo'],true);
+    $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
@@ -837,7 +855,7 @@ if($req == "login"){
                 $page = $_POST['page'][$i];
             }
             //แผ่นพับ
-            if($_POST['type']==11&&$type==3){
+            if($type==3){
                 $meta['folding'] = $_POST['folding'][$i];
             }
             //ไดคัท

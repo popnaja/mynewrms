@@ -57,7 +57,6 @@ class PAPmenu extends mymenu {
                 "กลุ่มสินค้า" => $root."pap_option.php?type=product_cat",
                 "กลุ่มวัสดุ" => $root."pap_option.php?type=mat_cat",
                 "กลุ่มกระบวนการ" => $root."process_cat.php",
-                "เผื่อกระดาษเสีย" => $root."pap_option.php?type=paper_allo",
                 "ชนิดกระดาษ" => $root."pap_option.php?type=paper_type",
                 "ขนาดกระดาษ" => $root."pap_option.php?type=paper_size",
                 "แกรมกระดาษ" => $root."pap_option.php?type=paper_weight",

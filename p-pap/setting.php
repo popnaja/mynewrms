@@ -72,12 +72,36 @@ $grip = "<h4></h4>"
         . $form->show_num("grip",(isset($info['grip_size'])?$info['grip_size']:""),0.01,"","ขนาดกริ๊ปเครื่องพิมพ์ (ซ.ม.)","","label-3070")
         . $form->show_num("bleed",(isset($info['bleed_size'])?$info['bleed_size']:""),0.01,"","ขนาด Bleed (ซ.ม.)","","label-3070");
 
+$paper = "";
+$allo = (isset($info['paper_allo'])?json_decode($info['paper_allo'],true):array());
+$con_unit = array(
+    "piece" => "ชิ้น/เล่ม",
+);
+for($i=0;$i<5;$i++){
+    $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($con_unit));
+    $hid = ($i<count($allo)||$i==0?"":"form-hide");
+    $paper .= "<div class='form-section paper-cond $hid'>"
+    . "<div class='col-50'>"
+    . $form->show_num("pallo_$i",(isset($allo[$i])?$allo[$i]['pallo']:0),0.01,"","เผื่อกระดาษ","","label-3070","min=0","pallo[]")
+    . $form->show_select("unit_$i",array("sheet/frame"=>"แผ่นต่อกรอบ","%/piece"=>"%ต่อยอดผลิต"),"label-3070","หน่วย",(isset($allo[$i])?$allo[$i]['unit']:""),"","unit[]")
+    . "</div><!-- .col-50 -->"
+    . "<div class='col-50'>"
+    . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$con_unit,"label-3070","ข้อกำหนด",(isset($allo[$i])?$allo[$i]['cond']:""),"","cond[]")
+    . "<div class='$otherc'>"
+    . $form->show_num("btw_$i",(isset($allo[$i])?$allo[$i]['btw']:""),1,"","ระหว่าง","","label-3070","min=0","btw[]")
+    . $form->show_num("to_$i",(isset($allo[$i])?$allo[$i]['to']:""),1,"","ถึง","","label-3070","min=0","to[]")
+    . "</div><!-- .otherc -->"
+    . "</div><!-- .col-50 -->"
+    . "</div><!-- .paper-cond -->"
+    . "<script>select_option_byval('cond_$i');</script>";
+}
+$paper .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขการเผื่อกระดาษ' style='width:100%'/>";
 //update
 $content .= "<h1 class='page-title'>$pagename</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"
         . $form->show_st_form()
         . "<div class='col-100'>"
-        . $form->show_tabs("cinfo-tab",array("ข้อมูลบริษัท","ลำดับเอกสาร","อื่นๆ"),array($cominfo,$doc,$grip),0);
+        . $form->show_tabs("cinfo-tab",array("ข้อมูลบริษัท","ลำดับเอกสาร","Grip&Bleed","เผื่อกระดาษ"),array($cominfo,$doc,$grip,$paper),0);
 
 $content .= $form->show_submit("submit","Update","but-right")
         . $form->show_hidden("request","request","update_setting")
@@ -88,6 +112,7 @@ $form->addformvalidate("ez-msg", array('name','address','email','tel','tax_id'))
 $content .= $form->submitscript("$('#papform').submit();")
         . "<script>"
         //. "format_id('tax_id');"
+        . "view_more_section('paper-cond');"
         . "</script>";
 
 $content .= $menu->showfooter();
