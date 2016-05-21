@@ -1119,7 +1119,7 @@ if($req == "login"){
         $db->insert_data("pap_term_tax", array(null,$tid,$_POST['tax'],$parent,$tid,0,0));
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req =="edit_term"){
     __autoloada("term");
     $termdb = new myterm(DB_PAP);

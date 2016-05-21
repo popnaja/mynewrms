@@ -8,7 +8,7 @@ class myterm{
         try{
             $ssql = (isset($lineage)?"AND lineage NOT LIKE :line":"");
             $sql = <<<END_OF_TEXT
-SELECT tx.lineage,
+SELECT tx.term_id,
 CONCAT(REPEAT(' -  ',deep),name)
 FROM pap_term AS tm
 LEFT JOIN pap_term_tax AS tx ON tx.term_id=tm.id

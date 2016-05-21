@@ -58,6 +58,21 @@ if($req=="show_pic"){
     }
     $_SESSION['message'] = "ลบข้อมูลใบสั่งซื้อสำเร็จ";
     echo json_encode(array("redirect",$_POST['redirect']));
+} else if($req == "delete_term"){
+    __autoloada("term");
+    $termdb = new myterm(DB_PAP);
+    //log
+    $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
+    //delete
+    $termdb->del_term($_POST['tax'], $_POST['tid']);
+    if($_POST['tax']=="customer"){
+        $_SESSION['message'] = "ลบกลุ่มลูกค้าสำเร็จ";
+    } else if($_POST['tax']=="supplier"){
+        $_SESSION['message'] = "ลบกลุ่มผู้ผลิตสำเร็จ";
+    } else {
+        $_SESSION['message'] = "ลบกลุ่มสำเร็จ";
+    }
+    echo json_encode(array("redirect",$_POST['redirect']));
 } else if($req == "delete_process_po"){
     //log
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));

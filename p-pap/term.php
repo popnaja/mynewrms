@@ -18,18 +18,21 @@ $menu->__autoloadall("form");
 $menu->__autoloadall("table");
 $menu->pap_menu();
 $menu->pageTitle = "PAP | $submenu";
+$menu->astyle[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.css";
+$menu->ascript[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.min.js";
 $menu->ascript[] = PAP."js/papterm.js";
 $menu->extrascript = <<<END_OF_TEXT
 <style>
-
+    .but-right {
+        width:auto;
+    }
 </style>
 END_OF_TEXT;
-
 
 $content = $menu->showhead();
 $content .= $menu->pappanel($op_tax_name[$tax][0],$submenu);
 
-$form = new myform("option","",PAP."request.php");
+$form = new myform("papform","",PAP."request.php");
 $req = $form->show_require();
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $tid = filter_input(INPUT_GET,'tid',FILTER_SANITIZE_STRING);
@@ -39,9 +42,9 @@ if(isset($tid)){
         header("location:$redirect");
         exit();
     }
-    //edit
+/*-----------------------------------------------------------------------------EDIT ------------------------------------------------*/
     $info = $termdb->get_terminfo($tax,$tid);
-    $parents = $termdb->get_parent($tax,$info['lineage']);
+    $parents = array(0=>"--ไม่มี--")+$termdb->get_parent($tax,$info['lineage']);
     $content .= "<h1 class='page-title'>$submenu</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-50'>"
@@ -53,12 +56,19 @@ if(isset($tid)){
             . $form->show_hidden("tax","tax",$tax)
             . $form->show_hidden("tid","tid",$tid)
             . $form->show_hidden("oparent","oparent",$info['parent']);
-
-    $content .= $form->show_submit("submit","Update","but-right")
+    if($pauth==4){
+        $del = "<span id='del-term' class='red-but'>Delete</span>"
+                    . "<script>del_term();</script>";
+    } else {
+        $del = "";
+    }
+    $content .= $del
+            . $form->show_submit("submit","Update","but-right")
             . $form->show_hidden("request","request","edit_term")
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . $form->show_hidden("redirect","redirect",$redirect);
     $form->addformvalidate("ez-msg", array('name',"slug"));
-    $content .= $form->submitscript("$('#new').submit();")
+    $content .= $form->submitscript("$('#papform').submit();")
             . "</div><!-- .col-50 -->"
             . "<script>"
             . "mod_slug();"
@@ -67,8 +77,8 @@ if(isset($tid)){
     $content .= "<h1 class='page-title'>$submenu</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>";
     if($pauth>1){
-        //show add
-        $parents = $termdb->get_parent($tax);
+/*-----------------------------------------------------------------------------ADD ------------------------------------------------*/
+        $parents = array(0=>"--ไม่มี--")+$termdb->get_parent($tax);
         $content .= "<div class='col-50'>"
                 . "<h3>เพิ่ม $submenu</h3>"
                 . $form->show_st_form()
