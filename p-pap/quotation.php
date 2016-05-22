@@ -78,7 +78,7 @@ if($action=="add"||isset($qid)){
     $after =  $process_keypair[5];
     $packing = $process_keypair[11];
     $shipping = $process_keypair[12];
-    $fold = $process_keypair[7];
+    $fold = array("0"=>"--ไม่มี--")+$process_keypair[7];
     $scolor = $process_keypair[13];
 }
 

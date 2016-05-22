@@ -139,8 +139,10 @@ function cal_quote($info,$comps){
 
     //ถ้า เป็นหนังสือ cat_id=10 แผ่นพับ cat_id=11 มีการพับ
     if(in_array($info['cat_id'],array(10,11,69))||isset($info['folding'])){
-        $pcost = new_pcost($folding_id, $overall);
-        array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
+        if($folding_id>0){
+            $pcost = new_pcost($folding_id, $overall);
+            array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
+        }
     }
 
     //collecting

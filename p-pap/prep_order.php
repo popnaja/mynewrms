@@ -98,11 +98,13 @@ function prep_order($qid){
                     }
                     break;
                 case 7: //พับ
-                    $pid = $process[0];
+                    $pid = ($type==3&&$info['folding']>0?$info['folding']:$process[0]);
                     if($type==1){
                         //ปก ไม่พับ
-                    } else if($info['cat_id']==12||$info['cat_id']==13){
-                        //ใบปลิว โปสเตอร์ไม่พับ
+                    } else if($info['cat_id']==12||$info['cat_id']==13){ //ใบปลิว โปสเตอร์ไม่พับ
+                        if(isset($info['folding'])&&$info['folding']>0){
+                            add_data($data,$info['folding'],$name,$u['set'],$comp_id);
+                        }
                     } else {
                         add_data($data,$pid,$name,$u['set'],$comp_id);
                     }

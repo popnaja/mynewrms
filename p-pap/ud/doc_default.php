@@ -111,7 +111,7 @@ function show_quote_df($qid){
     $date = thai_date($show_date);
     if($info['user_id']>0){
         $sale = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=".$info['user_id']);
-        $sign = (isset($sale['signature'])?"<img src='".ROOTS.$sale['signature']."' />":"");
+        $sign = (isset($sale['signature'])&&$sale['signature']!=""?"<img src='".ROOTS.$sale['signature']."' />":"");
     }
     if($info['status']>=2){
         $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");

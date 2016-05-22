@@ -431,7 +431,7 @@ $(document).ready(function(){
         var ctype = comp.eq(i).val();
         var size = $(this).val();
         if($.inArray(parseInt(ctype),[1,2,3])!=-1){
-            confirm_dialog("คำเตือน","ต้องการเปลี่ยนขาดกระดาษจาก Master Lay ใช่หรือไม่",sel_ok,sel_cancel);
+            confirm_dialog("คำเตือน","ต้องการเปลี่ยนขนาดกระดาษจาก Master Lay ใช่หรือไม่",sel_ok,sel_cancel);
         } else {
             filter_papern(size,i);
         }
