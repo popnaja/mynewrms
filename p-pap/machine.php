@@ -114,6 +114,7 @@ if($action=="add"){
     $form->addformvalidate("ez-msg", array('name','setup_min',"capacity"));
     $content .= $form->submitscript("$('#papform').submit();");
 } else {
+/*--------------------------------------------------------------  VIEW ALL ------------------------------------------------------------------*/
     __autoload("pdo_tb");
     $tbpdo = new tbPDO();
     $tb = new mytable();

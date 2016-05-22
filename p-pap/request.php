@@ -1153,7 +1153,11 @@ if($req == "login"){
             $db->insert_data("pap_supplier_ct",array(null,$sid,$_POST['cname'][$i],$_POST['cemail'][$i],$_POST['ctel'][$i],$_POST['cetc'][$i]));
         }
     }
-
+    //add meta
+    $meta = array(
+        "branch" => $_POST['branch']
+    );
+    $db->update_meta("pap_supplier_meta", "supplier_id", $sid, $meta);
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req == "edit_supplier"){
@@ -1181,7 +1185,12 @@ if($req == "login"){
     //update cat
     $db->delete_data("pap_supplier_cat", "supplier_id", $sid);
     $db->insert_data("pap_supplier_cat", array($_POST['cat'],$sid));
-
+    
+    //update meta
+    $meta = array(
+        "branch" => $_POST['branch']
+    );
+    $db->update_meta("pap_supplier_meta", "supplier_id", $sid, $meta);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req == "add_sup_ct"){
