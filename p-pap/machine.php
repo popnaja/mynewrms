@@ -117,9 +117,19 @@ if($action=="add"){
     __autoload("pdo_tb");
     $tbpdo = new tbPDO();
     $tb = new mytable();
+    $cat = (isset($_GET['cat'])&&$_GET['cat']!=0?$_GET['cat']:null);
+    $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+    $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+    $iperpage = 20;
+    
+    //list
+    $cats = $db->get_keypair("pap_process_cat", "id", "name");
+    
     //view
     $head = array("เครื่องจักร","กระบวนการ","หน่วย","เวลาตั้งเครื่อง(นาที)","กำลังการผลิต(หน่วย/ชม)","ช่าง");
-    $rec = $tbpdo->view_machine($pauth);
+    $all_rec = $tbpdo->view_machine($pauth,$cat,$s);
+    $rec = $tbpdo->view_machine($pauth,$cat,$s,$page,$iperpage);
+    $max = ceil(count($all_rec)/$iperpage);
     $addhtml = "";
     if($pauth==1){
     } else {
@@ -131,6 +141,10 @@ if($action=="add"){
     $content .= "<h1 class='page-title'>$pagename $addhtml</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
+            . $tb->show_search(current_url(), "cusid", "s","ค้นหาชื่อเครื่องจักร หรือชื่อกระบวนการผลิต",$s)
+            . $tb->show_filter(current_url(), "cat", $cats, $cat,"--กลุ่มการผลิต--")
+            . "<div class='tb-clear-filter'><a href='$redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
+            . $tb->show_pagenav(current_url(), $page, $max)
             . $tb->show_table($head,$rec)
             . "</div>";
 }

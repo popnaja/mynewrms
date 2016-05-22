@@ -60,6 +60,7 @@ LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_a
 LEFT JOIN pap_option AS po ON po.op_id=meta_value
 $filter
 ORDER BY po.op_name ASC , user_login ASC
+$lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             if(isset($perpage)){
@@ -120,6 +121,7 @@ END_OF_TEXT;
                     LEFT JOIN pap_process_cat AS pc ON pc.id=process_cat_id
                     $filter
                     ORDER BY pc.id ASC , process_name ASC
+                    $lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             if(isset($perpage)){
@@ -161,6 +163,7 @@ END_OF_TEXT;
                     LEFT JOIN pap_option AS op1 ON op1.op_id=inside_paper
                     $filter
                     ORDER BY size_name ASC
+                    $lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             if(isset($perpage)){
@@ -565,12 +568,21 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_machine($auth){
+    public function view_machine($auth,$cat=null,$s=null,$page=null,$perpage=null){
         try {
             $edit = "";
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
+            $filter = "WHERE ma.id>0";
+            $filter .= (isset($cat)?" AND pc.process_cat_id=$cat":"");
+            $filter .= (isset($s)?" AND ma.name LIKE '%$s%' OR pc.process_name LIKE '%$s%'":"");
             if($auth>1){
                 $edit = <<<END_OF_TEXT
-                        CONCAT("<a href='machine.php?mid=",ma.id,"' title='Edit' class='icon-page-edit'></a>"),
+CONCAT("<a href='machine.php?mid=",ma.id,"' title='Edit' class='icon-page-edit'></a>"),
+END_OF_TEXT;
+            } else {
+                $edit .= <<<END_OF_TEXT
+CONCAT("<span class='icon-page-edit'></span>"),
 END_OF_TEXT;
             }
             $sql = <<<END_OF_TEXT
@@ -590,8 +602,15 @@ LEFT JOIN (
     LEFT JOIN pap_user AS pu ON pu.user_id=mu.user_id
     GROUP BY mach_id
 ) AS uu ON uu.mach_id=ma.id
+$filter
+ORDER BY pc.process_cat_id ASC, ma.name ASC
+$lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $ex) {
