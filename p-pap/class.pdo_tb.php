@@ -321,7 +321,7 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 $edit
-CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' class='icon-print' target='_blank'></a>"),
+CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' class='icon-print' target='_blank'></a>") AS print,
 CONCAT(quote_no,"<br/>",name),
 cus.customer_name,
 FORMAT(q_price,0),
@@ -355,6 +355,10 @@ END_OF_TEXT;
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach($res as $k=>$v){
                 $view = "";
+                //hide print if status = draft
+                if($v['status']==1){
+                    $res[$k]['print'] = "&nbsp;";
+                }
                 if(strlen($v['qsign'])>0){
                     $qsign = substr(ROOTS,0,-1).$v['qsign'];
                     $view = ($v['status']==9?"<a href='$qsign' title='View Doc' class='icon-search' target='_blank'></a>":"");

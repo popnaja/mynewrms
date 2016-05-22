@@ -541,6 +541,7 @@ class mytable {
     public function show_quote_tb($head,$rec,$id=null,$numcol,$margin,$adj){
         $sum = 0;
         $len = sizeof($head,0);
+        $span = $len-1;
         $html = "<div id='$id' class='ez-table'>"
                 . "<table>"
                 . "<tr class='tb-head tb-row'>";
@@ -553,8 +554,8 @@ class mytable {
             $tt_mg = 0;
             $j = 0;
             foreach($rec as $k=>$v){
-                $rows = count($v);
-                $ttd = ($rows==0?"<td colspan='6'></td>":"");
+                $rows = (count($v)==0?1:count($v));
+                $ttd = (count($v)==0?"<td colspan='$span'>&nbsp;</td>":"");
                 $html .= "<tr class='tb-first-gp tb-data'><th rowspan='$rows'>$k</th>".$ttd;
                 $i = 0;
                 foreach($v as $kk=>$vv){

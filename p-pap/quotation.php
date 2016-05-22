@@ -29,6 +29,11 @@ body {
 }
 </style>
 END_OF_TEXT;
+    $info = $db->get_quote_info($qid);
+    if($info['status']==1){
+        header("location:".$redirect);
+        exit;
+    }
     $content = $menu->showhead()
             . show_quote_df($qid)
             . "</body>";
@@ -230,7 +235,7 @@ if($action=="add"){
         . $form->show_num("discount",$info['discount'],0.01,"","ส่วนลด","","label-3070 ","min='0' ");
     } else {
         if($info['status']==1){
-            unset($qstatus[2]);
+            $qstatus = array("1" => "ฉบับร่าง");
         }
         if($info['status']<4){
             unset($qstatus[5]);
@@ -301,13 +306,19 @@ if($action=="add"){
 
 
     //output to html
-    $print_q = "<a href='quotation.php?action=print&qid=$qid' title='Print' class='icon-print' target='_blank'></a>";
+    if($pauth>=3||$info['status']>1){
+        $print_q = "<a href='quotation.php?action=print&qid=$qid' title='Print' class='icon-print' target='_blank'></a>";
+        $tabs = $form->show_tabs("view-tab",array("สถานะ","แสดงราคาแยกส่วน","เสนอราคาหลายยอด"),array($ustatus,$pricetab,$mquote),0);
+    } else {
+        $print_q = "";
+        $tabs = $form->show_tabs("view-tab",array("สถานะ"),array($ustatus),0);
+    }
     $content .= "<h1 class='page-title'>แก้ไข$pagename".$print_q."</h1>"
             . "<div id='ez-msg'>".  showmsg()."</div>"
             . "<div class='col-100'>"
             . $form->show_st_form(null, false, true)
             . $cost_adj
-            . $form->show_tabs("view-tab",array("สถานะ","แสดงราคาแยกส่วน","เสนอราคาหลายยอด"),array($ustatus,$pricetab,$mquote),0)
+            . $tabs
             . "<div class='col-50'>"
             . $form->show_text("qno","qno",$info['quote_no'],"","รหัสใบเสนอราคา","","label-3070 readonly",null,"readonly")
             . $form->show_text("scid","scid",$info['customer_name'],"","บริษัท","","label-3070 readonly",null,"readonly")
@@ -354,6 +365,7 @@ if($action=="add"){
             . $form->show_submit("submit","Update","but-right")
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)
+            . $form->show_hidden("pauth","pauth",$pauth)
             . $form->show_hidden("redirect","redirect",$redirect);
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("$('#papform').submit();")

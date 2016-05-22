@@ -873,33 +873,43 @@ if($req == "login"){
             $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allo,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
         }
     }
-    //คำนวนหลายยอดพิมพ์
-    $arramount = array();
-    for($i=0;$i<count($_POST['m_amount']);$i++){
-        $amount = $_POST['m_amount'][$i];
-        if($amount>0){
-            array_push($arramount,$amount);
-        }
+    if($_POST['pauth']>=3){
+        //adjust margin
+        $meta['adj_margin'] = implode(",",$_POST['adj_margin']);
     }
-    $mquote = array();
-    for($i=0;$i<count($_POST['qtt']);$i++){
-        if($_POST['qtt'][$i]>0){
-            $arrinfo = array(
-                "show" => $_POST['qshow'][$i],
-                "amount" => $_POST['qqty'][$i],
-                "remark" => $_POST['qlist'][$i],
-                "price" => $_POST['qtt'][$i]
-            );
-          array_push($mquote,$arrinfo);
+    if($_POST['pauth']>=3||$status>1){
+        //คำนวนหลายยอดพิมพ์
+        $arramount = array();
+        for($i=0;$i<count($_POST['m_amount']);$i++){
+            $amount = $_POST['m_amount'][$i];
+            if($amount>0){
+                array_push($arramount,$amount);
+            }
         }
-    }
-
-    //แสดงราคาแยกส่วน
-    $detail_price = array();
-    for($i=0;$i<count($_POST['ptt']);$i++){
-        if($_POST['ptt'][$i]>0){
-          array_push($detail_price,array($_POST['pshow'][$i],$_POST['plist'][$i],$_POST['pqty'][$i],$_POST['pperu'][$i],$_POST['ptt'][$i]));
+        $mquote = array();
+        for($i=0;$i<count($_POST['qtt']);$i++){
+            if($_POST['qtt'][$i]>0){
+                $arrinfo = array(
+                    "show" => $_POST['qshow'][$i],
+                    "amount" => $_POST['qqty'][$i],
+                    "remark" => $_POST['qlist'][$i],
+                    "price" => $_POST['qtt'][$i]
+                );
+              array_push($mquote,$arrinfo);
+            }
         }
+        //แสดงราคาแยกส่วน
+        $detail_price = array();
+        for($i=0;$i<count($_POST['ptt']);$i++){
+            if($_POST['ptt'][$i]>0){
+        array_push($detail_price,array($_POST['pshow'][$i],$_POST['plist'][$i],$_POST['pqty'][$i],$_POST['pperu'][$i],$_POST['ptt'][$i]));
+            }
+        }
+        $meta += array(
+            "cal_amount" => implode(",",$arramount),
+            "detail_price" => json_encode($detail_price),
+            "multi_quote_info" => json_encode($mquote)
+        );
     }
     //อื่นๆ
     $other = array();
@@ -908,7 +918,6 @@ if($req == "login"){
             array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i]));
         }
     }
-
      //update meta
     $meta += array(
         "remark" => $_POST['remark'],
@@ -918,13 +927,9 @@ if($req == "login"){
         "distance" => $_POST['distance'],
         "location" => $_POST['location'],
         "discount" => $_POST['discount'],
-        "adj_margin" => implode(",",$_POST['adj_margin']),
         "contact_id" => (isset($_POST['cusct'])?$_POST['cusct']:0),
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
-        "cal_amount" => implode(",",$arramount),
-        "detail_price" => json_encode($detail_price),
-        "multi_quote_info" => json_encode($mquote),
         "other_price" => json_encode($other)
     );
 
@@ -974,7 +979,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");
