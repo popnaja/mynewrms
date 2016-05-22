@@ -188,12 +188,13 @@ function new_pcost($pid,$arrinfo){
             $check = $arrinfo[$value['cond']];
             if($check>=$value['btw']&&$check<=($value['to']>0?$value['to']:INF)){
                 $res = cost_formular($value,$amount,$arrinfo);
+                array_unshift($res,$amount);
                 break;
             }
         } else {
             $res = cost_formular($value,$amount,$arrinfo);
+            array_unshift($res,$amount);
         }
-        array_unshift($res,$amount);
     }
     if(!isset($res)){
         var_dump($pid);
@@ -209,7 +210,6 @@ function cost_formular($value,$amount,$arrinfo){
         foreach($arrinfo as $k=>$v){
             $for = str_replace($k,$v,$for);
         }
-        var_dump($for);
         $cinfo = calculate_string($for);
         $cost_per_u = $value['formular'];
     } else {
@@ -221,7 +221,7 @@ function cost_formular($value,$amount,$arrinfo){
 function calculate_string( $mathString )    {
     $mathString = trim($mathString);     // trim white spaces
     // remove any non-numbers chars; exception for math operators
-    $mathString = ereg_replace ('[^0-9\+-\*\/\(\) ]', '', $mathString);
+    $mathString = preg_replace ('/[^0-9\\+\\-\\*\\/\\(\\)\\. ]/', '', $mathString);
     $compute = create_function("", "return (" . $mathString . ");" );
     return 0 + $compute();
 }
