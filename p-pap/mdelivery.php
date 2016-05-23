@@ -321,7 +321,7 @@ if($action=="add"){
     $all_rec = $tbpdo->view_job_mdeli($pauth,$op_job_delivery_icon,$mm,$status,$s);
     $addhtml = "";
     if($pauth>1){
-        $csvlink = $root."csv_download.php?req=deli_csv&month=$mm";
+        $csvlink = $root."csv_download.php?req=mdeli_csv&month=$mm";
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
     }

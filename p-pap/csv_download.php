@@ -36,6 +36,13 @@ if($req == "quote_csv"){
     $tt = array_merge($head,$rec);
     //var_dump($tt);
     $filename = "deli.csv";
+} else if($req == "mdeli_csv"){
+    $month = filter_input(INPUT_GET,'month',FILTER_UNSAFE_RAW);
+    $head[] = array("ชื่องาน","ลูกค้า","ยอดผลิต","ยอดแจ้งหนี้","สร้าง","ใบแจ้งหนี้","ใบส่งของ","สถานะ");
+    $rec = $db->get_mdeli_csv($op_job_status+$op_job_account,$month);
+    $tt = array_merge($head,$rec);
+    //var_dump($tt);
+    $filename = "mdeli.csv";
 } else {
     header("location:".PAP);
     exit();
@@ -181,7 +188,7 @@ quo.plan_delivery AS due,
 quo.amount,
 deli.date,
 deli.no,
-GROUP_CONCAT(tdeli.no) AS gtno,
+GROUP_CONCAT(tdeli.no ORDER BY tdeli.no) AS gtno,
 deli.status
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS quo on quo.quote_id=po.quote_id
@@ -192,6 +199,38 @@ LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
 $filter
 GROUP BY po.order_id
 ORDER BY quo.plan_delivery ASC, tdeli.id ASC
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach($res as $k=>$v){
+                $res[$k]['status'] = $op[$v['status']];
+            }
+            return $res;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
+    public function get_mdeli_csv($op,$month=null){
+        try {
+            $filter = "WHERE dt.order_id=''";
+            $filter .= (isset($month)&&$month!=""?" AND DATE_FORMAT(deli.date,'%y%m')='$month'":"");
+            $sql = <<<END_OF_TEXT
+SELECT
+dt.job_name,cus.customer_name,
+FORMAT(dt.qty,0) AS qty,FORMAT(dt.price,2) AS price,
+deli.date,
+deli.no AS delino,
+GROUP_CONCAT(CONCAT(tdeli.no,"(",tdt.qty,")") ORDER BY tdeli.no ASC) AS tdeli,
+deli.status
+FROM pap_delivery_dt AS dt
+LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
+LEFT JOIN pap_customer AS cus ON cus.customer_id=dt.customer_id
+LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
+LEFT JOIN pap_temp_dt AS tdt ON tdt.job_name=dt.job_name AND temp_deli_id=tdeli.id
+$filter
+GROUP BY dt.job_name
+ORDER BY deli.date ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
