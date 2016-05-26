@@ -684,6 +684,8 @@ if($req == "login"){
     $ainfo = json_decode($adata['paper_allo'],true);
     $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
+    $coat2 = array();
+    $coatpage = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
@@ -695,7 +697,7 @@ if($req == "login"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2){
+            } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
             } else {
                 $page = $_POST['page'][$i];
@@ -713,6 +715,10 @@ if($req == "login"){
             //add comp
             $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
             $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allowance,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
+            //coat2
+            array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
+            //coat pages
+            array_push($coatpage,($type=="2"||$type=="6"?$_POST['coatpage'][$i]:0));
         }
     }
     //คำนวนหลายยอดพิมพ์
@@ -744,7 +750,9 @@ if($req == "login"){
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
         "cal_amount" => implode(",",$arramount),
-        "other_price" => json_encode($other)
+        "other_price" => json_encode($other),
+        "coat2" => json_encode($coat2),
+        "coatpage" => json_encode($coatpage)
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
@@ -798,7 +806,7 @@ if($req == "login"){
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?qid=".$qid);
+    //header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
     $qid = filter_input(INPUT_POST,"qid",FILTER_SANITIZE_NUMBER_INT);
     $status = (int)filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);
@@ -841,6 +849,8 @@ if($req == "login"){
     $ainfo = json_decode($adata['paper_allo'],true);
     $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
+    $coat2 = array();
+    $coatpage = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
@@ -852,7 +862,7 @@ if($req == "login"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2){
+            } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
             } else {
                 $page = $_POST['page'][$i];
@@ -871,6 +881,10 @@ if($req == "login"){
             $allo = (isset($_POST['allowance'][$i])?$_POST['allowance'][$i]:$allowance);
             $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
             $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allo,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
+            //coat2
+            array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
+            //coat pages
+            array_push($coatpage,($type=="2"||$type=="6"?$_POST['coatpage'][$i]:0));
         }
     }
     if($_POST['pauth']>=3){
@@ -930,7 +944,9 @@ if($req == "login"){
         "contact_id" => (isset($_POST['cusct'])?$_POST['cusct']:0),
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
-        "other_price" => json_encode($other)
+        "other_price" => json_encode($other),
+        "coat2" => json_encode($coat2),
+        "coatpage" => json_encode($coatpage)
     );
 
     //ต่อรองราคา
