@@ -26,6 +26,8 @@ function cal_quote($info,$comps){
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
     }
+    $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
+    $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     for($i=0;$i<$num;$i++){
         $unit = $units[$i];
         //var_dump($unit);
@@ -122,7 +124,13 @@ function cal_quote($info,$comps){
         //coating เคลือบคิดเต็มริม
         if($com['comp_coating']>0){
             $cost = new_pcost($com['comp_coating'],$unit);
-            array_push($res['หลังพิมพ์'],array_merge(array("เคลือบ $cname"),$cost));
+            $cpage = (is_array($coatpage)&&$coatpage[$i]>0?$coatpage[$i]." หน้า":"");
+            array_push($res['หลังพิมพ์'],array_merge(array($processes[$com['comp_coating']]." $cname ".$cpage),$cost));
+        }
+        //coat2
+        if(is_array($coat2)&&$coat2[$i]>0){
+            $cost = new_pcost($coat2[$i],$unit);
+            array_push($res['หลังพิมพ์'],array_merge(array($processes[$coat2[$i]]." $cname(ด้านใน)"),$cost));
         }
         //post process หลังงานพิมพ์คิดเต็มริม
         $post = explode(",",$com['comp_postpress']);
@@ -247,6 +255,8 @@ function unit_cal($quote,$comps){
     $n = count($comps);
     $amount = $quote['amount'];
     $res = array();
+    $c = 0;
+    $coatpage = (isset($quote['coatpage'])?json_decode($quote['coatpage']):0);
     foreach($comps as $k=>$comp){
         $color = $op_print_color[$comp['comp_print_id']];
         $allo = $res[$k]['allo'] = $comp['comp_paper_allowance'];
@@ -410,7 +420,15 @@ function unit_cal($quote,$comps){
             }
         }
         $res[$k]['ff'] = $frame;
-        $res[$k]['in2'] = $res[$k]['sheet']*$sinfo['width']*$sinfo['length'];
+        //คำนวณพื้นที่เคลือบ
+        if($type==2||$type==6){
+            $cpage = (is_array($coatpage)?$coatpage[$c]:0);
+            $csheet = ceil($amount*$cpage/$paper_lay);
+            $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
+        } else {
+            $res[$k]['in2'] = $res[$k]['sheet']*$sinfo['width']*$sinfo['length'];
+        }
+        $c++;
     }
     //collect total unit info
     $tinfo = array(

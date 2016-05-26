@@ -75,35 +75,6 @@ function show_quote_df($qid){
     } else {
         array_push($recs,array(1,$dttb,$amount,$peru,$tt));
     }
-    //check row
-    if($x>15){
-        $page1 = "หน้า 1/2";
-        $page2 = "</div><!-- .print-a4-fix -->"
-                . "<div class='print-a4-fix'>"
-                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
-                . $head
-                . $extra;
-    } else if($x>7){
-        $page1 = "หน้า 1/2";
-        $page2 = $extra
-                . "</div><!-- .print-a4-fix -->"
-                . "<div class='print-a4-fix'>"
-                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
-                . $head;
-    } else {
-        $page1 = "";
-        $page2 = $extra;
-
-    }
-    $discount = (int)$info['discount'];
-    $tax = ($cus['tax_exclude']=="yes"?0:0.07);
-    $content = "<div class='print-a4-fix'>"
-            . print_header("ใบเสนอราคา",$page1,"ghpp_font")
-            . $head
-            . "<div class='doc-dt head-color'>"
-            . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
-            . "</div><!-- .doc-dt -->";
-
     //sign
     $pay = ($info['credit']>0?"เครดิต ".$info['credit']." วัน":"ชำระเป็นเงินสด");
     $sign = "";
@@ -117,14 +88,13 @@ function show_quote_df($qid){
         $manager = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=4");
         $msign = "<img src='".ROOTS.$manager['signature']."' />";
     }
-    $content .= $page2
-            . "<table id='rp-2sign' class='doc-final head-color'>"
+    $sig = "<table id='rp-2sign' class='doc-final head-color'>"
     . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้อนุมัติ</th><th width='180'>เจ้าหน้าที่ฝ่ายขาย</th></tr>"
     . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='70'>$msign</td><td class='doc-sign' height='70'>$sign</td></tr>"
     . "<tr><td>วันที่ : $date</td><td>วันที่ : $date</td></tr>"
     . "</table>";
 
-    $content .= "<table id='rp-cus-sign' class='doc-final head-color'>"
+    $cussign = "<table id='rp-cus-sign' class='doc-final head-color'>"
             . "<tr><td rowspan='4'>"
             . "<ul style='padding-left:0.7cm;'>"
             . "<li>บริษัทฯขอสงวนสิทธิในการเปลี่ยนแปลงราคา หากรายละเอียดงานมีการเปลี่ยนแปลงเกิดขึ้นภายหลังการว่าจ้าง</li>"
@@ -138,8 +108,37 @@ function show_quote_df($qid){
             . "<tr><td>ข้าพเจ้ารับทราบเอกสารว่าจ้างและเงื่อนไขงานตามใบเสนอราคา</td></tr>"
             . "<tr><td height='90'></td></tr>"
             . "<tr><td>ประทับตราบริษัท(ถ้ามี)<span class='float-right'>วันที่:____/_____/______</span></td></tr>"
-            . "</table";
+            . "</table>";
+    //check row
+    $discount = (int)$info['discount'];
+    $tax = ($cus['tax_exclude']=="yes"?0:0.07);
+    if($x>8){
+        $page1 = print_header("ใบเสนอราคา","หน้า 1/2","ghpp_font")
+            . $head
+            . "<div class='doc-dt head-color'>"
+            . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
+            . "</div><!-- .doc-dt -->";
+        $page2 = "</div><!-- .print-a4-fix -->"
+                . "<div class='print-a4-fix'>"
+                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
+                . $head
+                . $extra;
+    } else {
+        $page1 = print_header("ใบเสนอราคา","","ghpp_font")
+            . $head
+            . "<div class='doc-dt head-color'>"
+            . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
+            . "</div><!-- .doc-dt -->"
+            . "$extra";
+        $page2 = "";
 
+    }
+    $content = "<div class='print-a4-fix'>"
+            . $page1
+            . $sig
+            . $cussign
+            . $page2;
+            
     $content .= "</div><!-- .print-a4-fix -->";
     return $content;
 }
@@ -793,22 +792,11 @@ function job_detail($qid){
     $product_type = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='product_cat'");
     $process =  $db->get_keypair("pap_process", "process_id", "process_name");
     $comps = $db->get_print_comp($qid);
-    //page
-    if($info['cat_id']==10||$info['cat_id']==69){
-        $page = "เนื้อใน ".$info['page_inside']. " หน้า";
-    } else {
-        if($info['page_inside']==2){
-            $page = "พิมพ์ 2 ด้าน";
-        } else {
-            $page = "พิมพ์ 1 ด้าน";
-        }
-    }
     //เข้าเล่ม
     $data['บริการงานพิมพ์'] = array(
         "ชื่องาน : ".$info['name'],
         "ประเภท : ".$product_type[$info['cat_id']],
-        "ขนาด : ".$info['size'],
-        $page
+        "ขนาด : ".$info['size']
     );
     if($info['binding_id']>0){
         array_push($data['บริการงานพิมพ์'],"เข้าเล่ม : ".$process[$info['binding_id']]);
@@ -816,27 +804,48 @@ function job_detail($qid){
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
     }
-    foreach($comps as $k=>$v){
+    $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
+    $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
+    for($i=0;$i<count($comps);$i++){
+        $v = $comps[$i];
         $post = explode(",",$v['comp_postpress']);
         //name
         $type = $v['comp_type'];
         $run[$type]++;
         $cname = $op_comp_type[$type].($run[$type]>1?" ($run[$type])":"");
         $data[$cname] = array(
-            $v['paper'],
-            $v['weight']." แกรม",
-            $v['color']
+            $v['paper']." ".$v['weight']." แกรม"
         );
+        //color
+        if($type==2||$type==6){
+            array_push($data[$cname],$v['color']." ".$v['comp_page']." หน้า");
+        } else {
+            if($v['color']==$v['color2']){
+                array_push($data[$cname],$v['color']." สองด้าน");
+            } else if($v['color2']==null){
+                array_push($data[$cname],$v['color']." ด้านเดียว");
+            } else {
+                array_push($data[$cname],$v['color']."/".$v['color2']);
+            }
+        }
         //coating
         if(isset($v['coating'])){
-            array_push($data[$cname],$v['coating']);
+            array_push($data[$cname],$v['coating'].($type==2||$type==6&&is_array($coatpage)&&$coatpage[$i]>0?" $coatpage[$i] หน้า":""));
+        }
+        //coat2
+        if(is_array($coat2)&&$coat2[$i]>0){
+            array_push($data[$cname],$process[$coat2[$i]]." ด้านใน");
         }
         //cwing
         if($info['cwing']==1&&$type==1){
-            array_push($data[$cname],"ปีกปกหน้า ".$info['fwing']." cm","ปีกปกหลัง ".$info['bwing']." cm");
+            if($info['fwing']>0||$info['bwing']>0){
+                $fwing = ($info['fwing']>0?"ปีกปกหน้า ".$info['fwing']." cm":"");
+                $bwing = ($info['bwing']>0?"ปีกปกหลัง ".$info['bwing']." cm":"");
+                array_push($data[$cname],$fwing.$bwing);
+            }
         }
         //แผ่นพับ show พับกี่ส่วน
-        if($type==3&&isset($info['folding'])){
+        if($type==3&&isset($info['folding'])&&$info['folding']>0){
             array_push($data[$cname],$process[$info['folding']]);
         }
         //ไดคัท
@@ -858,17 +867,18 @@ function job_detail($qid){
     if(strlen($info['packing'])>0||strlen($info['shipping'])>0){
         $packing = explode(",",$info['packing']);
         $shipping = explode(",",$info['shipping']);
-        $data["ข้อกำหนดอื่นๆ"] = array();
+        $other = array();
         foreach($packing as $v){
             if($v>0){
-                array_push($data["ข้อกำหนดอื่นๆ"],$process[$v]);
+                array_push($other,$process[$v]);
             }
         }
         foreach($shipping as $v){
             if($v>0){
-                array_push($data["ข้อกำหนดอื่นๆ"],$process[$v]);
+                array_push($other,$process[$v]);
             }
         }
+        $data["ข้อกำหนดอื่นๆ"] = array(implode(",",$other));
     }
     if(isset($info['other_price'])){
         foreach(json_decode($info['other_price'],true) as $i=>$v){

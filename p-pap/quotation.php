@@ -445,7 +445,10 @@ function special_comp($info=null,$comps=null){
     global $form,$paper,$after,$print,$coating,$fold,$scolor;
     $size = array("0"=>"--ขนาดกระดาษ--")+$db->get_paper_keypair("mat_size");
     $html = "";
+    $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
+    $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     for($i=0;$i<8;$i++){
+        $print2class = "sel-print2_$i-".implode(" sel-print2_$i-",array_keys($print));
         if(isset($comps[$i])){
             $hid = "";
             $comp = $comps[$i];
@@ -484,6 +487,12 @@ function special_comp($info=null,$comps=null){
                 . "</div><!-- .sel-cwing_$i-1 -->"
                 . "</div><!-- .sel-compt$i-1 -->"
                 . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",$comp['comp_coating'],"","coating[]")
+                . "<div class='sel-compt$i-2 sel-compt$i-6'>"
+                . $form->show_num("coat_page_$i",(is_array($coatpage)?$coatpage[$i]:0),1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
+                . "</div>"
+                . "<div class='$print2class'>"
+                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",(is_array($coat2)?$coat2[$i]:0),"","coating2[]")
+                . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox("post_$i","post_$i",$post,"ไดคัท และอื่นๆ","label-3070")
@@ -500,6 +509,7 @@ function special_comp($info=null,$comps=null){
                 . "select_option('sother_$i');"
                 . "select_option('cwing_$i');"
                 . "select_option_byval('compt$i');"
+                . "select_option_byval('print2_$i');"
                 . "</script>";
         } else {
             $hid = ($i==0?"":"form-hide");
@@ -527,6 +537,12 @@ function special_comp($info=null,$comps=null){
                 . "</div><!-- .sel-cwing_$i-1 -->"
                 . "</div><!-- .sel-compt$i-1 -->"
                 . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",null,"","coating[]")
+                . "<div class='sel-compt$i-2 sel-compt$i-6'>"
+                . $form->show_num("coat_page_$i",0,1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
+                . "</div>"
+                . "<div class='$print2class'>"
+                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",null,"","coating2[]")
+                . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
@@ -542,6 +558,7 @@ function special_comp($info=null,$comps=null){
                 . "select_option('sother_$i');"
                 . "select_option('cwing_$i');"
                 . "select_option_byval('compt$i');"
+                . "select_option_byval('print2_$i');"
                 . "</script>";
         }
     }

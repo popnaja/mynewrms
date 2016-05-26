@@ -77,10 +77,11 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT
-comp_type,
+comp_type,comp_page,
 po1.op_name AS paper,
 po.op_name AS weight,
 pc1.process_name AS color,
+pc2.process_name AS color2,
 pc.process_name AS coating,
 cc.comp_postpress
 FROM pap_quote_comp AS cc
@@ -89,6 +90,7 @@ LEFT JOIN pap_option AS po ON po.op_id=mat.mat_weight
 LEFT JOIN pap_option AS po1 ON po1.op_id=mat.mat_type
 LEFT JOIN pap_process AS pc ON pc.process_id=comp_coating
 LEFT JOIN pap_process AS pc1 ON pc1.process_id=comp_print_id
+LEFT JOIN pap_process AS pc2 ON pc2.process_id=comp_print2
 WHERE quote_id=:qid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
