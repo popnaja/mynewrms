@@ -317,6 +317,9 @@ END_OF_TEXT;
             $sale = "";
             if($auth>3){
                 $sale = ",user.user_login";
+                $price = "FORMAT(q_price,0)";
+            } else {
+                $price = "'-'";
             }
             $sql = <<<END_OF_TEXT
 SELECT
@@ -324,7 +327,7 @@ $edit
 CONCAT("<a href='quotation.php?action=print&qid=",quo.quote_id,"' title='Print' class='icon-print' target='_blank'></a>") AS print,
 CONCAT(quote_no,"<br/>",name),
 cus.customer_name,
-FORMAT(q_price,0),
+$price,
 FORMAT(meta2.meta_value,0) AS nego,
 CONCAT(size_name,' (',size_height,'x',size_width,')') AS size,
 meta.meta_value AS pages,
