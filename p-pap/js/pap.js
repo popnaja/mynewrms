@@ -419,7 +419,7 @@ $(document).ready(function(){
         }
     });
     function change_pagelabel(ctype,index){
-        if($.inArray(parseInt(ctype),[3,4,5])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด
+        if($.inArray(parseInt(ctype),[3,4,5,7])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด สายคาด
             label.eq(index).html("จำนวน(แผ่น)");
         } else {
             label.eq(index).html("จำนวน(หน้า)");
@@ -535,7 +535,7 @@ function filter_paper(sid,type,index){
                 psize = res['cover_paper'];
                 play = res['cover_lay'];
                 pcut = res['cover_div'];
-            } else if(type==2||type==3) {
+            } else if(type==2||type==3||type==6) {
                 psize = res['inside_paper'];
                 play = res['inside_lay'];
                 pcut = res['inside_div'];

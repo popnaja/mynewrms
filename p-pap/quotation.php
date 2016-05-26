@@ -30,7 +30,7 @@ body {
 </style>
 END_OF_TEXT;
     $info = $db->get_quote_info($qid);
-    if($info['status']==1){
+    if($info['status']==1&&$pauth<3){
         header("location:".$redirect);
         exit;
     }
@@ -445,7 +445,7 @@ function special_comp($info=null,$comps=null){
     global $form,$paper,$after,$print,$coating,$fold,$scolor;
     $size = array("0"=>"--ขนาดกระดาษ--")+$db->get_paper_keypair("mat_size");
     $html = "";
-    for($i=0;$i<5;$i++){
+    for($i=0;$i<8;$i++){
         if(isset($comps[$i])){
             $hid = "";
             $comp = $comps[$i];
@@ -461,7 +461,7 @@ function special_comp($info=null,$comps=null){
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",$comp['comp_type'],"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",$comp['mat_size'],"","paper_size[]")
-                . "<div class='sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_num("paper_lay_$i",$comp['comp_paper_lay'],1,"","Lay","","label-3070","min=0","paper_lay[]")
                 . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า",$comp['comp_paper_cut'],"","paper_cut[]")
                 . "</div><!-- .sel-compt$i-3 -->"
@@ -472,7 +472,7 @@ function special_comp($info=null,$comps=null){
                 . $form->show_select("paper_gram_$i",$gram,"label-3070","แกรม",$comp['mat_weight'],"","paper_gram[]")
                 . "</div>"
                 . $form->show_select("print_$i",$print,"label-3070","สี",$comp['comp_print_id'],"","print[]")
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",$comp['comp_print2'],"","print2[]")
                 . "</div><!-- .sel-compt$i-1 -->"
                 //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
@@ -491,7 +491,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
                 . "</div>"
-                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5' sel-compt$i-6 sel-compt$i-7>"
                 . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
                 . "</div><!-- .sel-compt$i-2 -->"
         . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อกรอบ)","","label-3070","min=0","allowance[]")
@@ -506,7 +506,7 @@ function special_comp($info=null,$comps=null){
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",null,"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",null,"","paper_size[]")
-                . "<div class='sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_num("paper_lay_$i","",1,"","Lay","","label-3070","min=0","paper_lay[]")
                 . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า", null,null,"paper_cut[]")
                 . "</div><!-- .sel-compt$i-3 -->"
@@ -515,7 +515,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='tg_pweight'>"
                 . "</div>"
                 . $form->show_select("print_$i",$print,"label-3070","สี",null,"","print[]")
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",null,"","print2[]")
                 . "</div><!-- .sel-compt$i-1 -->"
                 //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
@@ -534,7 +534,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")
                 . "</div>"
-                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5'>"
+                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-6 sel-compt$i-7'>"
                 . $form->show_num("page_$i",1,1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
                 . "</div><!-- .sel-compt$i-2 -->"
                 . "</div><!-- .form-section -->"

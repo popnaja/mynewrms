@@ -695,7 +695,7 @@ if($req == "login"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2){
+            } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
             } else {
                 $page = $_POST['page'][$i];
@@ -852,7 +852,7 @@ if($req == "login"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2){
+            } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
             } else {
                 $page = $_POST['page'][$i];
@@ -979,7 +979,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");

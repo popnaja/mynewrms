@@ -87,7 +87,7 @@ if($action=="add"){
             . $form->show_st_form()
             . "<div class='cheight'>"
             . "<div class='col-50'>"
-            . $form->show_text("name","name","","เช่น A4 29.5x21.0 cm","ขนาดชิ้งาน","","label-3070")
+            . $form->show_text("name","name","","เช่น A4 29.5x21.0 cm","ขนาดชิ้นงาน","","label-3070")
             . $form->show_num("height","",0.01,"","ความสูงชิ้นงาน(cm)","","lay-input label-3070")
             . $form->show_num("width","",0.01,"","ความกว้างชิ้นงาน(cm)","","lay-input label-3070")
             . "</div><!-- .col-50 -->"
