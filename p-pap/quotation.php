@@ -461,7 +461,7 @@ function special_comp($info=null,$comps=null){
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",$comp['comp_type'],"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",$comp['mat_size'],"","paper_size[]")
-                . "<div class='sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
+                . "<div class='qlayinfo sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_num("paper_lay_$i",$comp['comp_paper_lay'],1,"","Lay","","label-3070","min=0","paper_lay[]")
                 . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า",$comp['comp_paper_cut'],"","paper_cut[]")
                 . "</div><!-- .sel-compt$i-3 -->"
@@ -506,7 +506,7 @@ function special_comp($info=null,$comps=null){
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",null,"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",null,"","paper_size[]")
-                . "<div class='sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
+                . "<div class='qlayinfo sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_num("paper_lay_$i","",1,"","Lay","","label-3070","min=0","paper_lay[]")
                 . $form->show_select("paper_cut", $op_paper_div, "label-3070","ผ่า", null,null,"paper_cut[]")
                 . "</div><!-- .sel-compt$i-3 -->"
