@@ -419,7 +419,7 @@ $(document).ready(function(){
         }
     });
     function change_pagelabel(ctype,index){
-        if($.inArray(parseInt(ctype),[3,4,5])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด
+        if($.inArray(parseInt(ctype),[3,4,5,7])!=-1){ //ชิ้นงาน ใบพาด แจ็คเก็ด สายคาด
             label.eq(index).html("จำนวน(แผ่น)");
         } else {
             label.eq(index).html("จำนวน(หน้า)");
@@ -437,6 +437,7 @@ $(document).ready(function(){
         }
         function sel_ok(){
             filter_papern(size,i);
+            $(".qlayinfo").eq(i).css({"display":"block"});
         }
         function sel_cancel(){
             filter_paper($("#sid").val(),ctype,i);
@@ -524,35 +525,35 @@ function filter_paper(sid,type,index){
         dataType:"json",
         data:data,
         success: function(res) {
-            
             var size_sel = $("[name='paper_size[]']");
             var lay = $("[name='paper_lay[]']");
             var cut = $("[name='paper_cut[]']");
-            var psize,play,pcut,sel_type;
+            var psize,play,pcut;
             //console.log(res);
             //show size,lay,cut
             if(type==1){
                 psize = res['cover_paper'];
                 play = res['cover_lay'];
                 pcut = res['cover_div'];
-            } else if(type==2||type==3) {
+            } else if(type==2||type==3||type==6) {
                 psize = res['inside_paper'];
                 play = res['inside_lay'];
                 pcut = res['inside_div'];
             } else {
-                if(typeof res['clay'] != "string"){
+                if(res['clay']!=""){
                     $.each(res['clay'],function(k,v){
                         if(v[0]==type){
                             psize = v[1];
                             play = v[3];
                             pcut = v[2];
-                            return false;
                         }
                     });
                 } else {
-                    psize = 0;
-                    play = "";
-                    pcut = 0;
+                    size_sel.eq(index).val(0);
+                    lay.eq(index).val("");
+                    cut.eq(index).val(0);
+                    pg_loading(false);
+                    return false;
                 }
             }
             size_sel.eq(index).val(psize);
