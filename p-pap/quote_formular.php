@@ -250,7 +250,8 @@ function unit_cal($quote,$comps){
     $set_id = array(
         8 => 41,
         4 => 40,
-        2 => 8
+        2 => 8,
+        1 => 0
     );
     $n = count($comps);
     $amount = $quote['amount'];
@@ -276,7 +277,7 @@ function unit_cal($quote,$comps){
         $res[$k]["piece"] = $quote['amount'];
         
         $type = $comp['comp_type'];
-        if($type==2){                   //เนื้อใน
+        if($type==2||$type==6){                   //เนื้อใน
             $frame = $page/$paper_lay;
             $res[$k]['finfo'] = array();
             $res[$k]['sinfo'] = array();
@@ -351,23 +352,40 @@ function unit_cal($quote,$comps){
                             $cut += $div*($amount+ceil($allo*$s*$paper_lay));
                             $yok += $div*($amount+ceil($allo*$s*$paper_lay));
                             $i++;
-                            //check folding
-                            if(isset($set_id[$ss/2*$paper_lay])){
-                                $sid = $set_id[$ss/2*$paper_lay];
-                                $set = $amount+ceil($allo*$s*$paper_lay);
-                            } else if(isset($set_id[$ss/2*$paper_lay/2])){
-                                $sid = $set_id[$ss/2*$paper_lay/2];
-                                $set = $amount+ceil($allo*$s*$paper_lay)*2;
-                            }
                             array_push($res[$k]['finfo'],array(
                                 "frameid" => $op_print_toplate[$comp['comp_print_id']],
                                 "frame" => 1,
                                 "round" => $round
                             ));
-                            array_push($res[$k]['sinfo'],array(
-                                "foldid" => $sid,
-                                "set" => $set
-                            ));
+                            //check folding
+                            if(isset($set_id[$s*$paper_lay])){
+                                array_push($res[$k]['sinfo'],array(
+                                    "foldid" => $set_id[$s*$paper_lay],
+                                    "set" => $amount+$allo
+                                ));
+                            } else {
+                                $st = $s*$paper_lay;
+                                $setcomp = array();
+                                while($st>0){
+                                    foreach($set_id as $fpage=>$sid){
+                                        while($st/$fpage>=1){
+                                            $fid = $set_id[$fpage];
+                                            if(!isset($setcomp[$fid])){
+                                                $setcomp[$fid] = $amount+$allo;
+                                            } else {
+                                                $setcomp[$fid] += $amount+$allo;
+                                            }
+                                            $st -= $fpage;
+                                        }
+                                    }
+                                }
+                                foreach($setcomp as $fid=>$set){
+                                    array_push($res[$k]['sinfo'],array(
+                                        "foldid" => $fid,
+                                        "set" => $set
+                                    ));
+                                }
+                            }
                         }
                     }
                 }
@@ -444,7 +462,7 @@ function unit_cal($quote,$comps){
     //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];
-        $set = (in_array($unit['type'],array(1,2,3))?$unit['set']:0);
+        $set = (in_array($unit['type'],array(1,2,3,6))?$unit['set']:0);
         if($quote['binding_id']==1){
             $tinfo['set'] += ($unit['type']==1?0:$set);
         } else {
