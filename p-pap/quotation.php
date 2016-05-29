@@ -184,8 +184,11 @@ if($action=="add"){
 
     //show tb-cost
     if($pauth==4){
+        //margin
         $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
-        $margin = $cinfo['margin'];
+        $cmargin = $cinfo['margin'];
+        //margin by group
+        $margin = $db->get_group_margin($info['customer_id'], $cmargin);
         $head = array("กลุ่มรายการ","รายการต้นทุน","จำนวน","ต้นทุนต่อหน่วย","ต้นทุนรวม","%margin","ราคารวม");
         $aamount = (isset($info['cal_amount'])&&$info['cal_amount']!=""?explode(",",$info['cal_amount']):array());
         array_unshift($aamount,$info['amount']);

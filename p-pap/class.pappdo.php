@@ -1646,4 +1646,22 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_group_margin($cid,$cmargin){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT IFNULL(meta_value,:cmargin) AS margin
+FROM pap_customer_cat AS cat
+LEFT JOIN pap_term_meta AS meta ON meta.term_id=cat.tax_id AND meta_key='margin'
+WHERE customer_id=:cid
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":cid",$cid);
+            $stmt->bindParam(":cmargin",$cmargin);
+            $stmt->execute();
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $res['margin'];
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
 }

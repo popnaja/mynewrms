@@ -1129,6 +1129,11 @@ if($req == "login"){
 } else if($req=="add_term"){
     //add term
     $tid = $db->insert_data("pap_term", array(null,$_POST['name'],$_POST['slug'],$_POST['des']));
+    //meta
+    if(isset($_POST['margin'])){
+        $meta['margin'] = $_POST['margin'];
+        $db->update_meta("pap_term_meta", "term_id", $tid, $meta);
+    }
     //add tax
     $parent = $_POST['parent'];
     if($parent>0){
@@ -1153,6 +1158,11 @@ if($req == "login"){
         "des" => $_POST['des']
     );
     $db->update_data("pap_term", "id", $tid, $arrinfo);
+    //meta
+    if(isset($_POST['margin'])){
+        $meta['margin'] = $_POST['margin'];
+        $db->update_meta("pap_term_meta", "term_id", $tid, $meta);
+    }
     //update term_tax
     if($_POST['oparent']!=$parent){
         $termdb->update_parent($_POST['tax'],$tid,$_POST['oparent'],$parent);

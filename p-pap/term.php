@@ -44,14 +44,21 @@ if(isset($tid)){
     }
 /*-----------------------------------------------------------------------------EDIT ------------------------------------------------*/
     $info = $termdb->get_terminfo($tax,$tid);
+    $meta = $db->get_meta("pap_term_meta", "term_id", $tid);
     $parents = array(0=>"--ไม่มี--")+$termdb->get_parent($tax,$info['lineage']);
+    if($tax=="customer"){
+        $margin = $form->show_num("margin",(isset($meta['margin'])?$meta['margin']:""),0.01,"","Margin(%)","","label-inline");;
+    } else {
+        $margin = "";
+    }
     $content .= "<h1 class='page-title'>$submenu</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-50'>"
             . $form->show_st_form()
             . $form->show_text("name","name",$info['name'],"",$submenu.$req,"","label-inline")
             . $form->show_text("slug","slug",$info['slug'],"ภาษาอังกฤษ หรือ ตัวเลข 1-5 ตัวอักษร","รหัสกลุ่ม".$req,"","label-inline")
-            . $form->show_select("parent", $parents, "label-inline", "กลุ่มใหญ่", $info['parent'])
+            . $form->show_select("parent", $parents, "label-inline", "กลุ่มหลัก", $info['parent'])
+            . $margin
             . $form->show_textarea("des",$info['des'],4,10,"","คำอธิบาย","label-inline")
             . $form->show_hidden("tax","tax",$tax)
             . $form->show_hidden("tid","tid",$tid)
@@ -78,13 +85,19 @@ if(isset($tid)){
             . "<div id='ez-msg'>".  showmsg() ."</div>";
     if($pauth>1){
 /*-----------------------------------------------------------------------------ADD ------------------------------------------------*/
+        if($tax=="customer"){
+            $margin = $form->show_num("margin","",0.01,"","Margin(%)","","label-inline");;
+        } else {
+            $margin = "";
+        }
         $parents = array(0=>"--ไม่มี--")+$termdb->get_parent($tax);
         $content .= "<div class='col-50'>"
                 . "<h3>เพิ่ม $submenu</h3>"
                 . $form->show_st_form()
                 . $form->show_text("name","name","","",$submenu.$req,"","label-inline")
                 . $form->show_text("slug","slug","","ภาษาอังกฤษ หรือ ตัวเลข 1-5 ตัวอักษร","รหัสกลุ่ม".$req,"","label-inline")
-                . $form->show_select("parent", $parents, "label-inline", "กลุ่มใหญ่", null)
+                . $form->show_select("parent", $parents, "label-inline", "กลุ่มหลัก", null)
+                . $margin
                 . $form->show_textarea("des","",4,10,"","คำอธิบาย","label-inline")
                 . $form->show_hidden("tax","tax",$tax);
 
