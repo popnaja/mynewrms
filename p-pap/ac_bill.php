@@ -36,9 +36,9 @@ END_OF_TEXT;
     if(isset($bid)){
         $show = show_pbill($bid);
     } else if(isset($ivid)){
-        $show = show_invoice_ghpp($ivid);
+        $show = show_invoice_ghpp1($ivid);
     } else if(isset($rcid)){
-        $show = show_rc_ghpp($rcid);
+        $show = show_rc_ghpp1($rcid);
     }
     $content = $menu->showhead()
             . $show

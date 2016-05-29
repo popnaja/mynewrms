@@ -27,7 +27,7 @@ function show_quote_df($qid){
     
     //job detail
     $jdetail = job_detail($qid);
-    $dttb = job_dttb($jdetail);
+    $dttb = job_dttb_ghpp($jdetail);
     $x = ceil((count($jdetail,1)-count($jdetail))/2);
     
     //$due = ($info['plan_delivery']>0?"<div class='print-list-title'>กำหนดส่งงาน : ".thai_date($info['plan_delivery'])."</div>":"");
@@ -57,7 +57,7 @@ function show_quote_df($qid){
     $tt = (float)$info['q_price'];
     $amount = (int)$info['amount'];
     $peru = $tt/$amount;
-    $header = array("ลำดับ<br/>No","รายการ<br/>List","จำนวน<br/>Quantity","ราคาหน่วยละ<br/>Unit Price","จำนวนเงิน<br/>Amount(Baht)");
+    $header = array("ลำดับ","รายการ","จำนวน","ราคาหน่วยละ","จำนวนเงิน");
     $recs = array();
     if(isset($info['detail_price'])){
         $dt = json_decode($info['detail_price'],true);
@@ -79,7 +79,7 @@ function show_quote_df($qid){
     $pay = ($info['credit']>0?"เครดิต ".$info['credit']." วัน":"ชำระเป็นเงินสด");
     $sign = "";
     $msign = "";
-    $date = thai_date($show_date);
+    $date = thai_date($show_date,true);
     if($info['user_id']>0){
         $sale = $db->get_keypair("pap_usermeta", "meta_key", "meta_value","WHERE user_id=".$info['user_id']);
         $sign = (isset($sale['signature'])&&$sale['signature']!=""?"<img src='".ROOTS.$sale['signature']."' />":"");
@@ -89,8 +89,8 @@ function show_quote_df($qid){
         $msign = "<img src='".ROOTS.$manager['signature']."' />";
     }
     $sig = "<table id='rp-2sign' class='doc-final head-color'>"
-    . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='180'>ผู้อนุมัติ</th><th width='180'>เจ้าหน้าที่ฝ่ายขาย</th></tr>"
-    . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='70'>$msign</td><td class='doc-sign' height='70'>$sign</td></tr>"
+    . "<tr><th width='110'>การชำระเงิน :</th><td>$pay</td><th width='150'>ผู้อนุมัติ</th><th width='150'>เจ้าหน้าที่ฝ่ายขาย</th></tr>"
+    . "<tr><th rowspan='2'>หมายเหตุ : </th><td rowspan='2'>".$info['remark']."</td><td class='doc-sign' height='50'>$msign</td><td class='doc-sign' height='50'>$sign</td></tr>"
     . "<tr><td>วันที่ : $date</td><td>วันที่ : $date</td></tr>"
     . "</table>";
 
@@ -103,10 +103,10 @@ function show_quote_df($qid){
             . "<li>บริษัทฯขอสงวนสิทธิในการไม่รับผิดชอบ หากมีการละเมิดลิขสิทธิ์ในข้อเขียน, บทความ, บทปรพันธ์, การออกแบบ ฯลฯ</li>"
             . "</ul>"
             . "</td>"
-            . "<th width='360'>สำหรับลูกค้าเพื่อตอบรับและส่งกลับมาที่บริษัทฯ</th>"
+            . "<th width='300'>สำหรับลูกค้าเพื่อตอบรับและส่งกลับมาที่บริษัทฯ</th>"
             . "</tr>"
-            . "<tr><td>ข้าพเจ้ารับทราบเอกสารว่าจ้างและเงื่อนไขงานตามใบเสนอราคา</td></tr>"
-            . "<tr><td height='90'></td></tr>"
+            . "<tr><td style='text-align:center'>รับทราบเอกสารว่าจ้างและเงื่อนไขตามใบเสนอราคา</td></tr>"
+            . "<tr><td height='70'></td></tr>"
             . "<tr><td>ประทับตราบริษัท(ถ้ามี)<span class='float-right'>วันที่:____/_____/______</span></td></tr>"
             . "</table>";
     //check row
@@ -742,7 +742,7 @@ function print_cus_info($cid,$aid=0,$showtax=true,$ctid=null){
     } else {
         $name =  $sinfo['customer_name'];
         $address = $sinfo['customer_address']
-        . "<br/>Tel. ".$sinfo['customer_tel'];
+        . " Tel. ".$sinfo['customer_tel'];
     }
     $tax = ($showtax?"<div class='float-left' style='clear:left'>เลขประจำตัวผู้เสียภาษีอากร ".$sinfo['customer_taxid']." ".$sinfo['c_branch']."</div>":"");
     $sup = "<h3>CUSTOMER'S NAME</h3>"
@@ -785,6 +785,23 @@ function job_dttb($data){
     $dttb .= "</table>";
     return $dttb;
 }
+function job_dttb_ghpp($data){
+    $dttb = "<div class='list-job-dt'>";
+    foreach($data as $k=>$v){
+        $dttb .= "<p><span style='font-weight:600'>$k : </span>";
+        if(is_array($v)){
+            for($i=0;$i<count($v);$i++){
+                $dttb .= ($i==0?"":"<br/>")
+                        . $v[$i];
+            }
+        } else {
+            $dttb .= $v;
+        }
+        $dttb .= "</p>";
+    }
+    $dttb .= "</div>";
+    return $dttb;
+}
 function job_detail($qid){
     global $rpdb,$op_comp_type;
     $db = $rpdb;
@@ -793,13 +810,13 @@ function job_detail($qid){
     $process =  $db->get_keypair("pap_process", "process_id", "process_name");
     $comps = $db->get_print_comp($qid);
     //เข้าเล่ม
-    $data['บริการงานพิมพ์'] = array(
-        "ชื่องาน : ".$info['name'],
-        "ประเภท : ".$product_type[$info['cat_id']],
-        "ขนาด : ".$info['size']
+    $data = array(
+        "ชื่องาน" => $info['name'],
+        "ประเภท" => $product_type[$info['cat_id']],
+        "ขนาด" => $info['size']
     );
     if($info['binding_id']>0){
-        array_push($data['บริการงานพิมพ์'],"เข้าเล่ม : ".$process[$info['binding_id']]);
+        $data['เข้าเล่ม'] = $process[$info['binding_id']];
     }
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
@@ -813,28 +830,27 @@ function job_detail($qid){
         $type = $v['comp_type'];
         $run[$type]++;
         $cname = $op_comp_type[$type].($run[$type]>1?" ($run[$type])":"");
-        $data[$cname] = array(
-            $v['paper']." ".$v['weight']." แกรม"
-        );
+        
         //color
         if($type==2||$type==6){
-            array_push($data[$cname],$v['color']." ".$v['comp_page']." หน้า");
+            $color = $v['color']." ".$v['comp_page']." หน้า";
         } else {
             if($v['color']==$v['color2']){
-                array_push($data[$cname],$v['color']." สองด้าน");
+                $color = $v['color']." สองด้าน";
             } else if($v['color2']==null){
-                array_push($data[$cname],$v['color']." ด้านเดียว");
+                $color = $v['color']." ด้านเดียว";
             } else {
-                array_push($data[$cname],$v['color']."/".$v['color2']);
+                $color = $v['color']."/".$v['color2'];
             }
         }
+        $data[$cname] = array($v['paper']." ".$v['weight']." แกรม ".$color);
         //coating
         if(isset($v['coating'])){
-            array_push($data[$cname],$v['coating'].($type==2||$type==6&&is_array($coatpage)&&$coatpage[$i]>0?" $coatpage[$i] หน้า":""));
+            array_push($data[$cname],"เคลือบ ".$v['coating'].($type==2||$type==6&&is_array($coatpage)&&$coatpage[$i]>0?" $coatpage[$i] หน้า":""));
         }
         //coat2
         if(is_array($coat2)&&$coat2[$i]>0){
-            array_push($data[$cname],$process[$coat2[$i]]." ด้านใน");
+            array_push($data[$cname],"เคลือบ ".$process[$coat2[$i]]." ด้านใน");
         }
         //cwing
         if($info['cwing']==1&&$type==1){
@@ -878,7 +894,7 @@ function job_detail($qid){
                 array_push($other,$process[$v]);
             }
         }
-        $data["ข้อกำหนดอื่นๆ"] = array(implode(",",$other));
+        $data["ข้อกำหนดอื่นๆ"] = array(implode(", ",$other));
     }
     if(isset($info['other_price'])){
         foreach(json_decode($info['other_price'],true) as $i=>$v){
@@ -887,7 +903,120 @@ function job_detail($qid){
     }
     return $data;
 }
+function show_invoice_ghpp1($ivid){
+    global $rpdb;
+    global $op_type_unit;
+    $db = $rpdb;
+    __autoload("pdo_report");
+    __autoloada("table");
+    $rp = new reportPDO();
+    $tb = new mytable();
+    $info = $rp->rp_invoice_info($ivid);
+    $deliinfo = $db->get_info("pap_delivery", "id", $info['adid']);
+    $cus = $db->get_meta("pap_customer_meta", "customer_id", $info['customer_id']);
+    $thdate = thai_date($info['date']);
+    //deli info
+    $dinfo = $rp->rp_deli_info($deliinfo['id']);
+    $aoid = explode(",",$dinfo['aoid']);
+    //pay
+    $i = 0;
+    $pay = "";
+    if($aoid[0]==0){
+        //manual
+        $credit = explode(",",$dinfo['credit']);
+        $cd = max($credit);
+        $pay = ($cd>0?"เครดิต $cd วัน":"ชำระเป็นเงินสด");
+    } else {
+        //normal
+        foreach($aoid as $oid){
+            $oinfo = $rp->rp_order($oid);
+            $pay .= ($i==0?"":"<br/>");
+            $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
+            $i++;
+        }
+    }
+    $doc = "<div class='print-letter'>"
+            . "<div class='doc-header'></div><!-- .doc-header -->"
+            . "<div class='doc-info ghpp-doc-info'>"
+            . "<div class='doc-to'>"
+            . print_cus_info($info['customer_id'])
+            . "</div><!-- .doc-to -->"
+            . "<div class='doc-date ghpp'>"
+            . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Invoice No. : </span>".  $info['no']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Sale Representative : </span>". $info['user_login']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>เงื่อนไขการชำระเงิน : </span>". $pay."</div>"
+            . "</div>"
+            . "</div>";
+    $head = array("&nbsp;","&nbsp;","&nbsp;","&nbsp;","&nbsp;");
+    $recs = $rp->rp_invoice_dt($ivid,$op_type_unit);
+    $discount = $info['discount'];
+    $tax = ($cus['tax_exclude']=="yes"?0:0.07);
+    $doc .= "<div class='doc-dt ghpp'>"
+            . $tb->show_tb_wtax($head,$recs,"tb-rp-ghpp",$tax,$discount,"",9,"ghpp-tb")
+            . "</div><!-- .doc-dt -->"
+            . "</div><!-- .print-letter -->";
+    return $doc;
+}
+function show_rc_ghpp1($rcid){
+    global $rpdb;
+    global $op_type_unit;
+    $db = $rpdb;
 
+    __autoload("pdo_report");
+    __autoloada("table");
+    $rp = new reportPDO();
+    $tb = new mytable();
+
+    $info = $rp->rp_receipt_info($rcid);
+    $thdate = thai_date($info['date']);
+    $user = (isset($info['user_login'])?$info['user_login']:"-");
+    $company_info = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
+    
+    $dinfo = $rp->rp_deli_info($info['adeli']);
+    $aoid = explode(",",$dinfo['aoid']);
+    $pay = "";
+    $i= 0;
+    if($aoid[0]==0){
+        //manual
+        $credit = explode(",",$dinfo['credit']);
+        $cd = max($credit);
+        $pay = ($cd>0?"เครดิต $cd วัน":"ชำระเป็นเงินสด");
+    } else {
+        //normal
+        foreach($aoid as $oid){
+            $oinfo = $rp->rp_order($oid);
+            $pay .= ($i==0?"":"<br/>");
+            $pay .= ($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด");
+            $i++;
+        }
+    }
+    
+    $doc = "<div class='print-letter'>"
+            . "<div class='doc-header'></div><!-- .doc-header -->"
+            . "<div class='doc-info ghpp-doc-info'>"
+            . "<div class='doc-to'>"
+            . print_cus_info($info['customer_id'])
+            . "</div><!-- .doc-to -->"
+            . "<div class='doc-date'>"
+            . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
+            . "<div class='doc-600'> <span class='float-left'>REC No. : </span>".  $info['no']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Sale Representative: </span>". $user."</div>"
+            . "<div class='doc-600'> <span class='float-left'>เงื่อนไขการชำระเงิน : </span>".  $pay."</div>"
+            . "</div>"
+            . "</div>";
+    $ivinfo = $db->get_info("pap_invoice", "id", $info['ivid']);
+    $tax = ($info['tax_exclude']=="yes"?1:1.07);
+    $head = array("&nbsp;","&nbsp;","&nbsp;","&nbsp;");
+    $recs = array(array(1,$info['invoiceno'],  thai_date($ivinfo['date'], true),  $ivinfo['total']*$tax));
+    $discount = 0;
+ 
+    $doc .= "<div class='doc-dt ghpp'>"
+            . $tb->show_tb_bill_o($head,$recs,"tb-rp-ghpprc",7)
+            . "</div><!-- .doc-dt -->";
+    $doc .= "</div><!-- .print-letter -->";
+    return $doc;
+}
 function show_invoice_ghpp($ivid){
     global $rpdb;
     global $op_type_unit;

@@ -391,19 +391,19 @@ END_OF_TEXT;
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $i=1;
+            $res1 = array();
             foreach($res as $k=>$v){
                 $jname = explode(",",$v['jname']);
                 $qty = explode(",",$v['qty']);
                 $type = explode(",",$v['type']);
-                $job = "<ul class='job-list'>";
+                array_push($res1,array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>",1,$v['amount'],$v['amount']));
+
                 for($j=0;$j<count($jname);$j++){
                     $unit = $op[$type[$j]];
-                    $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";
+                    $amount = number_format($qty[$j],0);
+                    $job = "<p class='job-list'>$jname[$j] จำนวน $amount $unit</p>";
+                    array_push($res1,array("",$job,"","",""));
                 }
-                $job .= "</ul>";
-                $percent = round($v['amount']*100/$v['price'],2);
-                $per = ($percent==100?"":"(".number_format($percent,2)."%)");
-                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",1,$v['amount'],$v['amount']);
                 $i++;
             }
             return $res1;

@@ -188,7 +188,7 @@ class mytable {
         __autoloada("thai");
         function sub_format($v){
             if((float)$v==0){
-                return "-";
+                return "";
             } else {
                 return number_format($v,2);
             }
@@ -230,10 +230,10 @@ class mytable {
             }
             $sum -= $discount;
             $thaitt = ($sum!=0?"(".ThaiBahtConversion(round($sum*(1+$tax),2)).")":"");
-            $html .= "<tr class='tb-discount'><td colspan='2'></td><td colspan='2'>ส่วนลด / Discount</td><td>".number_format($discount,2)."</td></tr>"
-                . "<tr class='tb-sum'><td colspan='2' rowspan='3'>$thaitt</td><th colspan='2'>มูลค่าสินค้า</td><td>".number_format($sum,2)."</td></tr>"
-                . "<tr class='tb-sum'><th colspan='2'>ภาษีมูลค่าเพิ่ม 7%</td><td>".number_format($sum*$tax,2)."</td></tr>"
-                . "<tr class='tb-sum tb-gtt'><th colspan='2'>รวมเป็นเงินทั้งสิ้น</td><td>".number_format($sum*(1+$tax),2)."</td></tr>";
+            $html .= "<tr class='tb-discount'><td colspan='2'></td><td colspan='2'><span class='print-hide'>ส่วนลด / Discount<span></td><td>".number_format($discount,2)."</td></tr>"
+                . "<tr class='tb-sum'><td colspan='2' rowspan='3'>$thaitt</td><th colspan='2'><span class='print-hide'>มูลค่าสินค้า</span></td><td>".number_format($sum,2)."</td></tr>"
+                . "<tr class='tb-sum'><th colspan='2'><span class='print-hide'>ภาษีมูลค่าเพิ่ม 7%</span></td><td>".number_format($sum*$tax,2)."</td></tr>"
+                . "<tr class='tb-sum tb-gtt'><th colspan='2'><span class='print-hide'>รวมเป็นเงินทั้งสิ้น</span></td><td>".number_format($sum*(1+$tax),2)."</td></tr>";
         } else {
             
             $html .= "<tr><td colspan='$len' class='td-span5 tb-noinfo'>No information.</td></tr>";
@@ -329,7 +329,7 @@ class mytable {
             }
             $total = number_format($sum,2);
             $thaitt = "(".ThaiBahtConversion(round($sum,2)).")";
-            $html .= "<tr class='tb-sum'><td colspan='".($len-2)."'>จำนวน $n รายการ <br/>$thaitt</td><th>รวมเป็นเงินทั้งสิ้น</td><td class='tb-gtt'>$total</td></tr>";
+            $html .= "<tr class='tb-sum'><td colspan='".($len-2)."'>จำนวน $n รายการ <br/>$thaitt</td><th><span class='print-hide'>รวมเป็นเงินทั้งสิ้น</span></td><td class='tb-gtt'>$total</td></tr>";
         } else {
             
             $html .= "<tr><td colspan='$len' class='td-span5 tb-noinfo'>No information.</td></tr>";
