@@ -24,7 +24,7 @@ $op_unit = array(
     "round" => "รอบ",
     "frame" => "กรอบ",
     "set" => "ยก",
-    "piece" => "ชิ้น/เล่ม",
+    "piece" => "ชิ้น,เล่ม",
     "in2" => "ตารางนิ้ว",
     "km" => "ระยะทาง(กม)",
     "location" => "จุดส่งของ"
@@ -288,25 +288,41 @@ $op_weekday = array(
     "5" => "ศุกร์",
     "6" => "เสาร์"
 );
-function cal_allo($allo,$amount){
+function cal_allo($allo,$amount,$print1,$print2){
+    $allo1 = $allo2 =0;
     foreach($allo as $k=>$v){
-        if($v['cond']=="piece"){
-            $btw = $v['btw'];
+        if($v['print']==$print1){
+            $from = $v['from'];
             $to = ($v['to']==0?INF:$v['to']);
-            if($amount>=$btw&&$amount<=$to){
-                if($v['unit']=="sheet/frame"){
-                    return $v['pallo'];
-                } else if($v['unit']=="%/piece"){
-                    return round($v['pallo']*$amount/100,0);
+            if($amount>=$from&&$amount<=$to){
+                if($v['unit']=="%/piece"){
+                    $allo1 = $amount*$v['pallo']/100;
+                } else {
+                    $allo1 = $v['pallo'];
                 }
-            }
-        } else {
-            if($v['unit']=="sheet/frame"){
-                return $v['pallo'];
-            } else if($v['unit']=="%/round"){
-                return round($v['pallo']*$amount/100,0);
+                break;
             }
         }
     }
-    return 0;
+    if($print2==0){
+        $allo2 = 0;
+    } else if($print2==$print1){
+        $allo2 = $allo1;
+    } else {
+        foreach($allo as $k=>$v){
+            if($v['print']==$print2){
+                $from = $v['from'];
+                $to = ($v['to']==0?INF:$v['to']);
+                if($amount>=$from&&$amount<=$to){
+                    if($v['unit']=="%/piece"){
+                        $allo2 = $amount*$v['pallo']/100;
+                    } else {
+                        $allo2 = $v['pallo'];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return $allo1+$allo2;
 }

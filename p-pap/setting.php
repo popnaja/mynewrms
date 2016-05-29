@@ -28,6 +28,7 @@ $content = $menu->showhead();
 $content .= $menu->pappanel("ผู้ดูแลระบบ",$pagename);
 
 $form = new myform("papform","",PAP."request.php");
+$tb = new mytable();
 $md = new mymedia(PAP."request_ajax.php");
 //check
 if($pauth<1){
@@ -72,30 +73,23 @@ $grip = "<h4></h4>"
         . $form->show_num("grip",(isset($info['grip_size'])?$info['grip_size']:""),0.01,"","ขนาดกริ๊ปเครื่องพิมพ์ (ซ.ม.)","","label-3070")
         . $form->show_num("bleed",(isset($info['bleed_size'])?$info['bleed_size']:""),0.01,"","ขนาด Bleed (ซ.ม.)","","label-3070");
 
-$paper = "";
+$process_keypair = $db->get_process_keypair();
+$print = $process_keypair[3];
 $allo = (isset($info['paper_allo'])?json_decode($info['paper_allo'],true):array());
 $con_unit = array(
     "piece" => "ชิ้น/เล่ม",
 );
-for($i=0;$i<5;$i++){
-    $otherc = " sel-cond_$i-".implode(" sel-cond_$i-",array_keys($con_unit));
-    $hid = ($i<count($allo)||$i==0?"":"form-hide");
-    $paper .= "<div class='form-section paper-cond $hid'>"
-    . "<div class='col-50'>"
-    . $form->show_num("pallo_$i",(isset($allo[$i])?$allo[$i]['pallo']:0),0.01,"","เผื่อกระดาษ","","label-3070","min=0","pallo[]")
-    . $form->show_select("unit_$i",array("sheet/frame"=>"แผ่นต่อกรอบ","%/piece"=>"%ต่อยอดผลิต"),"label-3070","หน่วย",(isset($allo[$i])?$allo[$i]['unit']:""),"","unit[]")
-    . "</div><!-- .col-50 -->"
-    . "<div class='col-50'>"
-    . $form->show_select("cond_$i",array("0"=>"--ไม่มี--")+$con_unit,"label-3070","ข้อกำหนด",(isset($allo[$i])?$allo[$i]['cond']:""),"","cond[]")
-    . "<div class='$otherc'>"
-    . $form->show_num("btw_$i",(isset($allo[$i])?$allo[$i]['btw']:""),1,"","ระหว่าง","","label-3070","min=0","btw[]")
-    . $form->show_num("to_$i",(isset($allo[$i])?$allo[$i]['to']:""),1,"","ถึง","","label-3070","min=0","to[]")
-    . "</div><!-- .otherc -->"
-    . "</div><!-- .col-50 -->"
-    . "</div><!-- .paper-cond -->"
-    . "<script>select_option_byval('cond_$i');</script>";
+$allohead = array("พิมพ์","ยอดระหว่าง","ถึง","เผื่อกระดาษ","ต่อกรอบ");
+$allorec = array();
+for($i=0;$i<10;$i++){
+    $p = $form->show_select("print_$i",array(0=>"none")+$print,"label-inline",null,(isset($allo[$i])?$allo[$i]['print']:0),"","print[]");
+    $f = $form->show_num("from_$i",(isset($allo[$i])?$allo[$i]['from']:""),1,"",null,"","label-inline","min=0","from[]");
+    $t = $form->show_num("to_$i",(isset($allo[$i])?$allo[$i]['to']:""),1,"",null,"","label-inline","min=0","to[]");
+    $a = $form->show_num("pallo_$i",(isset($allo[$i])?$allo[$i]['pallo']:0),0.01,"",null,"","label-inline","min=0","pallo[]");
+    $u = $form->show_select("unit_$i",array("sheet/frame"=>"แผ่น","%/piece"=>"%ยอดผลิต"),"label-inline",null,(isset($allo[$i])?$allo[$i]['unit']:""),"","unit[]");
+    array_push($allorec,array($p,$f,$t,$a,$u));
 }
-$paper .= "<input id='view-more-but' type='button' value='เพิ่มเงื่อนไขการเผื่อกระดาษ' style='width:100%'/>";
+$paper = $tb->show_table($allohead, $allorec, "tb-allo");
 //update
 $content .= "<h1 class='page-title'>$pagename</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"

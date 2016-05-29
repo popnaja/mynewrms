@@ -207,7 +207,7 @@ function new_pcost($pid,$arrinfo){
         }
     }
     if(!isset($res)){
-        var_dump($pid);
+        echo "Recheck cost formular of process id ".$pid;
         $res = cost_formular($cost[0],$arrinfo[$cost[0]['vunit']],$arrinfo);
         array_unshift($res,$arrinfo[$cost[0]['vunit']]);
     }
@@ -220,7 +220,7 @@ function cost_formular($value,$amount,$arrinfo){
         foreach($arrinfo as $k=>$v){
             $for = str_replace($k,$v,$for);
         }
-        $cinfo = calculate_string($for);
+        $cinfo = max($value['min'],calculate_string($for));
         $cost_per_u = $value['formular'];
     } else {
         $cinfo = max($fcost+$value['cost']*$amount,$value['min']);

@@ -179,11 +179,12 @@ if($req == "login"){
     for($i=0;$i<count($_POST['pallo']);$i++){
         if($_POST['pallo'][$i]>0){
             array_push($pallow,array(
+                "print" => $_POST['print'][$i],
+                "from" => $_POST['from'][$i],
+                "to" => $_POST['to'][$i],
                 "pallo" => $_POST['pallo'][$i],
-                "unit" => $_POST['unit'][$i],
-                "cond" => $_POST['cond'][$i],
-                "btw" => $_POST['btw'][$i],
-                "to" => $_POST['to'][$i])
+                "unit" => $_POST['unit'][$i]
+                )
             );
         }
     }
@@ -682,13 +683,13 @@ if($req == "login"){
     //cal allowance
     $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
     $ainfo = json_decode($adata['paper_allo'],true);
-    $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
     $coat2 = array();
     $coatpage = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
+            $print2 = $_POST['print2'][$i];
             if($type=="1"){ //ปก
                 $page = $page_cover = 1;
                 //ปกปีก
@@ -699,6 +700,7 @@ if($req == "login"){
                 }
             } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
+                $print2 = $_POST['print'][$i];
             } else {
                 $page = $_POST['page'][$i];
             }
@@ -712,9 +714,11 @@ if($req == "login"){
             } else {
                 $post = "";
             }
+            //cal allowance
+            $allowance = cal_allo($ainfo, $_POST['amount'],$_POST['print'][$i],$print2);
             //add comp
             $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
-            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allowance,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
+            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allowance,$_POST['coating'][$i],$_POST['print'][$i],$print2,$post));
             //coat2
             array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
             //coat pages
@@ -847,13 +851,13 @@ if($req == "login"){
     //cal allowance
     $adata = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
     $ainfo = json_decode($adata['paper_allo'],true);
-    $allowance = cal_allo($ainfo, $_POST['amount']);
     $meta['cwing'] = 0;
     $coat2 = array();
     $coatpage = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
+            $print2 = $_POST['print2'][$i];
             if($type=="1"){ //ปก
                 $page = $page_cover = 1;
                 //ปกปีก
@@ -864,6 +868,7 @@ if($req == "login"){
                 }
             } else if($type==2||$type==6){
                 $page_inside += $page = $_POST['page'][$i];
+                $print2 = $_POST['print'][$i];
             } else {
                 $page = $_POST['page'][$i];
             }
@@ -878,9 +883,11 @@ if($req == "login"){
                 $post = "";
             }
             //add comp
+            //cal allowance
+            $allowance = cal_allo($ainfo, $_POST['amount'],$_POST['print'][$i],$print2);
             $allo = (isset($_POST['allowance'][$i])?$_POST['allowance'][$i]:$allowance);
             $paper_id = $db->get_paper($_POST['paper_type'][$i], $_POST['paper_size'][$i], $_POST['paper_gram'][$i]);
-            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allo,$_POST['coating'][$i],$_POST['print'][$i],$_POST['print2'][$i],$post));
+            $db->insert_data("pap_quote_comp",array($qid,$_POST['comp_type'][$i],$page,$paper_id['mat_id'],$_POST['paper_lay'][$i],$_POST['paper_cut'][$i],$allo,$_POST['coating'][$i],$_POST['print'][$i],$print2,$post));
             //coat2
             array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
             //coat pages
