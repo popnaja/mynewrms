@@ -106,15 +106,15 @@ function cal_quote($info,$comps){
                 $round = $v[1]/ceil($kinfo[0]);
             }
             $pcost = print_cost($unit['print_id'], $round);
-            array_push($res['พิมพ์'],array("พิมพ์ $cname นอก ($color[0] สี)",$round,$pcost[0],$pcost[0]));
+            array_push($res['พิมพ์'],array("$cname นอก ($color[0] สี)",$round,$pcost[0],$pcost[0]));
             $pcost = print_cost($unit['print_id2'], $round);
-            array_push($res['พิมพ์'],array("พิมพ์ $cname ใน ($color[1] สี)",$round,$pcost[0],$pcost[0]));
+            array_push($res['พิมพ์'],array("$cname ใน ($color[1] สี)",$round,$pcost[0],$pcost[0]));
         } else {
             foreach($unit['round'] as $k=>$v){
                 $kinfo = explode(",",$v[0]);
                 $round = $v[1]/ceil($kinfo[0]);
                 $pcost = print_cost($unit['print_id'], $round);
-                array_push($res['พิมพ์'],array("พิมพ์ $cname $kinfo[1]","$kinfo[0] กรอบ ($round รอบ/กรอบ)",$pcost[0],$pcost[0]*ceil($kinfo[0])));
+                array_push($res['พิมพ์'],array("$cname $kinfo[1]","$kinfo[0] กรอบ ($round รอบ/กรอบ)",$pcost[0],$pcost[0]*ceil($kinfo[0])));
             }
             
         }
