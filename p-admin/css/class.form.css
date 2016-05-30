@@ -522,15 +522,11 @@ select::-moz-focus-inner { /*Remove button padding in FF*/
     padding-bottom:10px;
 }
 .label-3070 ul li label{
-    width:20%;
-}
-.label-3070 ul li label{
-    width:80%;
+    width:90%;
     text-align:left;
     font-weight:500;
-    padding-left:15px;
+    padding-left:20px;
 }
-
 .label-5050 input,
 .label-5050 textarea,
 .label-5050 select{
@@ -1047,4 +1043,10 @@ select::-moz-focus-inner { /*Remove button padding in FF*/
 /*---------------------------------------------- MAX width --------------------------------------------------------------*/
 .max-720 {
     max-width:720px;
+}
+
+/*---------------------------------------------- check box with input --------------------------------------------------------------*/
+.check-input {
+    width:100% !important;
+    padding:0 5px !important;
 }

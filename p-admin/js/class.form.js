@@ -773,3 +773,26 @@ $(document).ready(function(){
     });
 });
 }
+function check_show(name){
+$(document).ready(function(){
+    var checklist = $("input[name='"+name+"[]']");
+    var input = $("input[name='"+name+"v[]']");
+    var i,val,ckid;
+    checklist.on("change",function(){
+        var check = $(this).prop("checked");
+        i = checklist.index($(this));
+        if(check==true){
+            input.eq(i).removeClass("form-hide");
+        } else {
+            input.eq(i).val("").addClass("form-hide");
+            $(this).val($(this).attr("ckid")+";0");
+        }
+    });
+    input.on("change",function(){
+        i = input.index($(this));
+        val = $(this).val();
+        ckid = checklist.eq(i).attr("ckid");
+        checklist.eq(i).val(ckid+";"+val);
+    });
+});
+}

@@ -676,7 +676,6 @@ if($req == "login"){
         null, null);
 
     $qid = $db->insert_data("pap_quotation",$data);
-
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;

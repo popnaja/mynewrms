@@ -117,7 +117,7 @@ if($action=="add"){
             . $form->show_text("due","due","","yyyy-mm-dd","กำหนดส่ง","","label-3070")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
 
-    $pack = $form->show_checkbox("pack","pack",$packing,"การแพ็ค","label-3070")
+    $pack = $form->show_checkbox_winput("pack","pack",$packing,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$shipping,"การขนส่ง","label-3070")
             . $form->show_num("distance","",0.01,"","ระยะทาง(กม)","","label-3070")
             . $form->show_num("location","",1,"","จุดส่งของ","","label-3070");
@@ -341,7 +341,7 @@ if($action=="add"){
             . $form->show_text("due","due",$info['plan_delivery'],"yyyy-mm-dd","กำหนดส่ง","","label-3070")
             . $form->show_num("credit",$info['credit'],1,"","เครดิต(วัน)","","label-3070")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
-    $pack = $form->show_checkbox("pack","pack",$pack_checked,"การแพ็ค","label-3070")
+    $pack = $form->show_checkbox_winput("pack","pack",$pack_checked,"การแพ็ค","label-3070")
             . $form->show_checkbox("ship","ship",$ship_checked,"การขนส่ง","label-3070")
             . $form->show_num("distance",(isset($info['distance'])?$info['distance']:""),0.01,"","ระยะทาง(กม)","","label-3070")
             . $form->show_num("location",(isset($info['location'])?$info['location']:""),1,"","จุดส่งของ","","label-3070");
@@ -498,7 +498,7 @@ function special_comp($info=null,$comps=null){
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
-                . $form->show_checkbox("post_$i","post_$i",$post,"ไดคัท และอื่นๆ","label-3070")
+                . $form->show_checkbox_winput("post_$i","post_$i",$post,"ไดคัท และอื่นๆ","label-3070")
                 . "</div>"
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
@@ -548,7 +548,7 @@ function special_comp($info=null,$comps=null){
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
-                . $form->show_checkbox("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
+                . $form->show_checkbox_winput("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
                 . "</div>"
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")

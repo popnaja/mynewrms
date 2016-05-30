@@ -44,10 +44,17 @@ function cal_quote($info,$comps){
 
             //packing
             $pack = explode(",",$info['packing']);
-            foreach($pack as $pid){
+            foreach($pack as $packdata){
+                $packdata = explode(";",$packdata);
+                $pid = $packdata[0];
                 if($pid>0){
-                    $pcost = new_pcost($pid, $unit);
-                    array_push($res['แพ็ค'],array_merge(array($processes[$pid]),$pcost));
+                    if(!isset($packdata[1])){
+                        $pcost = new_pcost($pid, $unit);
+                        array_push($res['แพ็ค'],array_merge(array($processes[$pid]),$pcost));
+                    } else {
+                        $pcost = new_pcost($pid, $unit);
+                        array_push($res['แพ็ค'],array($processes[$pid],$packdata[1],$pcost[1],$packdata[1]*$pcost[1]));
+                    }
                 }
             }
             //shipping
@@ -134,8 +141,13 @@ function cal_quote($info,$comps){
         }
         //post process หลังงานพิมพ์คิดเต็มริม
         $post = explode(",",$com['comp_postpress']);
-        foreach($post as $pid){
+        foreach($post as $pdata){
+            $pdata = explode(";",$pdata);
+            $pid = $pdata[0];
             if($pid>0){
+                if(isset($pdata[1])){
+                    $unit['unit']=$pdata[1];
+                }
                 $pcost = new_pcost($pid, $unit);
                 array_push($res['หลังพิมพ์'],array_merge(array($processes[$pid]." ".$cname),$pcost));
             }

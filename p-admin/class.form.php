@@ -123,6 +123,30 @@ class myform{
                 . "</div><!-- #$id -->\n";
         return $html;
     }
+    public function show_checkbox_winput($id,$name,$arrayval,$show="",$class="") {
+        $this->array_name[$name] = "checkbox";
+        $html = "<div id='$id' class='$class'>\n"
+                . "<span class='form-check-lb'>$show</span>"
+                . "<ul>";
+        $i = 0;
+        foreach($arrayval as $k => $v){  //key=id, value=[show,check,val] 1=check
+            $check = (is_array($v)?($v[1]===1?"checked":""):"");
+            $show = (is_array($v)?($v[1]===1?"":"form-hide"):"form-hide");
+            $val = (is_array($v)?$v[2]:0);
+            $html .="<li>"
+                    . "<input type='checkbox' id='$name-$i' name='$name"."[]' value='$k;$val' ckid='$k' $check>"
+                    . "<label for='$name-$i'>"
+                    . (is_array($v)?$v[0]:$v)
+                    . "<input type='number' id='$name-v-$i' name='$name"."v[]' value='$val' class='check-input $show' step='any' min='0'/>"
+                    . "</label>"
+                    . "</li>";
+            $i++;
+        }
+        $html .= "</ul>"
+                . "<script>check_show('$name');</script>"
+                . "</div><!-- #$id -->\n";
+        return $html;
+    }
     public function show_submit($id,$value,$class = ""){
         $this->submitid['submit'] = $id;
         $name = $id;
@@ -372,11 +396,16 @@ class myform{
         return $html;
     }
     public function checked_array($arrall,$arrchecked){
+        $id = array();
+        foreach($arrchecked as $val){
+            $t = explode(";",$val);
+            $id[$t[0]] =(isset($t[1])?$t[1]:0);
+        }
         foreach($arrall as $k=>$v){
-            if(in_array($k,$arrchecked)){
-                $arrall[$k] = array($v,1);
+            if(isset($id[$k])){
+                $arrall[$k] = array($v,1,$id[$k]);
             } else {
-                $arrall[$k] = array($v,0);
+                $arrall[$k] = array($v,0,0);
             }
         }
         return $arrall;
