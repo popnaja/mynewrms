@@ -881,10 +881,10 @@ function job_detail($qid){
             }
         }
     }
+    $other = array();
     if(strlen($info['packing'])>0||strlen($info['shipping'])>0){
         $packing = explode(",",$info['packing']);
         $shipping = explode(",",$info['shipping']);
-        $other = array();
         foreach($packing as $v){
             $v = explode(";",$v);
             if($v[0]>0){
@@ -897,12 +897,14 @@ function job_detail($qid){
                 array_push($other,$process[$v[0]]);
             }
         }
-        $data["ข้อกำหนดอื่นๆ"] = array(implode(", ",$other));
     }
     if(isset($info['other_price'])){
         foreach(json_decode($info['other_price'],true) as $i=>$v){
-            array_push($data["ข้อกำหนดอื่นๆ"],$v[0]);
+            array_push($other,$v[0]." ($v[3])");
         }
+    }
+    if(count($other)>0){
+        $data["ข้อกำหนดอื่นๆ"] = array(implode(", ",$other));
     }
     return $data;
 }
