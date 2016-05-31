@@ -408,16 +408,16 @@ function show_deli($did){
         if(is_numeric($v[1])){
             $qid = $v[1];
             $data = job_detail($qid);
-            $recs[0][$k][1] = job_dttb($data);
+            $recs[0][$k][1] = job_dttb_ghpp($data);
             $row += count($data,1)-count($data);
         } else {
             $jinfo = explode(";",$v[1]);
             $jname = $jinfo[0];
             $meta = $db->get_meta("pap_delidt_meta", "dtid", $jinfo[1]);
             $dt = explode(",",$meta['job_detail']);
-            array_unshift($dt,"ชื่องาน: $jname");
-            $data["บริการงานพิมพ์"] = $dt;
-            $recs[0][$k][1] = job_dttb($data);
+            $data["ชื่องาน"] = $jname;
+            $data["รายละเอียด"] = $dt;
+            $recs[0][$k][1] = job_dttb_ghpp($data);
             $row += count($data,1)-count($data);
         }
     }

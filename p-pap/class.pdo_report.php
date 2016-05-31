@@ -112,6 +112,7 @@ END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":cid",$cid);
             $stmt->execute();
+            $res = array();
             while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
                 $cost = json_decode($row['cost'],true);
                 $u = $unit[$cost[0]['vunit']];

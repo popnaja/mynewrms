@@ -327,7 +327,7 @@ function quote_adj(id){
     //adj margin total
     mgtt.on("change",function(){
         mg.val($(this).val());
-        update_mg()
+        update_mg();
         tt.html(ntt());
     });
     mg.on("change",function(){

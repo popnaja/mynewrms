@@ -227,7 +227,7 @@ LEFT JOIN pap_customer_cat AS cc ON cc.customer_id=cus.customer_id
 LEFT JOIN pap_term_tax AS tx ON tx.id=cc.tax_id
 LEFT JOIN pap_term AS tm ON tm.id=tx.term_id
 $filter
-ORDER BY customer_added DESC
+ORDER BY customer_name ASC
 $lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);

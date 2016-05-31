@@ -485,29 +485,18 @@ function unit_cal($quote,$comps){
         "type" => 9,
         "allpage" => $quote['page_cover']*2+$quote['page_inside'],
         "page" => $quote['page_inside'],
-        "km" => $quote['distance'],
         "location" => (isset($quote['location'])?$quote['location']:0),
         "piece" => $quote['amount'],
         "set" => 0,
         "frame" => 0,
-        "kong" => 0,
-        "minallo" => INF
     );
     //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];
         //frame
         $tinfo['frame'] += ceil($unit['ff']);
-        //kong
-        if($unit['ff']<=1){
-            $tinfo['kong'] += 1;
-        } else {
-            $div = plate_div($unit['ff']);
-            $tinfo['kong'] += $div[0]/2 + $div[1] + ceil($div[2]);
-        }
-        //min allo
-        $tinfo['minallo'] = min($tinfo['minallo'],$unit['allo']);
         //พับ
+        $tinfo['set'] += ($unit['type']==1&&$quote['binding_id']==1?0:$unit['set']);
         if(isset($unit['sinfo'])){
             foreach($unit['sinfo'] as $val){
                 if($val['foldid']>0){
@@ -520,7 +509,6 @@ function unit_cal($quote,$comps){
             }
         }
     }
-    $tinfo['set'] = $tinfo['kong']*($amount+$tinfo['minallo'])-($quote['binding_id']==1?($amount+$tinfo['minallo']):0);
     array_push($res,$tinfo);
     return $res;
 }
