@@ -565,7 +565,15 @@ class mytable {
                         $av = (in_array($kkk,$numcol)?number_format($vvv,0):$vvv);
                         $cls = ($kkk==4?"class='tb-stcost'":"");
                         if($kkk==3){
-                            $html .= "<td><input type='number' step='any' name='adj_cost[]' value='0' class='tb-adj-cost' info='$vvv'/></td>";
+                            if($k=="กระดาษ"){
+                                $html .= "<td>"
+                                . "<input type='number' step='any' name='adj_paper[]' value='0' class='tb-adj-paper' info='$vvv'/>"
+                                . "<br/>"
+                                . "<input type='number' step='any' name='adj_paper[]' value='0' class='tb-adj-paper' info='$vvv'/>"
+                                . "</td>";
+                            } else {
+                                $html .= "<td><input type='number' step='any' name='adj_cost[]' value='0' class='tb-adj-cost' info='$vvv'/></td>";
+                            }
                         } else {
                             $html .= "<td $cls>$av</td>";
                         }

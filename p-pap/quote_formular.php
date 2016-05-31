@@ -111,7 +111,9 @@ function cal_quote($info,$comps){
             "weight" => $weight[$pinfo['mat_weight']],
             "amount" => $rims
         );
-        array_push($res['กระดาษ'],array("$cname<br/>".$wh['width']."x".$wh['length'],$rims,$c_per_rim,json_encode($paperinfo),$rims*$c_per_rim));
+        $cperkg = 3100*$c_per_rim/$wh['width']/$wh['length']/$weight[$pinfo['mat_weight']];
+        $showcost = number_format($c_per_rim,2)."<br/>".number_format($cperkg,2);
+        array_push($res['กระดาษ'],array("$cname<br/>".$wh['width']."x".$wh['length'],$rims,$showcost,json_encode($paperinfo),$rims*$c_per_rim));
         
         //printing
         //var_dump($unit);
