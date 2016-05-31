@@ -294,20 +294,20 @@ if($action=="add"){
                 . $form->show_num("credit",$info['customer_credit_amount'],1,"","วงเงิน(บาท)","","label-3070")
                 . $form->show_select("bill",$op_bill_type,"label-3070","วันวางบิล",$info['customer_place_bill'])
                 . "<div class='sel-bill-2'>"
-                . $form->show_text("bill_day","bill_day",$info['bill_day'],"","วันที่","","label-3070")
+                . $form->show_text("bill_day","bill_day",(isset($info['bill_day'])?$info['bill_day']:""),"","วันที่","","label-3070")
                 . "</div><!-- .sel-bill-2 -->"
                 . "<div class='sel-bill-3'>"
-                . $form->show_text("bill_weekday","bill_weekday",$info['bill_weekday'],"","วันของสัปดาห์","","label-3070")
-                . $form->show_text("bill_week","bill_week",$info['bill_week'],"","สัปดาห์ที่","","label-3070")
+                . $form->show_text("bill_weekday","bill_weekday",(isset($info['bill_weekday'])?$info['bill_weekday']:""),"","วันของสัปดาห์","","label-3070")
+                . $form->show_text("bill_week","bill_week",(isset($info['bill_week'])?$info['bill_week']:""),"","สัปดาห์ที่","","label-3070")
                 . "</div><!-- .sel-bill-3 -->"
                 . $form->show_text("bill_remark","bill_remark",$info['bill_remark'],"","หมายเหตุวันวางบิล","","label-3070")
                 . $form->show_select("cheque",$op_cheque_type,"label-3070","วันรับเช็ค",$info['customer_collect_cheque'])
                 . "<div class='sel-cheque-2'>"
-                . $form->show_text("cheque_day","cheque_day",$info['cheque_day'],"","วันที่","","label-3070")
+                . $form->show_text("cheque_day","cheque_day",(isset($info['cheque_day'])?$info['cheque_day']:""),"","วันที่","","label-3070")
                 . "</div><!-- .sel-cheque-2 -->"
                 . "<div class='sel-cheque-3'>"
-                . $form->show_text("cheque_weekday","cheque_weekday",$info['cheque_weekday'],"","วันของสัปดาห์","","label-3070")
-                . $form->show_text("cheque_week","cheque_week",$info['cheque_week'],"","สัปดาห์ที่","","label-3070")
+                . $form->show_text("cheque_weekday","cheque_weekday",(isset($info['cheque_weekday'])?$info['cheque_weekday']:""),"","วันของสัปดาห์","","label-3070")
+                . $form->show_text("cheque_week","cheque_week",(isset($info['cheque_week'])?$info['cheque_week']:""),"","สัปดาห์ที่","","label-3070")
                 . "</div><!-- .sel-cheque-3 -->"
                 . $form->show_text("cheque_remark","cheque_remark",$info['cheque_remark'],"","หมายเหตุวันรับเช็ค","","label-3070")
                 . "</div><!-- .sel-pay-1 -->"

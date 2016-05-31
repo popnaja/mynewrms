@@ -538,7 +538,7 @@ class mytable {
                 . "</script>";
         return $html;
     }
-    public function show_quote_tb($head,$rec,$id=null,$numcol,$margin,$adj){
+    public function show_quote_tb($head,$rec,$id=null,$numcol,$margin,$adj,$adjcost){
         $sum = 0;
         $len = sizeof($head,0);
         $span = $len-1;
@@ -564,15 +564,16 @@ class mytable {
                     foreach($vv as $kkk=>$vvv){
                         $av = (in_array($kkk,$numcol)?number_format($vvv,0):$vvv);
                         $cls = ($kkk==4?"class='tb-stcost'":"");
+                        $adj_c = (isset($adjcost[$j])&&$adjcost[$j]!=""?$adjcost[$j]:0);
                         if($kkk==3){
                             if($k=="กระดาษ"){
                                 $html .= "<td>"
-                                . "<input type='number' step='any' name='adj_paper[]' value='0' class='tb-adj-paper' info='$vvv'/>"
+                                . "<input type='number' step='any' name='adj_cost[]' value='$adj_c' class='tb-adj-cost tb-adj-paper' info='$vvv'/>"
                                 . "<br/>"
-                                . "<input type='number' step='any' name='adj_paper[]' value='0' class='tb-adj-paper' info='$vvv'/>"
+                                . "<input type='number' step='any' name='adj_paperkg[]' value='0' class='tb-adj-paperkg' info='$vvv'/>"
                                 . "</td>";
                             } else {
-                                $html .= "<td><input type='number' step='any' name='adj_cost[]' value='0' class='tb-adj-cost' info='$vvv'/></td>";
+                                $html .= "<td><input type='number' step='any' name='adj_cost[]' value='$adj_c' class='tb-adj-cost' info='$vvv'/></td>";
                             }
                         } else {
                             $html .= "<td $cls>$av</td>";

@@ -531,7 +531,7 @@ if($req == "login"){
     }
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="edit_customer"){
     $cid = filter_input(INPUT_POST,"cid",FILTER_SANITIZE_NUMBER_INT);
     //update
@@ -630,7 +630,7 @@ if($req == "login"){
     }
     $db->update_data("pap_customer", "customer_id", $cid, $arrinfo);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="add_cus_ad"){
     if(isset($_POST['media'])){
         __autoloada("media");
@@ -753,6 +753,7 @@ if($req == "login"){
         "shipping" => (isset($_POST['ship'])?implode(",",$_POST['ship']):""),
         "discount" => 0,
         "adj_margin" => "",
+        "adj_cost" => "",
         "contact_id" => $_POST['cusct'],
         "page_cover" => $page_cover,
         "page_inside" => $page_inside,
@@ -813,7 +814,7 @@ if($req == "login"){
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']."?qid=".$qid);
+    header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
     $qid = filter_input(INPUT_POST,"qid",FILTER_SANITIZE_NUMBER_INT);
     $status = (int)filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);
@@ -900,6 +901,7 @@ if($req == "login"){
     if($_POST['pauth']>=3){
         //adjust margin
         $meta['adj_margin'] = implode(",",$_POST['adj_margin']);
+        $meta['adj_cost'] = implode(",",$_POST['adj_cost']);
     }
     if($_POST['pauth']>=3||$status>1){
         //คำนวนหลายยอดพิมพ์

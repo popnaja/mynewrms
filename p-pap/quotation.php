@@ -196,22 +196,24 @@ if($action=="add"){
         foreach($aamount AS $am){
             $tinfo['amount'] = $am;
             $res = cal_quote($tinfo, $comps);
+            //count row
             if($x==0){
                 $num = 0;
                 foreach($res as $k=>$v){
                     foreach($v as $kk=>$vv){
-                        $num += (isset($vv[3])?1:0);
+                        $num += (isset($vv[4])?1:0);
                     }
                 }
             }
             $adjmargin = array_slice(explode(",",$info['adj_margin']),$x*($num+1),$num+1);
-            array_push($adata,$tb->show_quote_tb($head, $res,"tb-cost_$x",array(4),$margin,$adjmargin));
+            $adjcost = array_slice(explode(",",(isset($info['adj_cost'])?$info['adj_cost']:"")),$x*($num),$num);
+            array_push($adata,$tb->show_quote_tb($head, $res,"tb-cost_$x",array(4),$margin,$adjmargin,$adjcost));
             $x++;
         }
         $cost_adj = "<h4>รายละเอียดต้นทุน</h4>"
             . $form->show_tabs("q-detail",$aamount,$adata,0);
         $del = "<span id='del-quote' class='red-but'>Delete</span>"
-                    . "<script>del_quote();</script>";
+                    . "<script>del_quote();reflex_adj();</script>";
     } else {
         $cost_adj = "";
         $del = "";

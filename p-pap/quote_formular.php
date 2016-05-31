@@ -109,7 +109,8 @@ function cal_quote($info,$comps){
             "width" => $wh['width'],
             "length" => $wh['length'],
             "weight" => $weight[$pinfo['mat_weight']],
-            "amount" => $rims
+            "amount" => $rims,
+            "cost" => $c_per_rim
         );
         $cperkg = 3100*$c_per_rim/$wh['width']/$wh['length']/$weight[$pinfo['mat_weight']];
         $showcost = number_format($c_per_rim,2)."<br/>".number_format($cperkg,2);

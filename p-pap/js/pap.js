@@ -266,6 +266,11 @@ function add_papera(e){
         a = $("#allo").val();
     });
 }
+function reflex_adj(){
+$(document).ready(function(){
+    $(".tb-adj-cost").trigger("change");
+});
+}
 function quote_adj(id){
     var tt = $("#"+id+" .tb-total-quote");
     tt.on("click",function(){
@@ -276,33 +281,60 @@ function quote_adj(id){
     var pr = $("#"+id+" .tb-pr");
     var cos = $("#"+id+" .tb-stcost");
     var adjcost = $("#"+id+" .tb-adj-cost");
-    var i,nmg,cost;
+    var adjkg = $("#"+id+" .tb-adj-paperkg");
+    var adjpaper = $("#"+id+" .tb-adj-paper");
+    var i,nmg,cost,info;
+    //adj paper cost
+    adjpaper.on("change",function(){
+        i = adjpaper.index($(this));
+        info = $.parseJSON($(this).attr("info"));
+        $.each(info,function(k,v){
+            info[k] = parseFloat(v);
+        });
+        var radj = $(this).val()*3100/info['width']/info['length']/info['weight'];
+        adjkg.eq(i).val(numformat(radj,3));
+    });
+    //adj paper by kg
+    adjkg.on("change",function(){
+        i = adjkg.index($(this));
+        info = $.parseJSON($(this).attr("info"));
+        $.each(info,function(k,v){
+            info[k] = parseFloat(v);
+        });
+        var kgc = $(this).val()/3100*info['width']*info['length']*info['weight'];
+        adjpaper.eq(i).val(kgc).trigger("change");
+    });
+    //adj cost per u
+    adjcost.on("change",function(){
+        i = adjcost.index($(this));
+        var ncost,nvari,frame;
+        info = $.parseJSON($(this).attr("info"));
+        $.each(info,function(k,v){
+            info[k] = parseFloat(v);
+        });
+        nvari = info['cost']+parseFloat($(this).val());
+        ncost = nvari*info['amount'];
+        if(info['min']>0){
+            ncost = Math.max(info['min'],ncost);
+        }
+        if(info['frame']>0){ //incase การพิมพ์ ต้องนำมาคูณจำนวนกรอบด้วย
+            frame = Math.ceil(info['frame']);
+            ncost = frame*ncost;
+        }
+        cos.eq(i).text(numformat(ncost,0));
+        mg.eq(i).trigger("change");
+    });
+    //adj margin total
     mgtt.on("change",function(){
         mg.val($(this).val());
         update_mg()
         tt.html(ntt());
     });
-    adjcost.on("change",function(){
-        i = adjcost.index($(this));
-        var info,ncost,nvari,frame,w,h,wg;
-        info = $.parseJSON($(this).attr("info"));
-        nvari = parseFloat(info['cost'])+parseFloat($(this).val());
-        ncost = nvari*parseFloat(info['amount']);
-        if(info['min']>0){
-            ncost = Math.max(parseFloat(info['min']),ncost);
-        }
-        if(info['frame']>0){ //incase การพิมพ์ ต้องนำมาคูณจำนวนกรอบด้วย
-            frame = Math.ceil(parseFloat(info['frame']));
-            ncost = frame*ncost;
-        }
-        cos.eq(i).text(ncost);
-        mg.trigger("change");
-    });
     mg.on("change",function(){
         i = mg.index($(this));
         nmg = 1+$(this).val()/100;
         cost = cos.eq(i).html();
-        pr.eq(i).html(numformat(nmg*stfloat(cost)));
+        pr.eq(i).html(numformat(nmg*stfloat(cost),0));
         tt.html(ntt());
     });
     function update_mg(){
@@ -310,7 +342,7 @@ function quote_adj(id){
            i = mg.index($(this));
            nmg = 1+$(this).val()/100;
            cost = cos.eq(i).html();
-           pr.eq(i).html(numformat(nmg*stfloat(cost)));
+           pr.eq(i).html(numformat(nmg*stfloat(cost),0));
         });
     }
     function ntt(){
@@ -318,7 +350,7 @@ function quote_adj(id){
         $.each(pr,function(){
             ntt += stfloat($(this).html());
         });
-        return numformat(ntt);
+        return numformat(ntt,0);
     }
 }
 function stfloat(st){

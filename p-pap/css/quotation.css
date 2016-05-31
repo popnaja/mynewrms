@@ -75,7 +75,8 @@
     font-weight:600;
 }
 .tb-adj-cost,
-.tb-adj-paper{
+.tb-adj-paper,
+.tb-adj-paperkg{
     width:100%;
     padding:0 5px !important;
 }
