@@ -321,6 +321,11 @@ function quote_adj(id){
             frame = Math.ceil(info['frame']);
             ncost = frame*ncost;
         }
+        ncost = Math.round(ncost);
+        var diff = ncost-stfloat(cos.eq(i).text());
+        var st = stfloat($(".tb-tt-stcost").text());
+        var nst = st+diff;
+        $(".tb-tt-stcost").text(nst);
         cos.eq(i).text(numformat(ncost,0));
         mg.eq(i).trigger("change");
     });

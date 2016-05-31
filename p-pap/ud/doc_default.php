@@ -850,14 +850,14 @@ function job_detail($qid){
         }
         //coat2
         if(is_array($coat2)&&$coat2[$i]>0){
-            array_push($data[$cname],"เคลือบ ".$process[$coat2[$i]]." ด้านใน");
+            array_push($data[$cname],"เคลือบด้านใน ".$process[$coat2[$i]]);
         }
         //cwing
         if($info['cwing']==1&&$type==1){
             if($info['fwing']>0||$info['bwing']>0){
                 $fwing = ($info['fwing']>0?"ปีกปกหน้า ".$info['fwing']." cm":"");
                 $bwing = ($info['bwing']>0?"ปีกปกหลัง ".$info['bwing']." cm":"");
-                array_push($data[$cname],$fwing.$bwing);
+                array_push($data[$cname],$fwing." ".$bwing);
             }
         }
         //แผ่นพับ show พับกี่ส่วน

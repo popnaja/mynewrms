@@ -200,14 +200,16 @@ function cal_quote($info,$comps){
         array_push($res['หลังพิมพ์'],array_merge(array($processes[$collect_id]),$pcost));
 
         //binding
-        $pcost = new_pcost($info['binding_id'], $overall);
-        array_push($res['หลังพิมพ์'],array_merge(array($processes[$info['binding_id']]),$pcost));
+        if($info['binding_id']>0){
+            $pcost = new_pcost($info['binding_id'], $overall);
+            array_push($res['หลังพิมพ์'],array_merge(array($processes[$info['binding_id']]),$pcost));
+        }
     }
     //อื่นๆ
     if(isset($info['other_price'])){
         $other = json_decode($info['other_price'],true);
         foreach($other as $k=>$oinfo){
-            array_push($res['อื่นๆ'],array($oinfo[0],0,0,$oinfo[1]));
+            array_push($res['อื่นๆ'],array($oinfo[0]."<br/>".$oinfo[3],$oinfo[2],$oinfo[1],json_encode(array("amount"=>$oinfo[2],"cost"=>$oinfo[1])),$oinfo[1]*$oinfo[2]));
         }
     }
     return $res;
@@ -244,7 +246,7 @@ function new_pcost($pid,$arrinfo){
         }
     }
     if(!isset($res)){
-        echo "Recheck cost formular of process id ".$pid;
+        var_dump("Recheck cost formular of process id ".$pid);
         $res = cost_formular($cost[0],$arrinfo[$cost[0]['vunit']],$arrinfo);
         array_unshift($res,$arrinfo[$cost[0]['vunit']]);
     }

@@ -778,7 +778,8 @@ if($req == "login"){
         foreach($v as $key=>$val){
             $total_cost += $val[4];
             if($k=="ทำเพลต"||$k=="กระดาษ"){
-                array_push($pricelist,array_merge(array(0),$val));
+                $cpu = explode("<br/>",$val[2]);
+                array_push($pricelist,array(0,$val[0],$val[1],str_replace(",","",$cpu[0]),$val[4]));
             }
         }
     }
@@ -941,7 +942,7 @@ if($req == "login"){
     $other = array();
     for($i=0;$i<count($_POST['olist']);$i++){
         if($_POST['olist'][$i]!=""){
-            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i]));
+            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i],$_POST['oamount'][$i],$_POST['oremark'][$i]));
         }
     }
      //update meta

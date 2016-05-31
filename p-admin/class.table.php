@@ -602,7 +602,7 @@ class mytable {
             } else {
                 $mg_v = $margin;
             }
-            $html .= "<tr class='tb-total'><td colspan='$span'>TOTAL</td><td class='tb-stcost'>".number_format($tt,0)."</td>"
+            $html .= "<tr class='tb-total'><td colspan='$span'>TOTAL</td><td class='tb-stcost tb-tt-stcost'>".number_format($tt,0)."</td>"
                     . "<td>"
                     . "<input type='number' min='-100' id='mg_$i' value='$mg_v' step='0.01' class='tb-mg-input-tt' name='adj_margin[]'/>"
                     . "</td>"
