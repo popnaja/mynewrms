@@ -275,11 +275,33 @@ function quote_adj(id){
     var mg = $("#"+id+" .tb-mg-input");
     var pr = $("#"+id+" .tb-pr");
     var cos = $("#"+id+" .tb-stcost");
+    var adjcost = $("#"+id+" .tb-adj-cost");
     var i,nmg,cost;
     mgtt.on("change",function(){
         mg.val($(this).val());
         update_mg()
         tt.html(ntt());
+    });
+    adjcost.on("change",function(){
+        i = adjcost.index($(this));
+        var info,ncost,nvari,frame,w,h,wg;
+        info = $.parseJSON($(this).attr("info"));
+        if(typeof info['width']!=="undefined"){ //case คำนวณราคากระดาษ
+            w = parseFloat(info['width']);
+            console.log(info['width']);
+        } else {
+            nvari = parseFloat(info['cost'])+parseFloat($(this).val());
+            ncost = nvari*parseFloat(info['amount']);
+            if(info['min']>0){
+                ncost = Math.max(parseFloat(info['min']),ncost);
+            }
+            if(info['frame']>0){ //incase การพิมพ์ ต้องนำมาคูณจำนวนกรอบด้วย
+                frame = Math.ceil(parseFloat(info['frame']));
+                ncost = frame*ncost;
+            }
+        }
+        cos.eq(i).text(ncost);
+        mg.trigger("change");
     });
     mg.on("change",function(){
         i = mg.index($(this));

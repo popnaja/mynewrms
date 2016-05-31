@@ -29,12 +29,15 @@ function prep_order($qid){
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
     }
+    //coat2
+    $coat2 = json_decode($info['coat2'],true);
     foreach($unit AS $ku=>$u){
         if($u['type']==9){
             $tt = $u;
             continue;
         }
         $comp = $comps[$ku];
+        $c2 = $coat2[$ku];
         //name
         $type = $u['type'];
         $run[$type]++;
@@ -82,10 +85,15 @@ function prep_order($qid){
                             add_data($data,$pid,$name,$sheet,$comp_id);
                         }
                     }
+                    if($c2>0){
+                        add_data($data,$c2,$name,$sheet,$comp_id);
+                    }
                     break;
                 case 5: //ไดตัท
                     $post = explode(",",$comp['comp_postpress']);
-                    foreach($post as $pid){
+                    foreach($post as $pdata){
+                        $pdata = explode(";",$pdata);
+                        $pid = $pdata[0];
                         if($pid>0){
                             add_data($data,$pid,$name,$sheet,$comp_id);
                         }
@@ -101,12 +109,14 @@ function prep_order($qid){
                     $pid = ($type==3&&$info['folding']>0?$info['folding']:$process[0]);
                     if($type==1){
                         //ปก ไม่พับ
-                    } else if($info['cat_id']==12||$info['cat_id']==13){ //ใบปลิว โปสเตอร์ไม่พับ
+                    } else if(in_array($info['cat_id'],array(11,12,13))){ //ใบปลิว โปสเตอร์ แผ่นพับ
                         if(isset($info['folding'])&&$info['folding']>0){
                             add_data($data,$info['folding'],$name,$u['set'],$comp_id);
                         }
                     } else {
-                        add_data($data,$pid,$name,$u['set'],$comp_id);
+                        foreach($u['sinfo'] as $kk=>$vv){
+                            add_data($data,$vv['foldid'],$name,$vv['set'],$comp_id);
+                        }
                     }
                     break;
                 default:
@@ -134,17 +144,21 @@ function prep_order($qid){
                 break;
             case 11: //แพ็ค
                 $pack = explode(",",$info['packing']);
-                foreach($pack as $pid){
+                foreach($pack as $pdata){
+                    $pdata = explode(";",$pdata);
+                    $pid = $pdata[0];
                     if($pid>0){
-                        add_data($data,$pid,$name,$amount,$comp_id);
+                        add_data($data,$pid,$name,$pdata[1],$comp_id);
                     }
                 }
                 break;
             case 12: //ส่ง
                 $ship = explode(",",$info['shipping']);
-                foreach($ship as $pid){
+                foreach($ship as $pdata){
+                    $pdata = explode(";",$pdata);
+                    $pid = $pdata[0];
                     if($pid>0){
-                        add_data($data,$pid,$name,$info['distance'],$comp_id);
+                        add_data($data,$pid,$name,$pdata[1],$comp_id);
                     }
                 }
                 break;

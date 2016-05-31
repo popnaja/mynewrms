@@ -6,12 +6,10 @@ function cal_quote($info,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     
-    $amount = $info['amount'];
     $processes = $db->get_keypair("pap_process", "process_id", "process_name");
     //calculate
 
     $units = unit_cal($info, $comps);
-    //var_dump($units);
     $res['ออกแบบ'] = array();
     $res['ทำเพลต'] = array();
     $res['กระดาษ'] = array();
@@ -44,25 +42,34 @@ function cal_quote($info,$comps){
 
             //packing
             $pack = explode(",",$info['packing']);
-            foreach($pack as $packdata){
-                $packdata = explode(";",$packdata);
-                $pid = $packdata[0];
+            foreach($pack as $pro){
+                $pro = explode(";",$pro);
+                $pid = $pro[0];
                 if($pid>0){
-                    if(!isset($packdata[1])){
-                        $pcost = new_pcost($pid, $unit);
-                        array_push($res['แพ็ค'],array_merge(array($processes[$pid]),$pcost));
-                    } else {
-                        $pcost = new_pcost($pid, $unit);
-                        array_push($res['แพ็ค'],array($processes[$pid],$packdata[1],$pcost[1],$packdata[1]*$pcost[1]));
+                    $meta = $db->get_meta("pap_process_meta", "process_id", $pid);
+                    $cost = json_decode($meta['cost'],true);
+                    if(isset($pro[1])){
+                        $tunit = $unit;
+                        $tunit[$cost[0]['vunit']]=$pro[1];
                     }
+                    $pcost = new_pcost($pid, $tunit);
+                    array_push($res['แพ็ค'],array_merge(array($processes[$pid]),$pcost));
                 }
             }
             //shipping
             $ship = explode(",",$info['shipping']);
-            foreach($ship as $pid){
+            foreach($ship as $pro){
+                $pro = explode(";",$pro);
+                $pid = $pro[0];
                 if($pid>0){
-                    $pcost = new_pcost($pid, $unit);
-                    array_push($res['ขนส่ง'],array_merge(array($processes[$pid]),$pcost));
+                    $meta = $db->get_meta("pap_process_meta", "process_id", $pid);
+                    $cost = json_decode($meta['cost'],true);
+                    if(isset($pro[1])){
+                        $tunit = $unit;
+                        $tunit[$cost[0]['vunit']]=$pro[1];
+                    }
+                    $pcost = new_pcost($pid, $tunit);
+                    array_push($res['แพ็ค'],array_merge(array($processes[$pid]),$pcost));
                 }
             }
             continue;
@@ -79,21 +86,16 @@ function cal_quote($info,$comps){
             $temp = array();
             foreach($unit['finfo'] as $key=>$val){
                 $tunit = $val+$unit;
+                //var_dump($tunit);
                 $fid = $val['frameid'];
                 $pcost = new_pcost($fid,$tunit);
-                if(isset($temp[$fid])){
-                    $temp[$fid][0]++;
-                    $temp[$fid][2] += $pcost[2];
-                } else {
-                    $temp[$fid] = array(1,$pcost[1],$pcost[2]);
-                }
-            }
-            foreach($temp as $tid=>$tinfo){
-                array_push($res['ทำเพลต'],array_merge(array("Plate ".$cname),$tinfo));
+                array_push($res['ทำเพลต'],array_merge(array($cname." ".str_replace("ทำเพลต","",$processes[$fid])),$pcost));
             }
         }
         //paper
         $pinfo = $db->get_info("pap_mat","mat_id",$unit['paper_id']);
+        $size = $db->get_keypair("pap_option", "op_id", "op_value", "WHERE op_type='paper_size'");
+        $weight = $db->get_keypair("pap_option","op_id","op_name","WHERE op_type='paper_weight'");
         $lot = $pinfo['mat_order_lot_size'];
         $lots = ceil($unit['sheet']/$unit['paper_cut']/$lot);
         $rims = $lots*$lot/500;
@@ -102,7 +104,14 @@ function cal_quote($info,$comps){
         } else {
             $c_per_rim = 0;
         }
-        array_push($res['กระดาษ'],array("กระดาษ $cname",$rims,$c_per_rim,$rims*$c_per_rim));
+        $wh = json_decode($size[$pinfo['mat_size']],true);
+        $paperinfo = array(
+            "width" => $wh['width'],
+            "length" => $wh['length'],
+            "weight" => $weight[$pinfo['mat_weight']],
+            "amount" => $rims
+        );
+        array_push($res['กระดาษ'],array("$cname<br/>".$wh['width']."x".$wh['length'],$rims,$c_per_rim,json_encode($paperinfo),$rims*$c_per_rim));
         
         //printing
         //var_dump($unit);
@@ -112,16 +121,22 @@ function cal_quote($info,$comps){
                 $kinfo = explode(",",$v[0]);
                 $round = $v[1]/ceil($kinfo[0]);
             }
-            $pcost = print_cost($unit['print_id'], $round);
-            array_push($res['พิมพ์'],array("$cname นอก ($color[0] สี)",$round,$pcost[0],$pcost[0]));
-            $pcost = print_cost($unit['print_id2'], $round);
-            array_push($res['พิมพ์'],array("$cname ใน ($color[1] สี)",$round,$pcost[0],$pcost[0]));
+            $tunit = $unit;
+            $tunit['round'] = $round;
+            $pcost = new_pcost($unit['print_id'], $tunit);
+            array_push($res['พิมพ์'],array("$cname นอก ($color[0] สี)",$round,$pcost[1],$pcost[2],$pcost[3]));
+            $pcost = new_pcost($unit['print_id2'], $tunit);
+            array_push($res['พิมพ์'],array("$cname ใน ($color[1] สี)",$round,$pcost[1],$pcost[2],$pcost[3]));
         } else {
             foreach($unit['round'] as $k=>$v){
                 $kinfo = explode(",",$v[0]);
                 $round = $v[1]/ceil($kinfo[0]);
-                $pcost = print_cost($unit['print_id'], $round);
-                array_push($res['พิมพ์'],array("$cname $kinfo[1]","$kinfo[0] กรอบ ($round รอบ/กรอบ)",$pcost[0],$pcost[0]*ceil($kinfo[0])));
+                $tunit = $unit;
+                $tunit['round'] = $round;
+                $pcost = new_pcost($unit['print_id'], $tunit);
+                $frameinfo = json_decode($pcost[2],true)+array("frame"=>$kinfo[0]);
+                $check = ($kinfo[0]==0.75?"quote-red":"");
+                array_push($res['พิมพ์'],array("$cname $kinfo[1]","<span class='$check'>$kinfo[0] กรอบ</span> ($round รอบ/กรอบ)",$pcost[1],json_encode($frameinfo),$pcost[3]*ceil($kinfo[0])));
             }
             
         }
@@ -141,14 +156,17 @@ function cal_quote($info,$comps){
         }
         //post process หลังงานพิมพ์คิดเต็มริม
         $post = explode(",",$com['comp_postpress']);
-        foreach($post as $pdata){
-            $pdata = explode(";",$pdata);
-            $pid = $pdata[0];
+        foreach($post as $pro){
+            $pro = explode(";",$pro);
+            $pid = $pro[0];
             if($pid>0){
-                if(isset($pdata[1])){
-                    $unit['unit']=$pdata[1];
+                $meta = $db->get_meta("pap_process_meta", "process_id", $pid);
+                $cost = json_decode($meta['cost'],true);
+                if(isset($pro[1])){
+                    $tunit = $unit;
+                    $tunit[$cost[0]['vunit']]=$pro[1];
                 }
-                $pcost = new_pcost($pid, $unit);
+                $pcost = new_pcost($pid, $tunit);
                 array_push($res['หลังพิมพ์'],array_merge(array($processes[$pid]." ".$cname),$pcost));
             }
         }
@@ -159,7 +177,12 @@ function cal_quote($info,$comps){
 
     //ถ้า เป็นหนังสือ cat_id=10 แผ่นพับ cat_id=11 มีการพับ
     if(in_array($info['cat_id'],array(10,11,69))||isset($info['folding'])){
-        if($folding_id>0){
+        if(isset($overall['sinfo'])){
+            foreach($overall['sinfo'] as $fid=>$set){
+                $pcost = new_pcost($fid, array("set"=>$set));
+                array_push($res['หลังพิมพ์'],array_merge(array($processes[$fid]),$pcost));
+            }
+        } else if($folding_id>0) {
             $pcost = new_pcost($folding_id, $overall);
             array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
         }
@@ -184,7 +207,6 @@ function cal_quote($info,$comps){
             array_push($res['อื่นๆ'],array($oinfo[0],0,0,$oinfo[1]));
         }
     }
-
     return $res;
 }
 function print_cost($process_id,$amount){
@@ -230,7 +252,9 @@ function cost_formular($value,$amount,$arrinfo){
     if(isset($value['formular'])&&$value['formular']!=""){
         $for = $value['formular'];
         foreach($arrinfo as $k=>$v){
-            $for = str_replace($k,$v,$for);
+            if(!is_array($v)){
+                $for = str_replace($k,$v,$for);
+            }
         }
         $cinfo = max($value['min'],calculate_string($for));
         $cost_per_u = $value['formular'];
@@ -238,7 +262,7 @@ function cost_formular($value,$amount,$arrinfo){
         $cinfo = max($fcost+$value['cost']*$amount,$value['min']);
         $cost_per_u = $value['cost'];
     }
-    return array($cost_per_u,$cinfo);
+    return array($cost_per_u,json_encode(array("amount"=>$amount)+$value),$cinfo);
 }
 function calculate_string( $mathString )    {
     $mathString = trim($mathString);     // trim white spaces
@@ -258,13 +282,8 @@ function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
-    global $op_print_color,$op_print_toplate;
-    $set_id = array(
-        8 => 41,
-        4 => 40,
-        2 => 8,
-        1 => 0
-    );
+    global $op_print_color,$op_print_toplate,$op_set_id;
+    $set_id = $op_set_id;
     $n = count($comps);
     $amount = $quote['amount'];
     $res = array();
@@ -286,7 +305,7 @@ function unit_cal($quote,$comps){
         $res[$k]['paper_cut'] = $paper_cut;
         $res[$k]['print_id'] = $comp['comp_print_id'];
         $res[$k]['print_id2'] = $comp['comp_print2'];
-        $res[$k]["piece"] = $quote['amount'];
+        $res[$k]["piece"] = $amount;
         
         $type = $comp['comp_type'];
         if($type==2||$type==6){                   //เนื้อใน
@@ -329,31 +348,28 @@ function unit_cal($quote,$comps){
                             array_push($res[$k]['round'],array($name,$s*$round));
                             $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
                             $cut += ($div>1?$div/2*$temp:0);
-                            $yok += $div*$temp;
+                            
                             //check folding
-                            if(isset($set_id[$paper_lay])){
-                                $sid = $set_id[$paper_lay];
+                            if(isset($set_id[$paper_lay*2])){
+                                $sid = $set_id[$paper_lay*2];
                                 $set = $tsheet;
+                            } else if(isset($set_id[$paper_lay])){
+                                $sid = $set_id[$paper_lay];
+                                $set = $tsheet*2;
                             } else if(isset($set_id[$paper_lay/2])){
                                 $sid = $set_id[$paper_lay/2];
-                                $set = $tsheet*2;
-                            } else if(isset($set_id[$paper_lay/4])){
-                                $sid = $set_id[$paper_lay/4];
                                 $set = $tsheet*4;
                             }
-                            for($x=0;$x<$s;$x++){
-                                array_push($res[$k]['finfo'],array(
-                                    "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                                    "frame" => 1,
-                                    "round" => $round
-                                ));
-                                if($x%2==1){
-                                    array_push($res[$k]['sinfo'],array(
-                                        "foldid" => $sid,
-                                        "set" => $set
-                                    ));
-                                }
-                            }
+                            array_push($res[$k]['finfo'],array(
+                                "frameid" => $op_print_toplate[$comp['comp_print_id']],
+                                "frame" => $s,
+                                "round" => $round
+                            ));
+                            array_push($res[$k]['sinfo'],array(
+                                "foldid" => $sid,
+                                "set" => $set*$s/2
+                            ));
+                            $yok += $set*$s/2;
                         } else {
                             $ss = ($s>0.5?1:$s);
                             $sheet += $tsheet = $amount*$ss/2+$allo;
@@ -362,7 +378,6 @@ function unit_cal($quote,$comps){
                             array_push($res[$k]['round'],array($name,$round));
                             $div = (is_int($paper_lay*$s/2/8)&&$paper_lay*$s/2/8>=2?$paper_lay*$s/2/8:1);
                             $cut += $div*($amount+ceil($allo*$s*$paper_lay));
-                            $yok += $div*($amount+ceil($allo*$s*$paper_lay));
                             $i++;
                             array_push($res[$k]['finfo'],array(
                                 "frameid" => $op_print_toplate[$comp['comp_print_id']],
@@ -370,13 +385,14 @@ function unit_cal($quote,$comps){
                                 "round" => $round
                             ));
                             //check folding
-                            if(isset($set_id[$s*$paper_lay])){
+                            $st = $s*$paper_lay; //remainding page
+                            if(isset($set_id[$st])){
+                                $yok += $amount+$allo;
                                 array_push($res[$k]['sinfo'],array(
-                                    "foldid" => $set_id[$s*$paper_lay],
+                                    "foldid" => $set_id[$st],
                                     "set" => $amount+$allo
                                 ));
                             } else {
-                                $st = $s*$paper_lay;
                                 $setcomp = array();
                                 while($st>0){
                                     foreach($set_id as $fpage=>$sid){
@@ -392,6 +408,7 @@ function unit_cal($quote,$comps){
                                     }
                                 }
                                 foreach($setcomp as $fid=>$set){
+                                    $yok += $set;
                                     array_push($res[$k]['sinfo'],array(
                                         "foldid" => $fid,
                                         "set" => $set
@@ -469,19 +486,38 @@ function unit_cal($quote,$comps){
         "location" => (isset($quote['location'])?$quote['location']:0),
         "piece" => $quote['amount'],
         "set" => 0,
-        "frame" => 0
+        "frame" => 0,
+        "kong" => 0,
+        "minallo" => INF
     );
     //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];
-        $set = (in_array($unit['type'],array(1,2,3,6))?$unit['set']:0);
-        if($quote['binding_id']==1){
-            $tinfo['set'] += ($unit['type']==1?0:$set);
-        } else {
-            $tinfo['set'] += $set;
-        }
+        //frame
         $tinfo['frame'] += ceil($unit['ff']);
+        //kong
+        if($unit['ff']<=1){
+            $tinfo['kong'] += 1;
+        } else {
+            $div = plate_div($unit['ff']);
+            $tinfo['kong'] += $div[0]/2 + $div[1] + ceil($div[2]);
+        }
+        //min allo
+        $tinfo['minallo'] = min($tinfo['minallo'],$unit['allo']);
+        //พับ
+        if(isset($unit['sinfo'])){
+            foreach($unit['sinfo'] as $val){
+                if($val['foldid']>0){
+                    if(isset($tinfo['sinfo'][$val['foldid']])){
+                        $tinfo['sinfo'][$val['foldid']] += $val['set'];
+                    } else {
+                        $tinfo['sinfo'][$val['foldid']] = $val['set'];
+                    }
+                }
+            }
+        }
     }
+    $tinfo['set'] = $tinfo['kong']*($amount+$tinfo['minallo'])-($quote['binding_id']==1?($amount+$tinfo['minallo']):0);
     array_push($res,$tinfo);
     return $res;
 }

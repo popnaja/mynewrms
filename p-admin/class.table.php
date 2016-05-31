@@ -559,19 +559,23 @@ class mytable {
                 $html .= "<tr class='tb-first-gp tb-data'><th rowspan='$rows'>$k</th>".$ttd;
                 $i = 0;
                 foreach($v as $kk=>$vv){
-                    $tt += $vv[3];
+                    $tt += $vv[4];
                     $html .= ($i==0?"":"<tr class='tb-data'>");
                     foreach($vv as $kkk=>$vvv){
                         $av = (in_array($kkk,$numcol)?number_format($vvv,0):$vvv);
-                        $cls = ($kkk==3?"class='tb-stcost'":"");
-                        $html .= "<td $cls>$av</td>";
+                        $cls = ($kkk==4?"class='tb-stcost'":"");
+                        if($kkk==3){
+                            $html .= "<td><input type='number' step='any' name='adj_cost[]' value='0' class='tb-adj-cost' info='$vvv'/></td>";
+                        } else {
+                            $html .= "<td $cls>$av</td>";
+                        }
                     }
                     if(isset($adj[$j])&&$adj[$j]!=""){
                         $mg_v = $adj[$j];
-                        $mg = $vv[3]*(1+$adj[$j]/100);
+                        $mg = $vv[4]*(1+$adj[$j]/100);
                     } else {
                         $mg_v = $margin;
-                        $mg = $vv[3]*(1+$margin/100);
+                        $mg = $vv[4]*(1+$margin/100);
                     }
                     $tt_mg += $mg;
                     $html .= "<td>"

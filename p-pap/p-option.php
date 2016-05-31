@@ -10,6 +10,12 @@ $op_type_unit = array(
     14 => "ชิ้น",
     69 => "เล่ม",
 );
+$op_set_id = array(
+    16 => 41,
+    8 => 40,
+    4 => 8,
+    2 => 0
+);
 $op_authlevel = array(
     "0"=>"None",
     "1"=>"View",
@@ -28,7 +34,8 @@ $op_unit = array(
     "in2" => "ตารางนิ้ว",
     "km" => "ระยะทาง(กม)",
     "location" => "จุดส่งของ",
-    "unit" => "หน่วย"
+    "unit" => "หน่วย",
+    "line" => "เส้น"
 );
 $op_criteria = $op_unit+array(
     //"area" => "พื้นที่(cm2)"

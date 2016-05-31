@@ -143,7 +143,7 @@ function show_quote_df($qid){
     return $content;
 }
 function show_order($oid,$edit=false){
-    global $op_paper_div;
+    global $op_paper_div,$op_unit;
     global $rpdb;
     $db = $rpdb;
     __autoload("pdo_report");
@@ -161,7 +161,7 @@ function show_order($oid,$edit=false){
     foreach($comp as $k=>$com){
         if($com['type']==9){
             //packing & shipping
-            $pack = $rp->rp_order_cpro($com['id'], "(11,12)");
+            $pack = $rp->rp_order_cpro($op_unit,$com['id'], "(11,12)",true);
             $packing .= "<tr>"
                     . "<th colspan='2'>การห่อ</th>"
                     . "<td colspan='5'>".(isset($pack[11])?$pack[11]:"")."</td>"
@@ -173,7 +173,7 @@ function show_order($oid,$edit=false){
         }
         if(count($comp)==1){
             //packing & shipping
-            $pack = $rp->rp_order_cpro($com['id'], "(11,12)");
+            $pack = $rp->rp_order_cpro($op_unit,$com['id'], "(11,12)",true);
             $packing .= "<tr>"
                     . "<th colspan='2'>การห่อ</th>"
                     . "<td colspan='5'>".(isset($pack[11])?$pack[11]:"")."</td>"
@@ -191,7 +191,7 @@ function show_order($oid,$edit=false){
                 . "</tr>";
 
         //plate
-        $print = $rp->rp_order_cpro($com['id'], "(3)");
+        $print = $rp->rp_order_cpro($op_unit,$com['id'], "(3)");
         $set = explode(";",$print[3]);
         for($i=0;$i<count($set);$i++){
             $pinfo = explode(",",$set[$i]);
@@ -209,7 +209,7 @@ function show_order($oid,$edit=false){
         }
 
         // post-print
-        $post = $rp->rp_order_cpro($com['id'], "(4,5)");
+        $post = $rp->rp_order_cpro($op_unit,$com['id'], "(4,5)");
         $after .= "<tr align='center'>"
                 . "<td colspan='2'>$cname</td>"
                 . "<td colspan='3'>".(isset($post[4])?$post[4]:"")."</td>"
@@ -866,8 +866,9 @@ function job_detail($qid){
         }
         //ไดคัท
         foreach($post as $p){
-            if($p>0){
-                array_push($data[$cname],$process[$p]);
+            $p = explode(";",$p);
+            if($p[0]>0){
+                array_push($data[$cname],$process[$p[0]]);
             }
         }
     }
@@ -885,13 +886,15 @@ function job_detail($qid){
         $shipping = explode(",",$info['shipping']);
         $other = array();
         foreach($packing as $v){
-            if($v>0){
-                array_push($other,$process[$v]);
+            $v = explode(";",$v);
+            if($v[0]>0){
+                array_push($other,$process[$v[0]]);
             }
         }
         foreach($shipping as $v){
-            if($v>0){
-                array_push($other,$process[$v]);
+            $v = explode(";",$v);
+            if($v[0]>0){
+                array_push($other,$process[$v[0]]);
             }
         }
         $data["ข้อกำหนดอื่นๆ"] = array(implode(", ",$other));
@@ -931,10 +934,11 @@ function show_invoice_ghpp1($ivid){
         foreach($aoid as $oid){
             $oinfo = $rp->rp_order($oid);
             $pay .= ($i==0?"":"<br/>");
-            $pay .= $oinfo['name']." (".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
+            $pay .= "(".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
             $i++;
         }
     }
+    $user = (isset($info['user_login'])?$info['user_login']:"-");
     $doc = "<div class='print-letter'>"
             . "<div class='doc-header'></div><!-- .doc-header -->"
             . "<div class='doc-info ghpp-doc-info'>"
@@ -944,7 +948,7 @@ function show_invoice_ghpp1($ivid){
             . "<div class='doc-date ghpp'>"
             . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
             . "<div class='doc-600'> <span class='float-left'>Invoice No. : </span>".  $info['no']."</div>"
-            . "<div class='doc-600'> <span class='float-left'>Sale Representative : </span>". $info['user_login']."</div>"
+            . "<div class='doc-600'> <span class='float-left'>Sale Representative : </span>". $user."</div>"
             . "<div class='doc-600'> <span class='float-left'>เงื่อนไขการชำระเงิน : </span>". $pay."</div>"
             . "</div>"
             . "</div>";
@@ -987,7 +991,7 @@ function show_rc_ghpp1($rcid){
         foreach($aoid as $oid){
             $oinfo = $rp->rp_order($oid);
             $pay .= ($i==0?"":"<br/>");
-            $pay .= ($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด");
+            $pay .= "(".($oinfo['credit']>0?"เครดิต ".$oinfo['credit']." วัน":"ชำระเป็นเงินสด").")";
             $i++;
         }
     }
@@ -998,7 +1002,7 @@ function show_rc_ghpp1($rcid){
             . "<div class='doc-to'>"
             . print_cus_info($info['customer_id'])
             . "</div><!-- .doc-to -->"
-            . "<div class='doc-date'>"
+            . "<div class='doc-date ghpp'>"
             . "<div class='doc-600'> <span class='float-left'>Date : </span>".$thdate."</div>"
             . "<div class='doc-600'> <span class='float-left'>REC No. : </span>".  $info['no']."</div>"
             . "<div class='doc-600'> <span class='float-left'>Sale Representative: </span>". $user."</div>"

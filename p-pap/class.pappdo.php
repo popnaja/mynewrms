@@ -356,6 +356,32 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_process_wunit($unit,$cat){
+        try {
+            $sql = <<<END_OF_TEXT
+SELECT
+pro.process_id,
+process_name,meta1.meta_value AS cost
+FROM pap_process AS pro
+LEFT JOIN pap_process_meta AS meta ON meta.process_id=pro.process_id AND meta.meta_key='pc_show'
+LEFT JOIN pap_process_meta AS meta1 ON meta1.process_id=pro.process_id AND meta1.meta_key='cost'
+WHERE pro.process_id NOT IN (26,37,38,39) AND meta.meta_value=1 AND pro.process_cat_id=:cat
+ORDER BY process_name ASC
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":cat",$cat);
+            $stmt->execute();
+            $res = array();
+            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                $cost = json_decode($row['cost'],true);
+                $vunit = $unit[$cost[0]['vunit']];
+                $res[$row['process_id']] = $row['process_name']." ($vunit)";
+            }
+            return $res;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
 /*=======================================================   CHECK CODE   =================================================================*/
     public function check_supplier_code($taxid){
         try {

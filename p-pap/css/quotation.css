@@ -70,3 +70,10 @@
 #tb-qshow .label-inline{
     margin-bottom:0;
 }
+.quote-red {
+    color:red;
+    font-weight:600;
+}
+.tb-adj-cost {
+    width:100%;
+}

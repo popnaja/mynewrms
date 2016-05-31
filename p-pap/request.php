@@ -745,8 +745,6 @@ if($req == "login"){
         "exclude" => $exclude,
         "packing" => (isset($_POST['pack'])?implode(",",$_POST['pack']):""),
         "shipping" => (isset($_POST['ship'])?implode(",",$_POST['ship']):""),
-        "distance" => $_POST['distance'],
-        "location" => $_POST['location'],
         "discount" => 0,
         "adj_margin" => "",
         "contact_id" => $_POST['cusct'],
@@ -771,7 +769,7 @@ if($req == "login"){
     $pricelist = array();
     foreach($res as $k=>$v){
         foreach($v as $key=>$val){
-            $total_cost += $val[3];
+            $total_cost += $val[4];
             if($k=="ทำเพลต"||$k=="กระดาษ"){
                 array_push($pricelist,array_merge(array(0),$val));
             }
@@ -786,7 +784,7 @@ if($req == "login"){
         $tt = 0;
         foreach($res as $k=>$v){
             foreach($v as $key=>$val){
-                $tt += $val[3];
+                $tt += $val[4];
             }
         }
         $ainfo = array(
@@ -944,8 +942,6 @@ if($req == "login"){
         "exclude" => $exclude,
         "packing" => (isset($_POST['pack'])?implode(",",$_POST['pack']):""),
         "shipping" => (isset($_POST['ship'])?implode(",",$_POST['ship']):""),
-        "distance" => $_POST['distance'],
-        "location" => $_POST['location'],
         "discount" => $_POST['discount'],
         "contact_id" => (isset($_POST['cusct'])?$_POST['cusct']:0),
         "page_cover" => $page_cover,
@@ -969,7 +965,7 @@ if($req == "login"){
     $total_cost = 0;
     foreach($res as $k=>$v){
         foreach($v as $key=>$val){
-            $total_cost += $val[3];
+            $total_cost += $val[4];
         }
     }
     $exmeta = array(
@@ -1001,7 +997,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");

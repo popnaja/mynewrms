@@ -80,9 +80,9 @@ if($action=="add"||isset($qid)){
     $binding = array("0"=>"--ไม่มี--")+$process_keypair[9];
     $coating = array("0"=>"--ไม่มี--")+$process_keypair[4];
     $print = $process_keypair[3];
-    $after =  $process_keypair[5];
-    $packing = $process_keypair[11];
-    $shipping = $process_keypair[12];
+    $after =  $db->get_process_wunit($op_unit,5);
+    $packing = $db->get_process_wunit($op_unit,11);
+    $shipping = $db->get_process_wunit($op_unit,12);
     $fold = array("0"=>"--ไม่มี--")+$process_keypair[7];
     $scolor = $process_keypair[13];
 }
@@ -118,9 +118,7 @@ if($action=="add"){
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
 
     $pack = $form->show_checkbox_winput("pack","pack",$packing,"การแพ็ค","label-3070")
-            . $form->show_checkbox("ship","ship",$shipping,"การขนส่ง","label-3070")
-            . $form->show_num("distance","",0.01,"","ระยะทาง(กม)","","label-3070")
-            . $form->show_num("location","",1,"","จุดส่งของ","","label-3070");
+            . $form->show_checkbox_winput("ship","ship",$shipping,"การขนส่ง","label-3070");
 
     $multi = "";
     for($x=1;$x<11;$x++){
@@ -189,7 +187,7 @@ if($action=="add"){
         $cmargin = $cinfo['margin'];
         //margin by group
         $margin = $db->get_group_margin($info['customer_id'], $cmargin);
-        $head = array("กลุ่มรายการ","รายการต้นทุน","จำนวน","ต้นทุนต่อหน่วย","ต้นทุนรวม","%margin","ราคารวม");
+        $head = array("กลุ่มรายการ","รายการต้นทุน","จำนวน","ต้นทุนต่อหน่วย","ปรับต้นทุน","ต้นทุนรวม","%margin","ราคารวม");
         $aamount = (isset($info['cal_amount'])&&$info['cal_amount']!=""?explode(",",$info['cal_amount']):array());
         array_unshift($aamount,$info['amount']);
         $tinfo = $info;
@@ -207,7 +205,7 @@ if($action=="add"){
                 }
             }
             $adjmargin = array_slice(explode(",",$info['adj_margin']),$x*($num+1),$num+1);
-            array_push($adata,$tb->show_quote_tb($head, $res,"tb-cost_$x",array(3),$margin,$adjmargin));
+            array_push($adata,$tb->show_quote_tb($head, $res,"tb-cost_$x",array(4),$margin,$adjmargin));
             $x++;
         }
         $cost_adj = "<h4>รายละเอียดต้นทุน</h4>"
@@ -342,9 +340,7 @@ if($action=="add"){
             . $form->show_num("credit",$info['credit'],1,"","เครดิต(วัน)","","label-3070")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
     $pack = $form->show_checkbox_winput("pack","pack",$pack_checked,"การแพ็ค","label-3070")
-            . $form->show_checkbox("ship","ship",$ship_checked,"การขนส่ง","label-3070")
-            . $form->show_num("distance",(isset($info['distance'])?$info['distance']:""),0.01,"","ระยะทาง(กม)","","label-3070")
-            . $form->show_num("location",(isset($info['location'])?$info['location']:""),1,"","จุดส่งของ","","label-3070");
+            . $form->show_checkbox_winput("ship","ship",$ship_checked,"การขนส่ง","label-3070");
 
     $aamount = (isset($info['cal_amount'])?explode(",",$info['cal_amount']):"");
     $multi = "";

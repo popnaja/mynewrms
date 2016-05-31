@@ -98,21 +98,31 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function rp_order_cpro($cid,$processcat){
+    public function rp_order_cpro($unit,$cid,$processcat,$withvol=false){
         try {
             $sql = <<<END_OF_TEXT
 SELECT
-pro.process_cat_id,
-GROUP_CONCAT(cpro.name SEPARATOR ';')
+pro.process_cat_id AS cat,
+cpro.name,cpro.volume,meta_value AS cost
 FROM pap_comp_process AS cpro
-LEFT JOIn pap_process AS pro ON pro.process_id=cpro.process_id
+LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
+LEFT JOIN pap_process_meta AS meta ON meta.process_id=pro.process_id AND meta_key='cost'
 WHERE comp_id=:cid AND pro.process_cat_id IN $processcat
-GROUP by pro.process_cat_id
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":cid",$cid);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                $cost = json_decode($row['cost'],true);
+                $u = $unit[$cost[0]['vunit']];
+                $vol = ($withvol?" (".$row['volume']." $u)":"");
+                if(!isset($res[$row['cat']])){
+                    $res[$row['cat']] = $row['name']. $vol;
+                } else {
+                    $res[$row['cat']] .= ", ".$row['name']. $vol;
+                }
+            }
+            return $res;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }

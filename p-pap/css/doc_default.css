@@ -24,7 +24,7 @@
 .print-letter {
     box-sizing:border-box;
     width:8.5in;
-    padding:0.39in;
+    padding:0.39in 0.46in;
     padding-bottom:0;
     margin-left:auto;
     margin-right:auto;
@@ -153,14 +153,14 @@
     position:absolute;
     right:0.5cm;
     top:0.5cm;
-    width:33%;
+    width:2.7in;
     text-align:right;
     vertical-align: top;
 }
 .doc-600 {
     font-weight:600;
+    font-size:10.5pt;
 }
-
 /*------------------------------------------------------------------- DOC DETAIL ---------------------------------------------------------*/
 .doc-dt {
     margin-top:0.3cm;
@@ -199,10 +199,6 @@
 .tb-sum td,
 .tb-sum th{
     border:rgb(150,150,150) solid 1px;
-}
-.tb-gtt td {
-    font-size:12pt;
-    font-weight:600;
 }
 #tb-rp .tb-data td{
     border-right:rgb(150,150,150) solid 1px;
@@ -337,7 +333,7 @@
 .doc-info.ghpp-doc-info{
     border:none;
     padding:0;
-    height:1.7in;
+    height:1.45in;
 }
 #tb-rp.ghpp-tb th{
     font-size:11.5pt;
@@ -393,7 +389,7 @@
 }
 /*------------------------------------------------------------  FOR PRINT ON COPY PAPER----------------------------------------------------*/
 .doc-header {
-    height:1.35in;
+    height:1.60in;
 }
 .doc-date.ghpp {
     right:0;
@@ -432,11 +428,11 @@
 }
 #tb-rp-ghpp .tb-data td,
 #tb-rp-ghpp .tb-sum {
-    height:1.03cm;
+    height:1.015cm;
     padding:0;
 }
 #tb-rp-ghpprc .tb-data td{
-    height:1.13cm;
+    height:1.11cm;
     padding:0;
 }
 #tb-rp-ghpprc .tb-sum {
@@ -450,12 +446,12 @@
     text-align:left;
 }
 #tb-rp-ghpp .tb-discount {
-    height:0.85cm;
+    height:0.8cm;
     border:none;
 }
 #tb-rp-ghpp .print-hide,
 #tb-rp-ghpprc .print-hide {
-    color:#fff;
+    display:none;
 }
 #tb-rp-ghpp .tb-sum td,
 #tb-rp-ghpp .tb-sum th,
