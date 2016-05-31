@@ -231,18 +231,46 @@ function time_min(){
     }
     return $hour;
 }
-function dofw_to_date($year,$month,$weekday,$week){
+function dofw_to_date($year,$month,$weekday,$week){ //weekday 0=sunday
+    $awd = daystr_to_array($weekday,6);
+    $aweek = daystr_to_array($week, 7);
     $first = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-    $t = $first->format("t");
+    $t = $first->format("t"); //total day in month
     for($j=0;$j<7;$j++){
         $wcount[$j] = 0;
     }
+    $res = array();
     for($i=0;$i<$t;$i++){
         $wd = $first->format("w");
         $wcount[$wd]++;
-        if($wcount[$wd]==$week&&$weekday==$wd){
-            return $first->format("d");
+        if(in_array($wcount[$wd],$aweek)&&in_array($wd,$awd)){
+            array_push($res,$first->format("d"));
         }
         $first->add(new DateInterval("P1D"));
     }
+    return $res;
+}
+//convert day string to array ex 1,2,3 or 1-5 etc.
+function daystr_to_array($str,$max){
+    $aday = array();
+    if(strpos($str,",")>0){
+        $t = explode(",",$str);
+        for($i=0;$i<count($t);$i++){
+            if($t[$i]>0&&$t[$i]<=$max){
+                array_push($aday,$t[$i]);
+            }
+        }
+    } else if(strpos($str,"-")>0){
+        $tft = explode("-",$str);
+        for($i=$tft[0];$i<=$tft[1];$i++){
+            if($i>0&&$i<=$max){
+                array_push($aday,$i);
+            }
+        }
+    } else {
+        if($str>0&&$str<=$max){
+            array_push($aday,$str);
+        }
+    }
+    return $aday;
 }

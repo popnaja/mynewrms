@@ -287,41 +287,55 @@ END_OF_TEXT;
             $res1 = array();
             foreach($res as $k=>$v){
                 //bill
-                if($v['bill']=="day"){
-                    $day = sprintf("%02s",$v['bill_day']);
-                } else if($v['bill']=="dofw"){
-                    $day = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
-                } else if($v['bill']=="eofm"){
+                $aday = array();
+                if($v['bill']=="2"){
+                    $aday = daystr_to_array($v['bill_day'],31);
+                } else if($v['bill']=="3"){
+                    $aday = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
+                } else if($v['bill']=="1"){
                     $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                    $day = $st->format("t");
+                    $aday = array($st->format("t"));
+                } else {
+                    $aday = array(0);
                 }
-                if(!isset($res1[$day])){
-                    $res1[$day] = array(0,"","");
+                if(count($aday)>0){
+                    foreach($aday as $day){
+                        $day = sprintf("%02s",$day);
+                        $this->add_date($res1,$day,$v,"cd-icon icon-file-text-o");
+                    }
                 }
-                $res1[$day][0]++;
-                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
-                $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='cd-icon icon-file-text-o'></span>".$v['name'];
 
                 //cheque
-                if($v['cheque']=="day"){
-                    $day = sprintf("%02s",$v['cheque_day']);
-                } else if($v['cheque']=="dofw"){
-                    $day = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
-                } else if($v['cheque']=="eofm"){
+                $aday = array();
+                if($v['cheque']=="2"){
+                    $aday = daystr_to_array($v['cheque_day'],31);
+                } else if($v['cheque']=="3"){
+                    $aday = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
+                } else if($v['cheque']=="1"){
                     $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                    $day = $st->format("t");
+                    $aday = array($st->format("t"));
+                } else {
+                    $aday = array(0);
                 }
-                if(!isset($res1[$day])){
-                    $res1[$day] = array(0,"","");
+                if(count($aday)>0){
+                    foreach($aday as $day){
+                        $day = sprintf("%02s",$day);
+                        $this->add_date($res1,$day,$v,"cd-icon icon-banknote");
+                    }
                 }
-                $res1[$day][0]++;
-                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
-                $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='cd-icon icon-banknote'></span>".$v['name'];
             }
             return $res1;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }
+    }
+    private function add_date(&$res1,$day,$v,$class){
+        if(!isset($res1[$day])){
+            $res1[$day] = array(0,"","");
+        }
+        $res1[$day][0]++;
+        $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
+        $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='$class'></span>".mb_substr($v['name'],0,15,"UTF8");
     }
     public function get_inv_remain($did,$inv=null){
         try {

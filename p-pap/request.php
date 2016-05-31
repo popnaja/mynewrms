@@ -477,7 +477,10 @@ if($req == "login"){
     //meta
     $meta = array(
         "tax_exclude" => $_POST['ntax'],
-        "c_branch" => $_POST['branch']
+        "c_branch" => $_POST['branch'],
+        "remark" => $_POST['remark'],
+        "bill_remark" => $_POST['bill_remark'],
+        "cheque_remark" => $_POST['cheque_remark']
     );
 
     //image
@@ -497,15 +500,15 @@ if($req == "login"){
         $meta['picture'] = "";
     }
     
-    if($_POST['bill']=="day"){
+    if($_POST['bill']==2){
         $meta['bill_day'] = $_POST['bill_day'];
-    } else if($_POST['bill']=="dofw"){
+    } else if($_POST['bill']==3){
         $meta['bill_week'] = $_POST['bill_week'];
         $meta['bill_weekday']  = $_POST['bill_weekday'];
     }
-    if($_POST['cheque']=="day"){
+    if($_POST['cheque']==2){
         $meta['cheque_day'] = $_POST['cheque_day'];
-    } else if($_POST['cheque']=="dofw"){
+    } else if($_POST['cheque']==3){
         $meta['cheque_week'] = $_POST['cheque_week'];
         $meta['cheque_weekday']  = $_POST['cheque_weekday'];
     }
@@ -528,7 +531,7 @@ if($req == "login"){
     }
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="edit_customer"){
     $cid = filter_input(INPUT_POST,"cid",FILTER_SANITIZE_NUMBER_INT);
     //update
@@ -565,7 +568,10 @@ if($req == "login"){
     //meta
     $meta = array(
         "tax_exclude" => $_POST['ntax'],
-        "c_branch" => $_POST['branch']
+        "c_branch" => $_POST['branch'],
+        "remark" => $_POST['remark'],
+        "bill_remark" => $_POST['bill_remark'],
+        "cheque_remark" => $_POST['cheque_remark']
     );
     
     //image
@@ -591,15 +597,15 @@ if($req == "login"){
         $meta['picture'] = "";
     }
     
-    if($_POST['bill']=="day"){
+    if($_POST['bill']==2){
         $meta['bill_day'] = $_POST['bill_day'];
-    } else if($_POST['bill']=="dofw"){
+    } else if($_POST['bill']==3){
         $meta['bill_week'] = $_POST['bill_week'];
         $meta['bill_weekday']  = $_POST['bill_weekday'];
     }
-    if($_POST['cheque']=="day"){
+    if($_POST['cheque']==2){
         $meta['cheque_day'] = $_POST['cheque_day'];
-    } else if($_POST['cheque']=="dofw"){
+    } else if($_POST['cheque']==3){
         $meta['cheque_week'] = $_POST['cheque_week'];
         $meta['cheque_weekday']  = $_POST['cheque_weekday'];
     }
@@ -624,7 +630,7 @@ if($req == "login"){
     }
     $db->update_data("pap_customer", "customer_id", $cid, $arrinfo);
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="add_cus_ad"){
     if(isset($_POST['media'])){
         __autoloada("media");

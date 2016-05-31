@@ -9,6 +9,7 @@ if(!$_POST){
 $req = filter_input(INPUT_POST,'request',FILTER_SANITIZE_STRING);
 $up = new phpcsv();
 $db = new PAPdb(DB_PAP);
+ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 if($req=="upload_paper"){
     /*
      * 0 = type
@@ -158,9 +159,21 @@ if($req=="upload_paper"){
             $cid = $db->insert_data("pap_customer",$arrinfo);
             
             //add meta
-            if($row[18]=="yes"||$row[18]=="no"){
-                $db->update_meta("pap_customer_meta", "customer_id", $cid, array("tax_exclude"=>$row[18]));
-            }
+            $meta = array(
+                "tax_exclude"=>$row[18],
+                "c_branch" => $row[19],
+                "remark" => "",
+                "bill_day" => $row[20],
+                "bill_week" => $row[22],
+                "bill_weekday" => $row[21],
+                "bill_remark" => $row[23],
+                "cheque_day" => $row[24],
+                "cheque_week" => $row[26],
+                "cheque_weekday" => $row[25],
+                "cheque_remark" => $row[27]
+            );
+            $db->update_meta("pap_customer_meta", "customer_id", $cid, $meta);
+
             
             //add sale
             if($row[17]>0){
