@@ -81,7 +81,7 @@ $con_unit = array(
 );
 $allohead = array("พิมพ์","ยอดระหว่าง","ถึง","เผื่อกระดาษ","ต่อกรอบ");
 $allorec = array();
-for($i=0;$i<10;$i++){
+for($i=0;$i<31;$i++){
     $p = $form->show_select("print_$i",array(0=>"none")+$print,"label-inline",null,(isset($allo[$i])?$allo[$i]['print']:0),"","print[]");
     $f = $form->show_num("from_$i",(isset($allo[$i])?$allo[$i]['from']:""),1,"",null,"","label-inline","min=0","from[]");
     $t = $form->show_num("to_$i",(isset($allo[$i])?$allo[$i]['to']:""),1,"",null,"","label-inline","min=0","to[]");
