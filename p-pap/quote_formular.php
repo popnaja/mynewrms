@@ -145,11 +145,19 @@ function cal_quote($info,$comps){
         }
         
         //update unit['sheet'] for coating and post press
-        $unit['sheet'] = $lots*$lot;
         //coating เคลือบคิดเต็มริม
         if($com['comp_coating']>0){
-            $cost = new_pcost($com['comp_coating'],$unit);
-            $cpage = (is_array($coatpage)&&$coatpage[$i]>0?$coatpage[$i]." หน้า":"");
+            //มีเคลือบเนื้อใน
+            $tunit = $unit;
+            if(is_array($coatpage)&&$coatpage[$i]>0){
+                $cpage = $coatpage[$i]." หน้า";
+                $tunit['sheet'] = $coatpage[$i]/$unit['page']*$lots*$lot*2;
+                $cost = new_pcost($com['comp_coating'],$tunit);
+            } else {
+                $tunit['sheet'] = $lots*$lot;;
+                $cost = new_pcost($com['comp_coating'],$tunit);
+                $cpage = "";
+            }
             array_push($res['หลังพิมพ์'],array_merge(array($processes[$com['comp_coating']]." $cname ".$cpage),$cost));
         }
         //coat2
@@ -165,8 +173,9 @@ function cal_quote($info,$comps){
             if($pid>0){
                 $meta = $db->get_meta("pap_process_meta", "process_id", $pid);
                 $cost = json_decode($meta['cost'],true);
+                $tunit = $unit;
+                $tunit['sheet'] = $lots*$lot;
                 if(isset($pro[1])){
-                    $tunit = $unit;
                     $tunit[$cost[0]['vunit']]=$pro[1];
                 }
                 $pcost = new_pcost($pid, $tunit);
@@ -287,7 +296,7 @@ function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
-    global $op_print_color,$op_print_toplate,$op_set_id;
+    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set;
     $set_id = $op_set_id;
     $n = count($comps);
     $amount = $quote['amount'];
@@ -314,6 +323,7 @@ function unit_cal($quote,$comps){
         
         $type = $comp['comp_type'];
         if($type==2||$type==6){                   //เนื้อใน
+            $yok = 0;
             $frame = $page/$paper_lay;
             $res[$k]['finfo'] = array();
             $res[$k]['sinfo'] = array();
@@ -331,10 +341,34 @@ function unit_cal($quote,$comps){
                     "frame" => 1,
                     "round" => $res[$k]['sheet']*2
                 ));
-                array_push($res[$k]['sinfo'],array(
-                    "foldid" => $set_id[$paper_lay],
-                    "set" => $res[$k]['sheet']
-                ));
+                //check folding
+                $st = $paper_lay*2;
+                $setcomp = array();
+                $y = 0;
+                while($st>0){
+                    $y++;
+                    if($y>10){break;}
+                    foreach($op_full_set as $fpage=>$sid){
+                        if($st==0){break;}
+                        while(is_int($st/$fpage)&&($st/$fpage)>0){
+                            if($y>10){break;}
+                            $fid = $op_full_set[$fpage];
+                            if(!isset($setcomp[$fid])){
+                                $setcomp[$fid] = $res[$k]['sheet'];
+                            } else {
+                                $setcomp[$fid] += $res[$k]['sheet'];
+                            }
+                            $st -= $fpage;
+                        }
+                    }
+                }
+                foreach($setcomp as $fid=>$set){
+                    $yok += $set;
+                    array_push($res[$k]['sinfo'],array(
+                        "foldid" => $fid,
+                        "set" => $set
+                    ));
+                }
             } else {                    //case หนังสือทั่วไป
                 $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
                 $set = plate_div($frame);
@@ -353,28 +387,41 @@ function unit_cal($quote,$comps){
                             array_push($res[$k]['round'],array($name,$s*$round));
                             $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
                             $cut += ($div>1?$div/2*$temp:0);
-                            
                             //check folding
-                            if(isset($set_id[$paper_lay*2])){
-                                $sid = $set_id[$paper_lay*2];
-                                $set = $tsheet;
-                            } else if(isset($set_id[$paper_lay])){
-                                $sid = $set_id[$paper_lay];
-                                $set = $tsheet*2;
-                            } else if(isset($set_id[$paper_lay/2])){
-                                $sid = $set_id[$paper_lay/2];
-                                $set = $tsheet*4;
+                            $st = $paper_lay*2;
+                            $setcomp = array();
+                            $y = 0;
+                            while($st>0){
+                                $y++;
+                                if($y>10){break;}
+                                foreach($op_full_set as $fpage=>$sid){
+                                    if($st==0){break;}
+                                    while(is_int($st/$fpage)&&($st/$fpage)>0){
+                                        if($y>10){break;}
+                                        $fid = $op_full_set[$fpage];
+                                        if(!isset($setcomp[$fid])){
+                                            $setcomp[$fid] = $tsheet;
+                                        } else {
+                                            $setcomp[$fid] += $tsheet;
+                                        }
+                                        $st -= $fpage;
+                                    }
+                                }
                             }
+                            foreach($setcomp as $fid=>$set){
+                                $yok += $set;
+                                array_push($res[$k]['sinfo'],array(
+                                    "foldid" => $fid,
+                                    "set" => $set*$s/2
+                                ));
+                            }
+                            $yok = $yok*$s/2;
+
                             array_push($res[$k]['finfo'],array(
                                 "frameid" => $op_print_toplate[$comp['comp_print_id']],
                                 "frame" => $s,
                                 "round" => $round
                             ));
-                            array_push($res[$k]['sinfo'],array(
-                                "foldid" => $sid,
-                                "set" => $set*$s/2
-                            ));
-                            $yok += $set*$s/2;
                         } else {
                             $ss = ($s>0.5?1:$s);
                             $sheet += $tsheet = $amount*$ss/2+$allo;
@@ -401,14 +448,17 @@ function unit_cal($quote,$comps){
                                 $setcomp = array();
                                 while($st>0){
                                     foreach($set_id as $fpage=>$sid){
-                                        while($st/$fpage>=1){
-                                            $fid = $set_id[$fpage];
-                                            if(!isset($setcomp[$fid])){
-                                                $setcomp[$fid] = $amount+$allo;
-                                            } else {
-                                                $setcomp[$fid] += $amount+$allo;
+                                        if($st==0){break;}
+                                        if($fpage<$paper_lay*2){
+                                            while($st/$fpage>=1){
+                                                $fid = $set_id[$fpage];
+                                                if(!isset($setcomp[$fid])){
+                                                    $setcomp[$fid] = $amount+$allo;
+                                                } else {
+                                                    $setcomp[$fid] += $amount+$allo;
+                                                }
+                                                $st -= $fpage;
                                             }
-                                            $st -= $fpage;
                                         }
                                     }
                                 }

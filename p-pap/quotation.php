@@ -84,7 +84,7 @@ if($action=="add"||isset($qid)){
     $packing = $db->get_process_wunit($op_unit,11);
     $shipping = $db->get_process_wunit($op_unit,12);
     $fold = array("0"=>"--ไม่มี--")+$process_keypair[7];
-    $scolor = $process_keypair[13];
+    //$scolor = $process_keypair[13];
 }
 
 if($action=="add"){
