@@ -323,9 +323,9 @@ function quote_adj(id){
         }
         ncost = Math.round(ncost);
         var diff = ncost-stfloat(cos.eq(i).text());
-        var st = stfloat($(".tb-tt-stcost").text());
+        var st = stfloat($("#"+id+" .tb-tt-stcost").text());
         var nst = st+diff;
-        $(".tb-tt-stcost").text(nst);
+        $("#"+id+" .tb-tt-stcost").text(numformat(nst,0));
         cos.eq(i).text(numformat(ncost,0));
         mg.eq(i).trigger("change");
     });

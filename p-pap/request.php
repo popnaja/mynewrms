@@ -742,7 +742,7 @@ if($req == "login"){
     $other = array();
     for($i=0;$i<count($_POST['olist']);$i++){
         if($_POST['olist'][$i]!=""){
-            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i]));
+            array_push($other,array($_POST['olist'][$i],$_POST['ocost'][$i],$_POST['oamount'][$i],$_POST['oremark'][$i]));
         }
     }
     //update meta

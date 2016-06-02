@@ -127,8 +127,10 @@ if($action=="add"){
     
     $other = "";
     for($x=1;$x<5;$x++){
-        $other .= $form->show_text("olist_$x","olist[]","","","รายการ","","label-inline left-50")
-            . $form->show_num("o_cost_$x","",0.01,"","ราคา","","label-inline right-50","min=0","ocost[]");
+        $other .= $form->show_text("olist_$x","olist[]","","","รายการ","","label-inline left-33")
+    . $form->show_num("o_cost_$x",0,0.01,"","ราคา/หน่วย","","label-inline left-33","min=0","ocost[]")    
+    . $form->show_num("o_amount_$x",0,0.01,"","จำนวน","","label-inline right-33","min=0","oamount[]")
+    . $form->show_text("o_remark_$x","oremark[]","","","หมายเหตุ","","label-3070");
     }
 
     $content .= $form->show_tabs("q-other",array("เงื่อนไข","แพ็คและขนส่ง","ยอดพิมพ์","อื่นๆ"),array($detail,$pack,$multi,$other))
