@@ -78,7 +78,7 @@ if($action=="add"){
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
             . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
-            . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=1")
+            . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=0")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
 
@@ -142,7 +142,7 @@ if($action=="add"){
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_num("amount", "", 1, "", "ยอดผลิต", "", "label-3070","min='0'")
             . $form->show_num("price", "", 0.01, "", "ราคาต่อหน่วย", "", "label-3070","min='0'")
-            . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=1")
+            . $form->show_num("discount", "", 0.01, "", "ส่วนลด", "", "label-3070","min=0")
             . "<input type='button' id='cancel' value='Cancel' class='form-hide float-left'/>"
             . "<input type='button' id='add-list' value='เพิ่มลงรายการ'/>";
 

@@ -112,6 +112,11 @@ $(document).ready(function(){
     if($.type(pre)!=="undefined"){
         pre_tb();
     }
+    //escape comma
+    $("#name , [id^='jdt_']").on("blur",function(){
+        var nname = $(this).val().replace(/,/g,"");
+        $(this).val(nname);
+    });
     function pre_tb(){
         $.each(pre,function(k,v){
             var name = v[0];

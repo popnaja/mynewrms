@@ -24,6 +24,7 @@ function show_mobilem(){
     var panel = $("#panel");
     but.on("click",function(){
         panel.toggleClass("panel-show");
+        $(window).scrollTop(0);
     });
 }
 function flex_menu(){
