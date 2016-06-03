@@ -547,27 +547,34 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_note($auth,$cid,$uid){
+    public function view_note($auth,$cid,$uid,$s=null,$page=null,$perpage=null){
         try {
+            $off = (isset($perpage)?$perpage*($page-1):0);
+            $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             if($auth>2){
-                $wh = "WHERE customer_id=:cid";
+                $filter = "WHERE customer_id=:cid";
             } else {
-                $wh = "WHERE user_id=:uid AND customer_id=:cid";
+                $filter = "WHERE user_id=:uid AND customer_id=:cid";
             }
+            $filter .= (isset($s)?" AND crm_detail LIKE '%$s%'":"");
             $sql = <<<END_OF_TEXT
-                    SELECT
-                    CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
-                    crm_detail
-                    FROM pap_crm
-                    LEFT JOIN pap_user AS pu on pu.user_id=pap_crm.user_id
-                    $wh
-                    ORDER BY crm_date DESC
+SELECT
+CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
+crm_detail
+FROM pap_crm
+LEFT JOIN pap_user AS pu on pu.user_id=pap_crm.user_id
+$filter
+ORDER BY crm_date DESC, crm_id DESC
+$lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":cid",$cid);
-            if($auth>2){
-            } else {
+            if($auth<=2){
                 $stmt->bindParam(":uid",$uid);
+            }
+            if(isset($perpage)){
+                $stmt->bindParam(":lim",$perpage,PDO::PARAM_INT);
+                $stmt->bindParam(":off",$off,PDO::PARAM_INT);
             }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

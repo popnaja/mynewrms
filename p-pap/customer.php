@@ -148,6 +148,10 @@ if($action=="add"){
     /*----------------------------------------------------------------------------------note -------------------------------------------*/
     if($action =="note"){
         __autoload("pdo_tb");
+        $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+        $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
+        $iperpage = 20;
+        
         $menu->astyle[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.css";
         $menu->ascript[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.min.js";
         $content = $menu->showhead();
@@ -156,7 +160,8 @@ if($action=="add"){
         
         $note = $form->show_text("date","date","","yyyy-mm-dd","วันที่ $req","","label-3070")
                 . $form->show_textarea("note","",4,10,"","บันทึก $req","label-3070")
-                . $form->show_submit("submit","เพิ่มบันทึก","but-right");
+                . $form->show_submit("submit","เพิ่มบันทึก","but-right")
+                . "<input type='button' id='cancel-edit' value='ยกเลิกการแก้ไข' class='form-hide' />";
         $send = $form->show_text("receiver","receiver","","ค้นหา 3 ตัวอักษรขึ้นไป","ผู้รับ","","label-inline")
                 . "<div id='rec-list'></div>"
                 . $form->show_button("send_email", "ส่งอีเมล","but-right");
@@ -169,8 +174,6 @@ if($action=="add"){
                 . $form->show_text("name","name",$info['customer_name'],"","ชื่อบริษัท","","label-3070 readonly",null,"readonly")
                 . $form->show_tabs("note-tab",array("บันทึก","ส่งบันทึก"),array($note,$send),0);
                 
-        
-        $content .= "<input type='button' id='cancel-edit' value='ยกเลิกการแก้ไข' class='form-hide' />";
         $content .= $form->show_hidden("request","request","add_note")
                 . $form->show_hidden("cid","cid",$cid)
                 . $form->show_hidden("uid","uid",$uid)
@@ -190,8 +193,14 @@ if($action=="add"){
         
         //show table
         $head = array("วันที่","บันทึก");
-        $rec = $tbpdo->view_note($pauth,$cid,$uid);
+        $rec = $tbpdo->view_note($pauth,$cid,$uid,$s,$page,$iperpage);
+        $all_rec = $tbpdo->view_note($pauth,$cid,$uid);
+        $max = ceil(count($all_rec)/$iperpage);
+        $clear_redirect = $redirect."?action=note&cid=$cid";
         $content .= "<div class='col-100'>"
+                . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน",$s)
+                . "<div class='tb-clear-filter'><a href='$clear_redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
+                . $tb->show_pagenav(current_url(), $page, $max)
                 . $tb->show_table($head,$rec,"tb-note")
                 . "</div><!-- .col-100 -->";
      /*----------------------------------------------------------------------------------view -------------------------------------------*/
