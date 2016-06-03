@@ -44,6 +44,8 @@ $content .= $menu->pappanel("เสนอราคา","คำนวณการ
 $form = new myform("lay","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $sid = filter_input(INPUT_GET,'sid',FILTER_SANITIZE_STRING);
+$process_keypair = $db->get_process_keypair();
+$fold = array("0"=>"--พับ--")+$process_keypair[7];
 if($action=="add"){
 /*--------------------------------------------------------------  ADD NEW ----------------------------------------------------------*/
     //check
@@ -58,6 +60,11 @@ if($action=="add"){
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
     $grip = (float)$cinfo['grip_size'];
     $bleed = (float)$cinfo['bleed_size'];
+    $folding = "<p>ใช้งานในกรณีมีการพับเนื้อแบบแปลกๆ เช่นพับ 3 2ยก พับ 2 1ยก</p>";
+    for($f=0;$f<3;$f++){
+        $folding .= $form->show_select("ifold_$f",$fold,"label-3070","พับเนื้อใน",null,"","ifold[]")
+            . $form->show_num("ifoldno_$f","",1,"","จำนวน","","label-3070","min='0'","ifoldno[]");
+    }
     $normal = "<div class='left-50'>"
             . $form->show_select("cover_paper",$paper_size,"label-3070","ปก",null)
             . $form->show_select("cover_div",$op_paper_div,"label-3070","ผ่า",null)
@@ -127,6 +134,7 @@ if($action=="add"){
     } else {
         $cuslay = array();
     }
+    $ifold = (isset($info['custom_fold'])?json_decode($info['custom_fold'],true):0);
     //edit
     $paper_size = $db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='paper_size'");
     $paper_info = $db->get_paper_size();
@@ -135,6 +143,16 @@ if($action=="add"){
     $grip1 = (isset($info['grip1'])?$info['grip1']:(float)$cinfo['grip_size']);
     $grip2 = (isset($info['grip2'])?$info['grip2']:0);
     $bleed = (float)$cinfo['bleed_size'];
+    $folding = "";
+    for($f=0;$f<3;$f++){
+        if(isset($ifold[$f])){
+            $folding .= $form->show_select("ifold_$f",$fold,"label-3070","พับเนื้อใน",$ifold[$f][0],"","ifold[]")
+            . $form->show_num("ifoldno_$f",$ifold[$f][1],1,"","จำนวน","","label-3070","min='0'","ifoldno[]");
+        } else {
+            $folding .= $form->show_select("ifold_$f",$fold,"label-3070","พับเนื้อใน",null,"","ifold[]")
+            . $form->show_num("ifoldno_$f","",1,"","จำนวน","","label-3070","min='0'","ifoldno[]");
+        }
+    }
     $normal = "<div class='left-50'>"
             . $form->show_select("cover_paper",$paper_size,"label-3070","ปก",$info['cover_paper'])
             . $form->show_select("cover_div",$op_paper_div,"label-3070","ผ่า",$info['cover_div'])

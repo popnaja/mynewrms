@@ -421,6 +421,16 @@ if($req == "login"){
                 $clay[$i] = array($_POST['ctype'][$i],$_POST['cpaper'][$i],$_POST['cdiv'][$i],$_POST['clay'][$i]);
             }
         }
+        /*
+        //custom folding
+        $fold = array();
+        for($i=0;$i<count($_POST['ifold']);$i++){
+            if($_POST['ifold'][$i]>0&&$_POST['ifoldno'][$i]>0){
+                $fold[$i] = array($_POST['ifold'][$i],$_POST['ifoldno'][$i]);
+            }
+        }
+         * 
+         */
         //meta
         $meta = array(
             "grip1" => $_POST['grip1'],
@@ -459,6 +469,16 @@ if($req == "login"){
                 $clay[$i] = array($_POST['ctype'][$i],$_POST['cpaper'][$i],$_POST['cdiv'][$i],$_POST['clay'][$i]);
             }
         }
+        /*
+        //custom folding
+        $fold = array();
+        for($i=0;$i<count($_POST['ifold']);$i++){
+            if($_POST['ifold'][$i]>0&&$_POST['ifoldno'][$i]>0){
+                $fold[$i] = array($_POST['ifold'][$i],$_POST['ifoldno'][$i]);
+            }
+        }
+         * 
+         */
         //meta
         $meta = array(
             "grip1" => $_POST['grip1'],
