@@ -296,7 +296,7 @@ function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
-    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set;
+    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set,$op_unit;
     $set_id = $op_set_id;
     $n = count($comps);
     $amount = $quote['amount'];
@@ -305,21 +305,30 @@ function unit_cal($quote,$comps){
     $coatpage = (isset($quote['coatpage'])?json_decode($quote['coatpage']):0);
     foreach($comps as $k=>$comp){
         $color = $op_print_color[$comp['comp_print_id']];
-        $allo = $res[$k]['allo'] = $comp['comp_paper_allowance'];
+        $allo = $comp['comp_paper_allowance'];
         $paper_lay = $comp['comp_paper_lay'];
         $paper_cut = $comp['comp_paper_cut'];
-        $res[$k]['type'] = $comp['comp_type'];
-        $page = $res[$k]['page'] = $comp['comp_page'];
+        $page = $comp['comp_page'];
         $pinfo = $db->get_info("pap_mat", "mat_id", $comp['comp_paper_id']);
         $size = $db->get_info("pap_option","op_id",$pinfo['mat_size']);
         $sinfo = json_decode($size['op_value'],true);
         
-        $res[$k]['paper_id'] = $comp['comp_paper_id'];
-        $res[$k]['paper_lay'] = $paper_lay;
-        $res[$k]['paper_cut'] = $paper_cut;
-        $res[$k]['print_id'] = $comp['comp_print_id'];
-        $res[$k]['print_id2'] = $comp['comp_print2'];
-        $res[$k]["piece"] = $amount;
+        $res[$k] = array(
+            "allo" => $allo,
+            "type" => $comp['comp_type'],
+            "page" => $page,
+            "paper_id" => $comp['comp_paper_id'],
+            "paper_lay" => $paper_lay,
+            "paper_cut" => $paper_cut,
+            "print_id" => $comp['comp_print_id'],
+            "print_id2" => $comp['comp_print2'],
+            "piece" => $amount,
+        );
+        foreach($op_unit as $ukey=>$uval){
+            if(!isset($res[$k][$ukey])){
+                $res[$k][$ukey] = 0;
+            }
+        }
         
         $type = $comp['comp_type'];
         if($type==2||$type==6){                   //เนื้อใน
@@ -538,10 +547,13 @@ function unit_cal($quote,$comps){
         "allpage" => $quote['page_cover']*2+$quote['page_inside'],
         "page" => $quote['page_inside'],
         "location" => (isset($quote['location'])?$quote['location']:0),
-        "piece" => $quote['amount'],
-        "set" => 0,
-        "frame" => 0,
+        "piece" => $amount,
     );
+    foreach($op_unit as $ukey=>$uval){
+        if(!isset($tinfo[$ukey])){
+            $tinfo[$ukey] = 0;
+        }
+    }
     //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];

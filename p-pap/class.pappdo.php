@@ -1185,7 +1185,7 @@ GROUP_CONCAT(job.order_id) AS id,
 GROUP_CONCAT(CONCAT(job.order_no,":",quo.name)) AS name
 FROM pap_order AS job
 LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
-WHERE DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en
+WHERE DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en AND job.status<79
 GROUP BY DATE_FORMAT(quo.plan_delivery,"%Y%m%d")
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
