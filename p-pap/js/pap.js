@@ -266,6 +266,18 @@ function add_papera(e){
         a = $("#allo").val();
     });
 }
+function check_quote(e){
+    var type = $("#type").val(); //หนังสือ และ สมุด
+    var binding = $("#binding").val();
+    if((type==10||type==69)&&binding==0){
+        pg_dialog("คำเตือน","ชนิดงานหนังสือและสมุด ต้องกำหนดการเข้าเล่ม");
+        $("#binding").parent().css({"background-color":"#ff9282"});
+        e.preventDefault();
+    } else {
+        $("#binding").parent().css({"background-color":"inherit"});
+        $('#papform').submit();
+    }
+}
 function reflex_adj(){
 $(document).ready(function(){
     $(".tb-adj-cost").trigger("change");

@@ -48,6 +48,7 @@ $op_unit = array(
 $op_criteria = $op_unit+array(
     //"area" => "พื้นที่(cm2)"
 );
+$op_binding_not_collect = array(1,3);
 $op_process_source = array(
     "1" => "ผลิตเอง",
     "2" => "สั่งผลิต"

@@ -7,8 +7,6 @@ function cal_quote($info,$comps){
     $db = new PAPdb(DB_PAP);
     
     $processes = $db->get_keypair("pap_process", "process_id", "process_name");
-    //calculate
-
     $units = unit_cal($info, $comps);
     $res['ออกแบบ'] = array();
     $res['ทำเพลต'] = array();
@@ -20,13 +18,12 @@ function cal_quote($info,$comps){
     $res['อื่นๆ'] = array();
   
     $ex = explode(",",$info['exclude']);
-    $num = count($units);
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
     }
     $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
-    for($i=0;$i<$num;$i++){
+    for($i=0;$i<count($units);$i++){
         $unit = $units[$i];
         //var_dump($unit);
         if($unit['type']==9){
@@ -39,7 +36,37 @@ function cal_quote($info,$comps){
                     array_push($res['ออกแบบ'],array_merge(array($processes[$pid]),$pcost));
                 }
             }
+            //folding
+            $fpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 7);   //cat id 7 = พับ
+            $folding_id = (isset($info['folding'])?$info['folding']:$fpro[0]);
 
+            //ถ้า เป็นหนังสือ=10 สมุด 69 แผ่นพับ 11 หรือ อื่นๆที่มีกำหนดการพับมีการพับ
+            if(in_array($info['cat_id'],array(10,11,69))||(isset($info['folding'])&&$info['folding']>0)){
+                if(isset($overall['sinfo'])){
+                    foreach($overall['sinfo'] as $fid=>$set){
+                        $pcost = new_pcost($fid, array("set"=>$set));
+                        array_push($res['หลังพิมพ์'],array_merge(array($processes[$fid]),$pcost));
+                    }
+                } else if($folding_id>0) {
+                    $pcost = new_pcost($folding_id, $overall);
+                    array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
+                }
+            }
+
+            //collecting
+            //ถ้า เป็นหนังสือ มีการเก็บ + เข้าเล่ม
+            $cpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 8);   //cat id 8 = เก็บเล่ม
+            $collect_id = $cpro[0];
+            if(in_array($info['cat_id'],array(10,69))){
+                $pcost = new_pcost($collect_id, $overall);
+                array_push($res['หลังพิมพ์'],array_merge(array($processes[$collect_id]),$pcost));
+
+                //binding
+                if($info['binding_id']>0){
+                    $pcost = new_pcost($info['binding_id'], $overall);
+                    array_push($res['หลังพิมพ์'],array_merge(array($processes[$info['binding_id']]),$pcost));
+                }
+            }
             //packing
             $pack = explode(",",$info['packing']);
             foreach($pack as $pro){
@@ -74,7 +101,6 @@ function cal_quote($info,$comps){
             }
             continue;
         }
-        //var_dump($unit['round']);
         $com = $comps[$i];
         //name
         $type = $unit['type'];
@@ -86,7 +112,6 @@ function cal_quote($info,$comps){
             $temp = array();
             foreach($unit['finfo'] as $key=>$val){
                 $tunit = $val+$unit;
-                //var_dump($tunit);
                 $fid = $val['frameid'];
                 $pcost = new_pcost($fid,$tunit);
                 array_push($res['ทำเพลต'],array_merge(array($cname." ".str_replace("ทำเพลต","",$processes[$fid])),$pcost));
@@ -183,37 +208,6 @@ function cal_quote($info,$comps){
             }
         }
     }
-    //folding
-    $fpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 7);   //cat id 7 = พับ
-    $folding_id = (isset($info['folding'])?$info['folding']:$fpro[0]);
-
-    //ถ้า เป็นหนังสือ cat_id=10 แผ่นพับ cat_id=11 มีการพับ
-    if(in_array($info['cat_id'],array(10,11,69))||isset($info['folding'])){
-        if(isset($overall['sinfo'])){
-            foreach($overall['sinfo'] as $fid=>$set){
-                $pcost = new_pcost($fid, array("set"=>$set));
-                array_push($res['หลังพิมพ์'],array_merge(array($processes[$fid]),$pcost));
-            }
-        } else if($folding_id>0) {
-            $pcost = new_pcost($folding_id, $overall);
-            array_push($res['หลังพิมพ์'],array_merge(array($processes[$folding_id]),$pcost));
-        }
-    }
-
-    //collecting
-    //ถ้า เป็นหนังสือ มีการเก็บ + เข้าเล่ม
-    $cpro= $db->get_mm_arr("pap_process", "process_id", "process_cat_id", 8);   //cat id 8 = เก็บเล่ม
-    $collect_id = $cpro[0];
-    if(in_array($info['cat_id'],array(10,69))){
-        $pcost = new_pcost($collect_id, $overall);
-        array_push($res['หลังพิมพ์'],array_merge(array($processes[$collect_id]),$pcost));
-
-        //binding
-        if($info['binding_id']>0){
-            $pcost = new_pcost($info['binding_id'], $overall);
-            array_push($res['หลังพิมพ์'],array_merge(array($processes[$info['binding_id']]),$pcost));
-        }
-    }
     //อื่นๆ
     if(isset($info['other_price'])){
         $other = json_decode($info['other_price'],true);
@@ -296,7 +290,7 @@ function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
-    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set,$op_unit;
+    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set,$op_unit,$op_binding_not_collect;
     $set_id = $op_set_id;
     $n = count($comps);
     $amount = $quote['amount'];
@@ -323,6 +317,7 @@ function unit_cal($quote,$comps){
             "print_id" => $comp['comp_print_id'],
             "print_id2" => $comp['comp_print2'],
             "piece" => $amount,
+            "kong" => 0
         );
         foreach($op_unit as $ukey=>$uval){
             if(!isset($res[$k][$ukey])){
@@ -333,6 +328,7 @@ function unit_cal($quote,$comps){
         $type = $comp['comp_type'];
         if($type==2||$type==6){                   //เนื้อใน
             $yok = 0;
+            $kong = 0;
             $frame = $page/$paper_lay;
             $res[$k]['finfo'] = array();
             $res[$k]['sinfo'] = array();
@@ -373,6 +369,7 @@ function unit_cal($quote,$comps){
                 }
                 foreach($setcomp as $fid=>$set){
                     $yok += $set;
+                    $kong += $set/$res[$k]['sheet'];
                     array_push($res[$k]['sinfo'],array(
                         "foldid" => $fid,
                         "set" => $set
@@ -419,12 +416,14 @@ function unit_cal($quote,$comps){
                             }
                             foreach($setcomp as $fid=>$set){
                                 $yok += $set;
+                                $kong += $set/$tsheet;
                                 array_push($res[$k]['sinfo'],array(
                                     "foldid" => $fid,
                                     "set" => $set*$s/2
                                 ));
                             }
                             $yok = $yok*$s/2;
+                            $kong = $kong*$s/2;
 
                             array_push($res[$k]['finfo'],array(
                                 "frameid" => $op_print_toplate[$comp['comp_print_id']],
@@ -449,6 +448,7 @@ function unit_cal($quote,$comps){
                             $st = $s*$paper_lay; //remainding page
                             if(isset($set_id[$st])){
                                 $yok += $amount+$allo;
+                                $kong += 1;
                                 array_push($res[$k]['sinfo'],array(
                                     "foldid" => $set_id[$st],
                                     "set" => $amount+$allo
@@ -473,6 +473,7 @@ function unit_cal($quote,$comps){
                                 }
                                 foreach($setcomp as $fid=>$set){
                                     $yok += $set;
+                                    $kong += $set/($amount+$allo);
                                     array_push($res[$k]['sinfo'],array(
                                         "foldid" => $fid,
                                         "set" => $set
@@ -485,9 +486,11 @@ function unit_cal($quote,$comps){
                 $res[$k]['sheet'] = $sheet;
                 $res[$k]['cut'] = $cut;
                 $res[$k]['set'] = $yok;
+                $res[$k]['kong'] = $kong;
             }
         } else {            //อื่นๆ ปก ใบพาด แจ็คเก็ด
             $piece = $page;
+            $res[$k]['kong'] = (in_array($type,array(4,5,7))?0:$piece);
             $sheet = $res[$k]["sheet"] = $amount*$piece/$paper_lay+$allo;
             $res[$k]['cut'] = $sheet*$paper_lay;
             $res[$k]['set'] = $sheet*$paper_lay;
@@ -548,6 +551,7 @@ function unit_cal($quote,$comps){
         "page" => $quote['page_inside'],
         "location" => (isset($quote['location'])?$quote['location']:0),
         "piece" => $amount,
+        "kong" => 0
     );
     foreach($op_unit as $ukey=>$uval){
         if(!isset($tinfo[$ukey])){
@@ -559,8 +563,10 @@ function unit_cal($quote,$comps){
         $unit = $res[$i];
         //frame
         $tinfo['frame'] += ceil($unit['ff']);
+        //kong
+        $tinfo['kong'] += ($unit['type']==1&&in_array($quote['binding_id'],$op_binding_not_collect)?0:$unit['kong']);
         //พับ
-        $tinfo['set'] += ($unit['type']==1&&$quote['binding_id']==1?0:$unit['set']);
+        $tinfo['set'] += ($unit['type']==1&&in_array($quote['binding_id'],$op_binding_not_collect)?0:$unit['set']);
         if(isset($unit['sinfo'])){
             foreach($unit['sinfo'] as $val){
                 if($val['foldid']>0){

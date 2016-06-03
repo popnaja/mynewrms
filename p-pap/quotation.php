@@ -148,7 +148,7 @@ if($action=="add"){
             . $form->show_hidden("ajax_req","ajax_req",$root."request_ajax.php")
             . $form->show_hidden("uid","uid",$uid);
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
-    $content .= $form->submitscript("$('#papform').submit();")
+    $content .= $form->submitscript("check_quote(e);")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
@@ -373,7 +373,7 @@ if($action=="add"){
             . $form->show_hidden("pauth","pauth",$pauth)
             . $form->show_hidden("redirect","redirect",$redirect);
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
-    $content .= $form->submitscript("$('#papform').submit();")
+    $content .= $form->submitscript("check_quote(e);")
             . "<script>"
             . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
