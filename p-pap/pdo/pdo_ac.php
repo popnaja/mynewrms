@@ -263,6 +263,12 @@ END_OF_TEXT;
     }
     public function get_bill_check($year,$month){
         try{
+            $arr = array(array($year,$month));
+            $next = new DateTime($year."-".$month."-01",new DateTimeZone("Asia/Bangkok"));
+            $prev = new DateTime($year."-".$month."-01",new DateTimeZone("Asia/Bangkok"));
+            $next->add(new DateInterval("P1M"));
+            $prev->sub(new DateInterval("P1M"));
+            array_push($arr,array($next->format("Y"),$next->format("m")),array($prev->format("Y"),$prev->format("m")));
             $sql = <<<END_OF_TEXT
 SELECT
 cus.customer_id,customer_code AS code,customer_name AS name,customer_place_bill AS bill,customer_collect_cheque AS cheque,
@@ -285,42 +291,55 @@ END_OF_TEXT;
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $res1 = array();
-            foreach($res as $k=>$v){
-                //bill
-                $aday = array();
-                if($v['bill']=="2"){
-                    $aday = daystr_to_array($v['bill_day'],31);
-                } else if($v['bill']=="3"){
-                    $aday = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
-                } else if($v['bill']=="1"){
-                    $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                    $aday = array($st->format("t"));
-                } else {
-                    $aday = array(0);
-                }
-                if(count($aday)>0){
-                    foreach($aday as $day){
-                        $day = sprintf("%02s",$day);
-                        $this->add_date($res1,$day,$v,"cd-icon icon-file-text-o");
+            for($x=0;$x<count($arr);$x++){
+                $year = $arr[$x][0];
+                $month = $arr[$x][1];
+                foreach($res as $k=>$v){
+                    //bill
+                    $aday = array();
+                    if($v['bill']=="2"){
+                        $aday = daystr_to_array($v['bill_day'],31);
+                        foreach($aday as $index=>$val){
+                            $aday[$index] = $year.$month.$val;
+                        }
+                    } else if($v['bill']=="3"){
+                        $aday = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
+                    } else if($v['bill']=="1"){ //last day of month
+                        $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+                        $t = $st->format("t");
+                        $st->add(new DateInterval("P".$t."D"));
+                        $aday = array($st->format("Ymd"));
+                    } else {
+                        $aday = array(0);
                     }
-                }
-
-                //cheque
-                $aday = array();
-                if($v['cheque']=="2"){
-                    $aday = daystr_to_array($v['cheque_day'],31);
-                } else if($v['cheque']=="3"){
-                    $aday = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
-                } else if($v['cheque']=="1"){
-                    $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                    $aday = array($st->format("t"));
-                } else {
-                    $aday = array(0);
-                }
-                if(count($aday)>0){
-                    foreach($aday as $day){
-                        $day = sprintf("%02s",$day);
-                        $this->add_date($res1,$day,$v,"cd-icon icon-banknote");
+                    if(count($aday)>0){
+                        foreach($aday as $day){
+                            $day = sprintf("%02s",$day);
+                            $this->add_date($res1,$day,$v,"cd-icon icon-file-text-o");
+                        }
+                    }
+                    //cheque
+                    $aday = array();
+                    if($v['cheque']=="2"){
+                        $aday = daystr_to_array($v['cheque_day'],31);
+                        foreach($aday as $index=>$val){
+                            $aday[$index] = $year.$month.$val;
+                        }
+                    } else if($v['cheque']=="3"){
+                        $aday = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
+                    } else if($v['cheque']=="1"){
+                        $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+                        $t = $st->format("t");
+                        $st->add(new DateInterval("P".$t."D"));
+                        $aday = array($st->format("Ymd"));
+                    } else {
+                        $aday = array(0);
+                    }
+                    if(count($aday)>0){
+                        foreach($aday as $day){
+                            $day = sprintf("%02s",$day);
+                            $this->add_date($res1,$day,$v,"cd-icon icon-banknote");
+                        }
                     }
                 }
             }

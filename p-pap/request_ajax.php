@@ -219,43 +219,43 @@ if($req=="show_pic"){
 /* =======================================================  CALENDAR AJAX ===================================================================*/
 } else if($req == "mycd_change_month"){
     __autoloada("calendar");
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $db->get_job_schedule($_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "mycd_change_type"){
     __autoloada("calendar");
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $db->get_job_schedule($_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "plate_cd_month"){
     __autoloada("calendar");
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $db->get_plate_sch($op_job_code,$_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "plate_cd_type"){
     __autoloada("calendar");
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $db->get_plate_sch($op_job_code,$_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "mycd_bill_month"){
     __autoloada("calendar");
     include_once(dirname(__FILE__)."/pdo/pdo_ac.php");
     $pdo_ac = new pdo_ac();
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $pdo_ac->get_bill_check($_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "mycd_bill_type"){
     __autoloada("calendar");
     include_once(dirname(__FILE__)."/pdo/pdo_ac.php");
     $pdo_ac = new pdo_ac();
-    $cd = new mycalendar($_POST['year'], $_POST['month'], 150);
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
     $data = $pdo_ac->get_bill_check($_POST['year'], $_POST['month']);
-    $html = $cd->show_calendar($data,$_POST['type'],"mycd_change('".$_POST['req']."');");
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "plan_change_month"){
     __autoload("prod");

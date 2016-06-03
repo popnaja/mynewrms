@@ -231,20 +231,28 @@ function time_min(){
     }
     return $hour;
 }
+function num_week($year,$month){
+        $first = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+        $wf = $first->format("w");
+        $t = $first->format("t")-1;
+        $first->add(new DateInterval("P".$t."D"));
+        $wl = $first->format("w");
+        return ceil(($t+$wf+(6-$wl))/7);
+}
 function dofw_to_date($year,$month,$weekday,$week){ //weekday 0=sunday
     $awd = daystr_to_array($weekday,6);
     $aweek = daystr_to_array($week, 7);
     $first = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-    $t = $first->format("t"); //total day in month
+    $t = $first->format("t");
+    $res = array();
     for($j=0;$j<7;$j++){
         $wcount[$j] = 0;
     }
-    $res = array();
     for($i=0;$i<$t;$i++){
         $wd = $first->format("w");
         $wcount[$wd]++;
         if(in_array($wcount[$wd],$aweek)&&in_array($wd,$awd)){
-            array_push($res,$first->format("d"));
+            array_push($res,$first->format("Ymd"));
         }
         $first->add(new DateInterval("P1D"));
     }

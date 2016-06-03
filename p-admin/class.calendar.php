@@ -3,26 +3,33 @@ class mycalendar{
     private $st_day;
     private $year;
     private $month;
+    private $week;
     private $data;
-    private $adj;
+    private $type;
+    private $adj = 150;
     private $thm = array("ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค","ก.ย.","ต.ค.","พ.ย.","ธ.ค.");
     private $thmonth = array("มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฏาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม");
     private $dayname = array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");
     private $dayname_th = array("อาทิตย์","จันทร์","อังคาร","พุทธ","พฤหัสบดี","ศุกร์","เสาร์");
-    public function __construct($year,$month,$adj) {
+    public function __construct($year,$month) {
         $this->year = $year;
         $this->month = $month;
-        $date = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-        $sub = -$date->format("w");
-        $this->tt = $date->format("t");
-        $date->sub(new DateInterval("P".abs($sub)."D"));
-        $this->st_day = $date;
-        $this->adj = $adj;
     }
-    public function show_calendar($data,$type="month",$script=""){
+    public function show_calendar($data,$type="month",$week=null,$script=""){
         $this->data = $data;   //data is array key=yyyy-mm-dd val=array(max,id,text)
+        $this->type = $type;
+        if($type=="day"||$type=="month"){
+            $date = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
+            $sub = -$date->format("w");
+            $date->sub(new DateInterval("P".abs($sub)."D"));
+            $this->st_day = $date;
+            $this->week = $this->weekno($this->st_day);
+        } else {
+            $this->week = $week;
+            $this->st_day = $this->st_week($week, $this->year);
+        }
         if($type=="day"){
-            $cdbox = $this->my_schedule();
+            $cdbox = $this->my_dayschedule();
         } else {
             $cdbox = "<div class='mycd-box'>"
                 . $this->my_dayname()
@@ -30,7 +37,7 @@ class mycalendar{
                 . "</div><!-- .mycd-box -->";
         }
         $html = "<div class='mycd-container'>"
-                . $this->mycd_nav($type)
+                . $this->mycd_nav()
                 . $cdbox
                 . "</div><!-- .mycd-container -->"
                 . "<script>"
@@ -39,37 +46,52 @@ class mycalendar{
                 . "</script>";
         return $html;
     }
-    private function mycd_nav($type){
-        $next = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
-        $next->add(new DateInterval("P1M"));
-        $prev = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
-        $prev->sub(new DateInterval("P1M"));
+    private function mycd_nav(){
+        $type = $this->type;
+        if($type=="day"||$type=="month"){
+            $next = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
+            $next->add(new DateInterval("P1M"));
+            $prev = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
+            $prev->sub(new DateInterval("P1M"));
+        } else if($type=="W") {
+            $next = $this->st_week($this->week, $this->year);
+            $next->add(new DateInterval("P1W"));
+            $prev = $this->st_week($this->week, $this->year);
+            $prev->sub(new DateInterval("P1W"));
+        } else if($type=="2W"){
+            $next = $this->st_week($this->week, $this->year);
+            $next->add(new DateInterval("P2W"));
+            $prev = $this->st_week($this->week, $this->year);
+            $prev->sub(new DateInterval("P2W"));
+        }
+        $nweek = $this->weekno($next);
+        $pweek = $this->weekno($prev);
         $now_m = date_format(date_create(null,timezone_open("Asia/Bangkok")),"m");
         $now_y = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y");
-        if($this->year==$now_y&&$this->month==$now_m){
+        $now_w = date_format(date_create(null,timezone_open("Asia/Bangkok")),"W");
+        if($now_w>$pweek&&$now_w<$nweek){
             $tclass = "mycd-disable";
         } else {
             $tclass = "";
         }
-        if($type=="month"){
-            $month_class = "mycd-active";
-            $day_class = "";
-        } else {
-            $month_class = "";
-            $day_class = "mycd-active";
-        }
+        $dclass = ($type=="day"?"mycd-active":"");
+        $wclass = ($type=="W"?"mycd-active":"");
+        $w2class = ($type=="2W"?"mycd-active":"");
+        $mclass = ($type=="month"?"mycd-active":"");
         $thyear = $this->year+543;
         $show_month = $this->thmonth[$this->month-1]." พ.ศ. $thyear";
         $html = "<div class='mycd-menu'>"
                 . "<div class='mycd-title'>$show_month</div>"
                 . "<div class='mycd-nav'>"
-                . "<span class='gray-but mycd-c-month $tclass' year='$now_y' month='$now_m' cdtype='$type'>Today</span>"
-                . "<span class='gray-but mycd-c-month icon-chevron-left' year='".$prev->format("Y")."' month='".$prev->format("m")."' cdtype='$type'></span>"
-                . "<span class='gray-but mycd-c-month icon-chevron-right' year='".$next->format("Y")."' month='".$next->format("m")."' cdtype='$type'></span>"
+                . "<span class='gray-but mycd-c-month $tclass' year='$now_y' month='$now_m' week='$now_w' cdtype='$type'>Today</span>"
+                . "<span class='gray-but mycd-c-month icon-chevron-left' year='".$prev->format("Y")."' month='".$prev->format("m")."' week='$pweek' cdtype='$type'></span>"
+                . "<span class='gray-but mycd-c-month icon-chevron-right' year='".$next->format("Y")."' month='".$next->format("m")."' week='$nweek' cdtype='$type'></span>"
                 . "</div><!-- . -->"
                 . "<div class='mycd-switch'>"
-                . "<span class='gray-but mycd-switch-type $day_class' cdtype='day' year='$this->year' month='$this->month'>DAY</span>"
-                . "<span class='gray-but mycd-switch-type $month_class' cdtype='month' year='$this->year' month='$this->month'>MONTH</span>"
+                . "<span class='gray-but mycd-switch-type $dclass' cdtype='day' year='$this->year' week='$this->week' month='$this->month'>DAY</span>"
+    . "<span class='gray-but mycd-switch-type $wclass' cdtype='W' year='$this->year' week='$this->week' month='$this->month'>WEEK</span>"
+    . "<span class='gray-but mycd-switch-type $w2class' cdtype='2W' year='$this->year' week='$this->week'month='$this->month'>2WEEK</span>"
+                . "<span class='gray-but mycd-switch-type $mclass' cdtype='month' year='$this->year' week='$this->week' month='$this->month'>MONTH</span>"
                 . "</div>"
                 . "</div><!-- .mycd-menu -->";
         return $html;
@@ -86,10 +108,17 @@ class mycalendar{
     }
     private function my_calendar(){
         $html = "<div class='mycd-calendar'>";
-        $w = $this->num_week($this->year, $this->month);
+        if($this->type=="month"||$this->type=="day"){
+            $w = $this->num_week($this->year, $this->month);
+        } else if($this->type=="W"){
+            $w = 1;
+        } else if($this->type=="2W"){
+            $w = 2;
+        }
         for($i=0;$i<$w;$i++){
             $top = $i*(100/$w);
-            $html .= "<div class='month-row' style='height:21%;top:$top%;'>"
+            $height = (100/$w);
+            $html .= "<div class='month-row' style='height:$height%;top:$top%;'>"
                     . $this->mycd_rundate()
                     . "</div><!-- .month-row -->";
         }
@@ -181,11 +210,12 @@ class mycalendar{
         
         return $big.$html;
     }
-    private function my_schedule(){
+    private function my_dayschedule(){
         $html = "<div class='mycd-schedule'>";
         $st = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
+        $tt = $st->format("t");
         $today = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Ymd");
-        for($i=0;$i<$this->tt;$i++){
+        for($i=0;$i<$tt;$i++){
             $day = $st->format("j");
             $dd = $st->format("d");
             $wday = $this->dayname_th[$st->format("w")];
@@ -224,6 +254,21 @@ class mycalendar{
         $first->add(new DateInterval("P".$t."D"));
         $wl = $first->format("w");
         return ceil(($t+$wf+(6-$wl))/7);
+    }
+    private function weekno($date){
+        if($date->format("w")==0){
+            return $date->format("W")+1;
+        } else {
+            return $date->format("W");
+        }
+    }
+    private function st_week($weekno,$year){
+        $d = new DateTime();
+        $d->setTimezone(new DateTimeZone("Asia/Bangkok"));
+        $d->setISODate($year, $weekno);
+        $d->setTime(0,0,0);
+        $d->sub(new DateInterval("P1D"));
+        return $d;
     }
 }
 
