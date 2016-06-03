@@ -117,6 +117,30 @@ $(document).ready(function(){
         var nname = $(this).val().replace(/,/g,"");
         $(this).val(nname);
     });
+    //check duplicate job name
+    $("#name").on("blur",function(){
+        var data = {};
+        var url = $("#ajax_req").val();
+        data['request'] = "check_mjob_name";
+        data['name'] = $(this).val();
+        $.ajax({
+            url:url,
+            type:'POST',
+            dataType:"json",
+            data:data,
+            success: function(res) {
+                if(res=="ok"){
+                    console.log("Name OK");
+                } else if(res=="dup"){
+                    pg_dialog("คำเตือน","ชื่องานซ้ำโปรดลองชื่อใหม่")
+                    $("#name").val("");
+                }
+            },
+            error: function(err){
+                console.log("ERROR"+JSON.stringify(err));
+            }
+        });
+    });
     function pre_tb(){
         $.each(pre,function(k,v){
             var name = v[0];

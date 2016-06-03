@@ -184,6 +184,8 @@ function post_ajax(data,url,silent){
             } else if (flag==="myOK"){
                 pg_dialog(response[1],response[2]);
                 $("body").addClass("pg-loading");
+            } else if(flag==="manual"){
+                response[1];
             }
         },
         error: function(err){

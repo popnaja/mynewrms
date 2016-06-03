@@ -413,6 +413,12 @@ if($req=="show_pic"){
             . "<script>$('#endate').datepicker({dateFormat: 'yy-mm-dd'});</script>"
             . "</div><!-- .col-50 -->";
     echo json_encode(array("html_replace",$_POST['target'],$html));
+} else if($req == "check_mjob_name"){
+    if($db->check_dup("pap_delivery_dt", "job_name", $_POST['name'], " order_id=0")){
+        echo json_encode("dup");
+    } else {
+        echo json_encode("ok");
+    }
 }
 function update_job_paid($adid){
     global $db;
