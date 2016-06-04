@@ -1170,6 +1170,44 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
+    public function get_meet_schedule($pauth,$year,$month){
+        try {
+            $uid = $_SESSION['upap'][0];
+            $mm = new DateTime($year.$month."01",new DateTimeZone("Asia/Bangkok"));
+            $mm->sub(new DateInterval("P1M"));
+            $st = $mm->format("Ym");
+            $mm->add(new DateInterval("P2M"));
+            $en = $mm->format("Ym");
+            $filter = "WHERE type=2 AND DATE_FORMAT(crm_date,'%Y%m') BETWEEN :st AND :en";
+            if($pauth<3){
+                $filter .= " AND pap_crm.user_id=$uid";
+            }
+            $sql = <<<END_OF_TEXT
+SELECT
+DATE_FORMAT(crm_date,"%Y%m%d") AS date,
+COUNT(crm_id) AS num,
+GROUP_CONCAT(crm_id) AS id,
+GROUP_CONCAT(CONCAT("",user.user_login,"-",customer_name,"=>",crm_detail)) AS name
+FROM pap_crm
+LEFT JOIN pap_user AS user ON user.user_id=pap_crm.user_id
+LEFT JOIN pap_customer AS cus ON cus.customer_id=pap_crm.customer_id
+$filter
+GROUP BY DATE_FORMAT(crm_date,"%Y%m%d")
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":st",$st);
+            $stmt->bindParam(":en",$en);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $res1 = array();
+            foreach($res as $k=>$v){
+                $res1[$v['date']] = array($v['num'],$v['id'],$v['name']);
+            }
+            return $res1;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
     public function get_job_schedule($year,$month){
         try {
             $mm = new DateTime($year.$month."01",new DateTimeZone("Asia/Bangkok"));

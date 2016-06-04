@@ -55,10 +55,9 @@
         width:30%;
     }
 }
-
-
-//note
-#tb-note tr th:first-child {
+/* customer note */
+#tb-note tr th:first-child,
+#tb-note tr th:nth-child(2){
     width:90px;
 }
 #o_ref {

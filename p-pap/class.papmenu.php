@@ -11,6 +11,7 @@ class PAPmenu extends mymenu {
             "ลูกค้า" => array(
                 "รายการลูกค้า" => $root."customer.php",
                 "กลุ่มลูกค้า" => $root."term.php?tax=customer",
+                "ตารางนัดหมาย" => $root."customer_s.php",
                 "ที่อยู่จัดส่ง" => $root."shipping_address.php"
             ),
             "เสนอราคา" => array(

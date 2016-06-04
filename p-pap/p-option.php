@@ -32,8 +32,8 @@ $op_authlevel = array(
     "4"=>"Manager"
 );
 $op_note_type = array(
-    1 => "Note",
-    2 => "Schedule"
+    1 => "โน๊ต",
+    2 => "นัดหมาย"
 );
 $op_unit = array(
     "allpage" => "หน้า(รวมปก)",

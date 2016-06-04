@@ -149,6 +149,7 @@ if($action=="add"){
     if($action =="note"){
         __autoload("pdo_tb");
         $s = (isset($_GET['s'])&&$_GET['s']!=""?$_GET['s']:null);
+        $type = (isset($_GET['fil_type'])&&$_GET['fil_type']>0?$_GET['fil_type']:null);
         $page = (isset($_GET['page'])?filter_input(INPUT_GET,'page',FILTER_SANITIZE_STRING):1);
         $iperpage = 20;
         
@@ -195,13 +196,14 @@ if($action=="add"){
                 . "</div><!-- .col-50 -->";
         
         //show table
-        $head = array("วันที่","บันทึก");
-        $rec = $tbpdo->view_note($pauth,$cid,$uid,$s,$page,$iperpage);
-        $all_rec = $tbpdo->view_note($pauth,$cid,$uid);
+        $head = array("Type","วันที่","บันทึก");
+        $rec = $tbpdo->view_note($op_note_type,$pauth,$cid,$uid,$type,$s,$page,$iperpage);
+        $all_rec = $tbpdo->view_note($op_note_type,$pauth,$cid,$uid,$type,$s);
         $max = ceil(count($all_rec)/$iperpage);
         $clear_redirect = $redirect."?action=note&cid=$cid";
         $content .= "<div class='col-100'>"
                 . $tb->show_search(current_url(), "scid", "s","ค้นหาใบสั่งงาน จากรหัส หรือชื่องาน",$s)
+                . $tb->show_filter(current_url(), "fil_type", $op_note_type, $type,"Type")
                 . "<div class='tb-clear-filter'><a href='$clear_redirect' title='Clear Filter'><input type='button' value='Clear Filter' /></a></div>"
                 . $tb->show_pagenav(current_url(), $page, $max)
                 . $tb->show_table($head,$rec,"tb-note")

@@ -217,6 +217,20 @@ if($req=="show_pic"){
     $db->delete_data("pap_comp_process", "id", $_POST['cproid']);
     echo json_encode(array("redirect",$_POST['redirect']));
 /* =======================================================  CALENDAR AJAX ===================================================================*/
+} else if($req == "meet_month"){
+    __autoloada("calendar");
+    $pauth = page_auth(basename(current_url()));
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
+    $data = $db->get_meet_schedule($pauth,$_POST['year'], $_POST['month']);
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
+    echo json_encode(array("html_replace","mycd-div",$html));
+} else if($req == "meet_type"){
+    __autoloada("calendar");
+    $pauth = page_auth(basename(current_url()));
+    $cd = new mycalendar($_POST['year'], $_POST['month']);
+    $data = $db->get_meet_schedule($pauth,$_POST['year'], $_POST['month']);
+    $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
+    echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "mycd_change_month"){
     __autoloada("calendar");
     $cd = new mycalendar($_POST['year'], $_POST['month']);

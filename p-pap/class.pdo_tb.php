@@ -547,18 +547,20 @@ END_OF_TEXT;
             db_error(__METHOD__, $ex);
         }
     }
-    public function view_note($auth,$cid,$uid,$s=null,$page=null,$perpage=null){
+    public function view_note($op,$auth,$cid,$uid,$type=null,$s=null,$page=null,$perpage=null){
         try {
             $off = (isset($perpage)?$perpage*($page-1):0);
             $lim_sql = (isset($perpage)?"LIMIT :lim OFFSET :off":"");
             if($auth>2){
                 $filter = "WHERE customer_id=:cid";
             } else {
-                $filter = "WHERE user_id=:uid AND customer_id=:cid";
+                $filter = "WHERE pap_crm.user_id=:uid AND customer_id=:cid";
             }
+            $filter .= (isset($type)?" AND type=$type":"");
             $filter .= (isset($s)?" AND crm_detail LIKE '%$s%'":"");
             $sql = <<<END_OF_TEXT
 SELECT
+type,
 CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,";",type,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
 crm_detail
 FROM pap_crm
@@ -577,7 +579,11 @@ END_OF_TEXT;
                 $stmt->bindParam(":off",$off,PDO::PARAM_INT);
             }
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach($res as $k=>$v){
+                $res[$k]['type'] = $op[$v['type']];
+            }
+            return $res;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }
