@@ -559,7 +559,7 @@ END_OF_TEXT;
             $filter .= (isset($s)?" AND crm_detail LIKE '%$s%'":"");
             $sql = <<<END_OF_TEXT
 SELECT
-CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
+CONCAT("<span class='note-edit' ninfo='",crm_id,";",crm_date,";",crm_detail,";",type,"'>",DATE_FORMAT(crm_date,"%d-%b-%Y"),"</span>"),
 crm_detail
 FROM pap_crm
 LEFT JOIN pap_user AS pu on pu.user_id=pap_crm.user_id

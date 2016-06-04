@@ -158,7 +158,10 @@ if($action=="add"){
         $content .= $menu->pappanel("ลูกค้า","รายการลูกค้า");
         $info = $db->get_info("pap_customer","customer_id",$cid);
         
-        $note = $form->show_text("date","date","","yyyy-mm-dd","วันที่ $req","","label-3070")
+        $note = $form->show_select("type", $op_note_type, "label-3070", "ประเภท", null)
+                . $form->show_text("date","date","","yyyy-mm-dd","วันที่ $req","","label-3070")
+                . $form->show_num("hour", "", 1, "", "HH", "", "label-3070","min='0' max='24'")
+                . $form->show_num("min", "", 1, "", "MM", "", "label-3070","min='0' max='60'")
                 . $form->show_textarea("note","",4,10,"","บันทึก $req","label-3070")
                 . $form->show_submit("submit","เพิ่มบันทึก","but-right")
                 . "<input type='button' id='cancel-edit' value='ยกเลิกการแก้ไข' class='form-hide' />";
@@ -278,8 +281,9 @@ if($action=="add"){
         $tax = $db->get_info("pap_customer_cat","customer_id",$cid);
         $contacts = $db->get_contact($cid,1);
         //edit
+        $note = "&nbsp;<a href='$redirect"."?action=note&cid=$cid' class='icon-comment-discussion'></a>";
         $cus_cat = array("0"=>"--กลุ่มลูกค้า--")+$db->get_keypair("pap_option", "op_id", "op_name","WHERE op_type='customer_cat'");
-        $content .= "<h1 class='page-title'>แก้ไขข้อมูลลูกค้า</h1>"
+        $content .= "<h1 class='page-title'>แก้ไขข้อมูลลูกค้า $note</h1>"
                 . "<div id='ez-msg'>".  showmsg() ."</div>"
                 . $form->show_st_form()
                 . "<div class='col-50'>"

@@ -1127,12 +1127,15 @@ if($req == "login"){
     }
     echo json_encode(array("redirect",$_POST['redirect']."?cid=".$_POST['cid']));
 } else if($req == "add_note"){
-    $db->insert_data("pap_crm", array(null,$_POST['uid'],$_POST['cid'],$_POST['note'],$_POST['date']));
+    $date = $_POST['date']." ".sprintf("%02s",$_POST['hour']).":".sprintf("%02s",$_POST['min']).":00";
+    $db->insert_data("pap_crm", array(null,$_POST['uid'],$_POST['cid'],$_POST['note'],$date,$_POST['type']));
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req == "edit_note"){
+    $date = $_POST['date']." ".sprintf("%02s",$_POST['hour']).":".sprintf("%02s",$_POST['min']).":00";
     $arrinfo = array(
-        "crm_date" => $_POST['date'],
+        "type" => $_POST['type'],
+        "crm_date" => $date,
         "crm_detail" => $_POST['note']
     );
     $db->update_data("pap_crm", "crm_id", $_POST['nid'], $arrinfo);

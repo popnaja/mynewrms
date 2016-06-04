@@ -103,7 +103,6 @@ function send_note(){
             }
         });
     });
-    
 }
 function edit_note(){
     $(document).ready(function(){
@@ -112,9 +111,18 @@ function edit_note(){
         var cancel = $("#cancel-edit");
         note.on("click",function(){
             ninfo = $(this).attr("ninfo").split(";");
+            var datestr = ninfo[1].replace(" ","T");
+            
+            var mdate = Date(datestr);
+            //var hour = mdate.getHours();
+            //var min = mdate.getMinutes();
+            console.log(mdate);
             $("#nid").val(ninfo[0]);
             $("#date").val(ninfo[1]);
+            $("#hour").val(hour);
+            $("#min").val(min);
             $("#note").val(ninfo[2]);
+            $("#type").val(ninfo[3]);
             $("#submit").val("แก้ไข");
             $("#request").val("edit_note");
             cancel.removeClass("form-hide");
