@@ -1225,7 +1225,7 @@ COUNT(job.order_id) AS num,
 GROUP_CONCAT(job.order_id) AS id,
 GROUP_CONCAT(CONCAT(job.order_no,":",quo.name)) AS name
 FROM pap_order AS job
-LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 WHERE DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en AND job.status<79
 GROUP BY DATE_FORMAT(quo.plan_delivery,"%Y%m%d")
 END_OF_TEXT;
@@ -1259,7 +1259,7 @@ quo.name AS name,
 job.status AS status,
 frame.frame
 FROM pap_order AS job
-LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 LEFT JOIN (
 	SELECT
 	comp.order_id AS id,
@@ -1306,9 +1306,9 @@ start,end,
 result,remark,
 cpro.id AS cproid
 FROM pap_order_comp AS comp
-LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
-LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
-LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
+JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
+JOIN pap_process AS pro ON pro.process_id=cpro.process_id
+JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
 LEFT JOIN pap_machine AS mach ON mach.id=cpro.machine_id
 WHERE comp.order_id=:oid AND process_cat_id BETWEEN 3 AND 11
 ORDER BY cpro.comp_id ASC, process_cat_id ASC
@@ -1348,9 +1348,9 @@ IF(cpro.machine_id IS NOT NULL,
 ),
 plan_start,plan_end
 FROM pap_order_comp AS comp
-LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
-LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
-LEFT JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
+JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
+JOIN pap_process AS pro ON pro.process_id=cpro.process_id
+JOIN pap_process_cat AS cat ON cat.id=pro.process_cat_id
 LEFT JOIN pap_machine AS mach ON mach.id=cpro.machine_id
 WHERE comp.order_id=:oid AND process_cat_id BETWEEN 3 AND 11
 ORDER BY cpro.comp_id ASC, process_cat_id ASC, cpro.name ASC
@@ -1385,8 +1385,8 @@ END_OF_TEXT;
 SELECT
 mach.id,mach.name
 FROM pap_machine AS mach
-LEFT JOIN pap_process AS pro ON pro.process_id=mach.process_id
-LEFT JOIN pap_process_cat AS cat ON pro.process_cat_id=cat.id
+JOIN pap_process AS pro ON pro.process_id=mach.process_id
+JOIN pap_process_cat AS cat ON pro.process_cat_id=cat.id
 $filter
 ORDER BY cat.id ASC, mach.name ASC
 END_OF_TEXT;
@@ -1413,9 +1413,9 @@ IF(plan_start<:st,est_time_hour-ROUND(TIMESTAMPDIFF(MINUTE,plan_start,:st)/60,2)
 IF(plan_start<:st,:st,plan_start) AS plan_start,
 CONCAT_WS("<br/>",job.order_no,quo.name,com.name,cpro.name) AS name
 FROM pap_comp_process as cpro
-LEFT JOIN pap_order_comp AS com ON com.id=cpro.comp_id
-LEFT JOIN pap_order AS job ON job.order_id=com.order_id
-LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_order_comp AS com ON com.id=cpro.comp_id
+JOIN pap_order AS job ON job.order_id=com.order_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 WHERE cpro.machine_id IS NOT NULL AND plan_end>:st AND plan_start<:en
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -1449,9 +1449,9 @@ ROUND(TIMESTAMPDIFF(MINUTE,start,end)/60,2)-IF(start<:st,ROUND(TIMESTAMPDIFF(MIN
 IF(start<:st,:st,start) AS start,
 CONCAT_WS("<br/>",CONCAT("ยอดผลิต",result),CONCAT(IF(TIMESTAMPDIFF(MINUTE,plan_end,end)>0,"+",""),TIMESTAMPDIFF(MINUTE,plan_end,end)," นาที")) AS name
 FROM pap_comp_process as cpro
-LEFT JOIN pap_order_comp AS com ON com.id=cpro.comp_id
-LEFT JOIN pap_order AS job ON job.order_id=com.order_id
-LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_order_comp AS com ON com.id=cpro.comp_id
+JOIN pap_order AS job ON job.order_id=com.order_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 WHERE start IS NOT NULL AND end IS NOT NULL AND end>:st AND start<:en
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -1530,7 +1530,7 @@ END_OF_TEXT;
 SELECT
 cpro.id,com.id AS compid,com.type
 FROM pap_comp_process AS cpro
-LEFT JOIN pap_order_comp AS com ON com.id=cpro.comp_id
+JOIN pap_order_comp AS com ON com.id=cpro.comp_id
 $where
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -1553,8 +1553,8 @@ END_OF_TEXT;
 SELECT
 comp.*,quo.amount,quo.cat_id
 FROM pap_order_comp AS comp
-LEFT JOIN pap_order AS job ON job.order_id=comp.order_id
-LEFT JOIn pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_order AS job ON job.order_id=comp.order_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 WHERE comp.id=:compid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -1588,8 +1588,8 @@ END_OF_TEXT;
 SELECT
 MAX(pro.process_cat_id)
 FROM pap_order_comp AS comp
-LEFT JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
-LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
+JOIN pap_comp_process AS cpro ON cpro.comp_id=comp.id
+JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 WHERE order_id=:oid
 GROUP BY order_id
 END_OF_TEXT;
