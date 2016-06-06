@@ -98,6 +98,7 @@ class PAPmenu extends mymenu {
     public function pappanel($active,$sub="",$visible=true){
         $root = $this->root;
         $logout = $this->root."logout.php";
+        $help = $this->root."help.php";
         $uid = (isset($_SESSION['upap'])?$_SESSION['upap'][0]:0);
         $requrl = PAP."request.php";
         $rms_white = $this->aroot."image/resolutems_logo_white.png";
@@ -108,9 +109,10 @@ class PAPmenu extends mymenu {
                 . "<div class='rms-logo'>"
                     . "<a href='http://www.resolutems.com/' title='Resolute MS'><img src='$rms_white'></a>"
                     . "</div><!-- .rms-logo -->"
-                . "<a href='$logout' title='ออกจากระบบ' class='icon-logout'></a>"
-                    . "<a href='$root' title='หน้าแรก' class='icon-home'></a>"
                 
+                . "<a href='$logout' title='ออกจากระบบ' class='icon-logout'></a>"
+                . "<a href='$root' title='หน้าแรก' class='icon-home'></a>"
+                . "<a href='$help' title='วิธีใช้งาน' class='icon-question'></a>"
                 . "</div><!-- #top-panel -->"
                 . "<div id='panel'>"
                 . "<ul id='mymenu'>"
