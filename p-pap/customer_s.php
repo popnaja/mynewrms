@@ -27,6 +27,7 @@ $cd = new mycalendar($year,$month);
 $content .= $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
         . "<div id='mycd-div'>"
         . $cd->show_calendar($job,"month",null,"mycd_change('meet');")
-        . "</div>";
+        . "</div>"
+        . $form->show_hidden("pauth","pauth",$pauth);
 $content .= $menu->showfooter();
 echo $content;

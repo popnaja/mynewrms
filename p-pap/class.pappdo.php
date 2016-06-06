@@ -1159,7 +1159,7 @@ END_OF_TEXT;
 SELECT
 GROUP_CONCAT(customer_id)
 FROM pap_order AS job
-LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 WHERE order_id IN ($stroid)
 GROUP BY customer_id
 END_OF_TEXT;
@@ -1181,16 +1181,19 @@ END_OF_TEXT;
             $filter = "WHERE type=2 AND DATE_FORMAT(crm_date,'%Y%m') BETWEEN :st AND :en";
             if($pauth<3){
                 $filter .= " AND pap_crm.user_id=$uid";
+                $name = 'GROUP_CONCAT(CONCAT(customer_name,"=>",crm_detail))';
+            } else {
+                $name = 'GROUP_CONCAT(CONCAT("(",user.user_login,")",customer_name,"=>",crm_detail))';
             }
             $sql = <<<END_OF_TEXT
 SELECT
 DATE_FORMAT(crm_date,"%Y%m%d") AS date,
 COUNT(crm_id) AS num,
 GROUP_CONCAT(crm_id) AS id,
-GROUP_CONCAT(CONCAT("",user.user_login,"-",customer_name,"=>",crm_detail)) AS name
+$name AS name
 FROM pap_crm
-LEFT JOIN pap_user AS user ON user.user_id=pap_crm.user_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pap_crm.customer_id
+JOIN pap_user AS user ON user.user_id=pap_crm.user_id
+JOIN pap_customer AS cus ON cus.customer_id=pap_crm.customer_id
 $filter
 GROUP BY DATE_FORMAT(crm_date,"%Y%m%d")
 END_OF_TEXT;

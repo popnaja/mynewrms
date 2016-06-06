@@ -219,16 +219,14 @@ if($req=="show_pic"){
 /* =======================================================  CALENDAR AJAX ===================================================================*/
 } else if($req == "meet_month"){
     __autoloada("calendar");
-    $pauth = page_auth(basename(current_url()));
     $cd = new mycalendar($_POST['year'], $_POST['month']);
-    $data = $db->get_meet_schedule($pauth,$_POST['year'], $_POST['month']);
+    $data = $db->get_meet_schedule($_POST['pauth'],$_POST['year'], $_POST['month']);
     $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "meet_type"){
     __autoloada("calendar");
-    $pauth = page_auth(basename(current_url()));
     $cd = new mycalendar($_POST['year'], $_POST['month']);
-    $data = $db->get_meet_schedule($pauth,$_POST['year'], $_POST['month']);
+    $data = $db->get_meet_schedule($_POST['pauth'],$_POST['year'], $_POST['month']);
     $html = $cd->show_calendar($data,$_POST['type'],$_POST['week'],"mycd_change('".$_POST['req']."');");
     echo json_encode(array("html_replace","mycd-div",$html));
 } else if($req == "mycd_change_month"){

@@ -126,3 +126,8 @@ td.mycd-bg-today {
 .mycd-day-rec>span {
     display:block;
 }
+.mycd-rec {
+    padding-left:3px;
+    padding-right:3px;
+    vertical-align: top;
+}

@@ -19,6 +19,7 @@ $(document).ready(function(){
             data['month'] = $(this).attr("month");
             data['week'] = $(this).attr("week");
             data['type'] = $(this).attr('cdtype');
+            data['pauth'] = $("#pauth").val();
             data['req'] = request;
             post_ajax(data,url)
         }
@@ -34,6 +35,7 @@ $(document).ready(function(){
             data['year'] = $(this).attr("year");
             data['month'] = $(this).attr("month");
             data['week'] = $(this).attr("week");
+            data['pauth'] = $("#pauth").val();
             data['req'] = request;
             post_ajax(data,url)
         }
