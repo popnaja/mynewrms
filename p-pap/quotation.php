@@ -220,7 +220,13 @@ if($action=="add"){
         $cost_adj = "";
         $del = "";
     }
-
+    //show copy
+    if($pauth>2){
+        $copy = "<span id='copy-quote' class='gray-but'>Copy</span>"
+                . "<script>copy_quote();</script>";
+    } else {
+        $copy = "";
+    }
     //ส่วนเปลี่ยนสถานะ
     $status_icon = $op_quote_status_icon[$info['status']];
     $md = new mymedia(PAP."request_ajax.php");
@@ -366,7 +372,7 @@ if($action=="add"){
             . "<input id='view-more-but' type='button' value='เพิ่มส่วนประกอบ' style='width:100%'/>"
             . "</div><!-- .col-50 -->";
 
-    $content .= $del
+    $content .= $del.$copy
             . $form->show_submit("submit","Update","but-right")
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)

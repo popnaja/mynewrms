@@ -216,6 +216,11 @@ if($req=="show_pic"){
     //delete
     $db->delete_data("pap_comp_process", "id", $_POST['cproid']);
     echo json_encode(array("redirect",$_POST['redirect']));
+/* =======================================================  COPY ===================================================================*/
+} else if($req == "copy_quote"){
+    //copy
+    $db->copy_quote($_POST['qid']);
+    echo json_encode(array("redirect",$_POST['redirect']));
 /* =======================================================  CALENDAR AJAX ===================================================================*/
 } else if($req == "meet_month"){
     __autoloada("calendar");

@@ -736,6 +736,21 @@ $(document).ready(function(){
     }
 });
 }
+function copy_quote(){
+$(document).ready(function(){
+    var but = $("#copy-quote");
+    var url = $("#ajax_req").val();
+    but.on("click",function(){
+        if(confirm("คุณแน่ใจแล้วที่จะ Copy ใบเสนอราคา")){
+            var data = {};
+            data['request'] = "copy_quote";
+            data['qid'] = $("#qid").val();
+            data['redirect'] = $("#redirect").val();
+            post_ajax(data,url);
+        }
+    });
+});
+}
 function del_quote(){
 $(document).ready(function(){
     var del = $("#del-quote");

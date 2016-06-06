@@ -556,11 +556,11 @@ END_OF_TEXT;
             $conn = $qr[3];
             $sql = <<<END_OF_TEXT
 SELECT
-                    quote_no,DATE_FORMAT(created,"$date") AS date
-                    FROM pap_quotation
-                    WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
-                    ORDER BY quote_id DESC
-                    LIMIT 1
+quote_no,DATE_FORMAT(created,"$date") AS date
+FROM pap_quotation
+WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
+ORDER BY quote_id DESC
+LIMIT 1
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
@@ -1728,6 +1728,35 @@ END_OF_TEXT;
             $stmt->execute();
             $res = $stmt->fetch(PDO::FETCH_ASSOC);
             return $res['margin'];
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
+    public function copy_quote($qid){
+        try {
+            $qno = $this->check_quote_no();
+            $sql = <<<END_OF_TEXT
+CREATE TEMPORARY TABLE tmp 
+SELECT * FROM pap_quotation WHERE quote_id=$qid;
+UPDATE tmp SET quote_id = NULL, quote_no='$qno', name=CONCAT(name,"(copy)"), status=1,created=now(),approved=null,finished=null ;
+INSERT INTO pap_quotation SELECT * FROM tmp;
+SET @qid = last_insert_id();
+DROP TEMPORARY TABLE IF EXISTS tmp;
+
+CREATE TEMPORARY TABLE tmp 
+SELECT * FROM pap_quote_meta WHERE quote_id=$qid;
+UPDATE tmp SET id = NULL, quote_id=@qid;
+INSERT INTO pap_quote_meta SELECT * FROM tmp;
+DROP TEMPORARY TABLE IF EXISTS tmp;
+                    
+CREATE TEMPORARY TABLE tmp 
+SELECT * FROM pap_quote_comp WHERE quote_id=$qid;
+UPDATE tmp SET quote_id=@qid;
+INSERT INTO pap_quote_comp SELECT * FROM tmp;
+DROP TEMPORARY TABLE IF EXISTS tmp;
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }

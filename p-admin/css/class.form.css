@@ -1047,6 +1047,6 @@ select::-moz-focus-inner { /*Remove button padding in FF*/
 
 /*---------------------------------------------- check box with input --------------------------------------------------------------*/
 .check-input {
-    width:100% !important;
+    margin-left:33px;
     padding:0 5px !important;
 }

@@ -64,8 +64,6 @@
     margin-bottom:10px;
     font-size:14px;
 }
-
-
 #tb-pshow .label-inline,
 #tb-qshow .label-inline{
     margin-bottom:0;
@@ -79,4 +77,7 @@
 .tb-adj-paperkg{
     width:100%;
     padding:0 5px !important;
+}
+#copy-quote {
+    margin-left:15px;
 }

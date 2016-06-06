@@ -137,8 +137,8 @@ class myform{
                     . "<input type='checkbox' id='$name-$i' name='$name"."[]' value='$k;$val' ckid='$k' $check>"
                     . "<label for='$name-$i'>"
                     . (is_array($v)?$v[0]:$v)
-                    . "<input type='number' id='$name-v-$i' name='$name"."v[]' value='$val' class='check-input $show' step='any' min='0'/>"
                     . "</label>"
+                    . "<input type='number' id='$name-v-$i' name='$name"."v[]' value='$val' class='check-input $show' step='any' min='0'/>"
                     . "</li>";
             $i++;
         }
