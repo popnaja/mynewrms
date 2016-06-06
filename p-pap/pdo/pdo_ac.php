@@ -309,13 +309,11 @@ END_OF_TEXT;
                         $t = $st->format("t");
                         $st->add(new DateInterval("P".$t."D"));
                         $aday = array($st->format("Ymd"));
-                    } else {
-                        $aday = array(0);
                     }
                     if(count($aday)>0){
-                        foreach($aday as $day){
-                            $day = sprintf("%02s",$day);
-                            $this->add_date($res1,$day,$v,"cd-icon icon-file-text-o");
+                        foreach($aday as $date){
+                            $name = "<span class='cd-icon icon-file-text-o'></span>".mb_substr($v['name'],0,15,"UTF8");
+                            prep_calendar($res1, $date, $v['customer_id'], $name, 1);
                         }
                     }
                     //cheque
@@ -336,9 +334,9 @@ END_OF_TEXT;
                         $aday = array(0);
                     }
                     if(count($aday)>0){
-                        foreach($aday as $day){
-                            $day = sprintf("%02s",$day);
-                            $this->add_date($res1,$day,$v,"cd-icon icon-banknote");
+                        foreach($aday as $date){
+                            $name = "<span class='cd-icon icon-banknote'></span>".mb_substr($v['name'],0,15,"UTF8");
+                            prep_calendar($res1, $date, $v['customer_id'], $name, 1);
                         }
                     }
                 }
@@ -347,14 +345,6 @@ END_OF_TEXT;
         } catch (Exception $ex) {
             db_error(__METHOD__, $ex);
         }
-    }
-    private function add_date(&$res1,$day,$v,$class){
-        if(!isset($res1[$day])){
-            $res1[$day] = array(0,"","");
-        }
-        $res1[$day][0]++;
-        $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['customer_id'];
-        $res1[$day][2] .= ($res1[$day][0]>1?",":"")."<span class='$class'></span>".mb_substr($v['name'],0,15,"UTF8");
     }
     public function get_inv_remain($did,$inv=null){
         try {

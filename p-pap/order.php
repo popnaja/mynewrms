@@ -74,6 +74,7 @@ if(isset($oid)){
     __autoload("pdo_report");
     $rp = new reportPDO();
     $info = $rp->rp_order($oid);
+    $qinfo = $db->get_meta("pap_quote_meta", "quote_id", $info['quote_id']);
     $comps = $rp->rp_order_comp($oid);
     $paperhtml = "";
     for($i=0;$i<count($comps);$i++){
@@ -101,6 +102,7 @@ if(isset($oid)){
             . $form->show_hidden("ori_media","ori_media",$info['picture'])
             . $form->show_hidden("order_no","order_no",$info['order_no'])
             . $form->show_text("due","due",$info['plan_delivery'],"","กำหนดส่ง","","label-inline")
+            . $form->show_text("dueto","dueto",(isset($qinfo['dueto'])?$qinfo['dueto']:""),"yyyy-mm-dd","ถึงวันที่","","label-inline")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-inline")
             . "</div><!-- .col-50 -->"
             . "<div class='col-50'>"
@@ -117,7 +119,7 @@ if(isset($oid)){
             . $form->show_hidden("redirect","redirect",$redirect."?oid=$oid");
     $content .= $form->submitscript("$('#papform').submit();")
             . "<script>"
-            . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "$('#due, #dueto').datepicker({dateFormat: 'yy-mm-dd'});"
             . "</script>";
     //show info
     include_once("ud/doc_default.php");

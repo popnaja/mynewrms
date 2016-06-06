@@ -282,3 +282,11 @@ function daystr_to_array($str,$max){
     }
     return $aday;
 }
+//prep for calendar
+function prep_calendar(&$res,$date,$id,$name,$day){
+    if(isset($res[$date])){
+        array_push($res[$date],array($id,$name,$day));
+    } else {
+        $res[$date] = array(array($id,$name,$day));
+    }
+}

@@ -69,10 +69,14 @@ class mycalendar{
         $now_m = date_format(date_create(null,timezone_open("Asia/Bangkok")),"m");
         $now_y = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Y");
         $now_w = date_format(date_create(null,timezone_open("Asia/Bangkok")),"W");
-        if($now_w>$pweek&&$now_w<$nweek){
-            $tclass = "mycd-disable";
+        if($type=="day"||$type=="month"){
+            $tclass = ($now_m==$this->month?"mycd-disable":"");
         } else {
-            $tclass = "";
+            if($now_w>$pweek&&$now_w<$nweek){
+                $tclass = "mycd-disable";
+            } else {
+                $tclass = "";
+            }
         }
         $dclass = ($type=="day"?"mycd-active":"");
         $wclass = ($type=="W"?"mycd-active":"");
@@ -125,43 +129,6 @@ class mycalendar{
         $html .= "</div><!-- .mycd-calendar -->";
         return $html;
     }
-    private function load_info($stdate,$max){
-        $info = "";
-        $stdate->sub(new DateInterval("P6D"));
-        for($j=0;$j<$max;$j++){
-            $info .= "<tr>";
-            $st = new DateTime($stdate->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
-            for($i=0;$i<7;$i++){
-                $date = $st->format("Ymd");
-                $dd = $st->format("d");
-                if(isset($this->data[$date])){
-                    if(isset(explode(",",$this->data[$date][1])[$j])){
-                        $oid = explode(",",$this->data[$date][1])[$j];
-                        $name = explode(",",$this->data[$date][2])[$j];
-                        $info .= "<td class='mycd-rec' oid='$oid'>$name</td>";
-                    } else {
-                        $info .= "<td>&nbsp;</td>";
-                    }
-                } else if(isset($this->data[$dd])){
-                    if($st->format("m")!=$this->month){
-                        continue;
-                    }
-                    if(isset(explode(",",$this->data[$dd][1])[$j])){
-                        $oid = explode(",",$this->data[$dd][1]);
-                        $name = explode(",",$this->data[$dd][2]);
-                        $info .= (isset($oid[$j])?"<td class='mycd-rec' oid='$oid[$j]'>$name[$j]</td>":"");
-                    } else {
-                        $info .= "<td>&nbsp;</td>";
-                    }
-                } else {
-                    $info .= "<td>&nbsp;</td>";
-                }
-                $st->add(new DateInterval("P1D"));
-            }
-            $info .= "</tr>";
-        }
-        return $info;
-    }
     private function mycd_rundate(){
         $big = "<table class='mycd-bg-tb'>"
                 . "<tr>";
@@ -196,9 +163,9 @@ class mycalendar{
             $html .= "<td class='mycd-dtitle $ismonth $istoday'>$show</td>";
             //check max data
             if(isset($this->data[$date])){
-                $max = max($max,$this->data[$date][0]);
+                $max = max($max,count($this->data[$date]));
             } else if(isset($this->data[$dd])){
-                $max = max($max,$this->data[$dd][0]);
+                $max = max($max,count($this->data[$dd]));
             }
             $this->st_day->add(new DateInterval("P1D"));
         }
@@ -210,11 +177,68 @@ class mycalendar{
         
         return $big.$html;
     }
+    private function load_info($stdate,$max){
+        $info = "";
+        $stdate->sub(new DateInterval("P6D"));
+        for($j=0;$j<$max;$j++){
+            $info .= "<tr>";
+            $st = new DateTime($stdate->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
+            for($i=0;$i<7;$i++){
+                $date = $st->format("Ymd");
+                $dd = $st->format("d");
+                $move = 1;
+                if(isset($this->data[$date])){
+                    $dinfo = $this->data[$date];
+                    if(isset($dinfo[$j])&&is_array($dinfo[$j])){
+                        $oid = $dinfo[$j][0];
+                        $name = $dinfo[$j][1];
+                        $days = $dinfo[$j][2];
+                        $rclass = "";
+                        if($days>1){
+                            $rclass = "deli-range";
+                            $tnext = new DateTime($st->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
+                            for($ii=0;$ii<$days-1;$ii++){
+                                $tnext->add(new DateInterval("P1D"));
+                                $td = $tnext->format("Ymd");
+                                if(isset($this->data[$td])){
+                                    array_unshift($this->data[$td],0);
+                                    $max++;
+                                }
+                            }
+                            $i += $days-1;
+                            $move = $days;
+                        }
+                        $info .= "<td class='mycd-rec $rclass' oid='$oid' colspan='$days'>$name</td>";
+                    } else {
+                        $info .= "<td>&nbsp;</td>";
+                    }
+                } else if(isset($this->data[$dd])){
+                    if($st->format("m")!=$this->month){
+                        continue;
+                    }
+                    if(isset(explode(",",$this->data[$dd][1])[$j])){
+                        $oid = explode(",",$this->data[$dd][1]);
+                        $name = explode(",",$this->data[$dd][2]);
+                        $info .= (isset($oid[$j])?"<td class='mycd-rec' oid='$oid[$j]'>$name[$j]</td>":"");
+                    } else {
+                        $info .= "<td>&nbsp;</td>";
+                    }
+                } else {
+                    $info .= "<td>&nbsp;</td>";
+                }
+                $st->add(new DateInterval("P".$move."D"));
+            }
+            $info .= "</tr>";
+        }
+        return $info;
+    }
     private function my_dayschedule(){
         $html = "<div class='mycd-schedule'>";
         $st = new DateTime("$this->year-$this->month-01",new DateTimeZone("Asia/Bangkok"));
         $tt = $st->format("t");
         $today = date_format(date_create(null,timezone_open("Asia/Bangkok")),"Ymd");
+        $extra = array();
+        $bcolor = 0;
         for($i=0;$i<$tt;$i++){
             $day = $st->format("j");
             $dd = $st->format("d");
@@ -227,11 +251,45 @@ class mycalendar{
                     . "<span>$wday</span>"
                     . "</div>"
                     . "<div class='mycd-day-rec'>";
+            if(isset($extra[$date])){
+                $einfo = $extra[$date];
+                for($x=0;$x<count($einfo);$x++){
+                    $id = $einfo[$x][0];
+                    $name = $einfo[$x][1];
+                    $bc = "bar-color-".$einfo[$x][2];
+                    $html .= "<span class='mycd-rec $bc' oid='$id'>$name</span>";
+                }
+            }
             if(isset($this->data[$date])){
-                $aoid = explode(",",$this->data[$date][1]);
-                $aname = explode(",",$this->data[$date][2]);
-                for($j=0;$j<count($aoid);$j++){
-                    $html .= "<span class='mycd-rec' oid='$aoid[$j]'>$aname[$j]</span>";
+                $dinfo = $this->data[$date];
+                for($j=0;$j<count($dinfo);$j++){
+                    $id = $dinfo[$j][0];
+                    $name = $dinfo[$j][1];
+                    $days = $dinfo[$j][2];
+                    $bc = "";
+                    if($days>1){
+                        $tnext = new DateTime($st->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
+                        if(isset($color[$id])){
+                            $c = $color[$id];
+                        } else {
+                            $c = $bcolor;
+                            $color[$id] = $c;
+                            $bcolor++;
+                        }
+                        for($ii=0;$ii<$days-1;$ii++){
+                            $tnext->add(new DateInterval("P1D"));
+                            $nd = $tnext->format("Ymd");
+                            if(isset($extra[$nd])){
+                                array_push($extra[$nd],array($id,$name,$c));
+                            } else {
+                                $extra[$nd] = array(array($id,$name,$c));
+                                
+                            }
+                        }
+                        $bc = "bar-color-".$c;
+                        
+                    }
+                    $html .= "<span class='mycd-rec $bc' oid='$id'>$name</span>";
                 }
             } else if(isset($this->data[$dd])){
                 $aoid = explode(",",$this->data[$dd][1]);

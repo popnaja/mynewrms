@@ -115,6 +115,7 @@ if($action=="add"){
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",null)
             . "</div><!-- #bind-sec -->"
             . $form->show_text("due","due","","yyyy-mm-dd","กำหนดส่ง","","label-3070")
+            . $form->show_text("dueto","dueto","","yyyy-mm-dd","ถึงวันที่","","label-3070")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
 
     $pack = $form->show_checkbox_winput("pack","pack",$packing,"การแพ็ค","label-3070")
@@ -150,7 +151,7 @@ if($action=="add"){
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("check_quote(e);")
             . "<script>"
-            . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "$('#due, #dueto').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
             . "quote_function();"
             . "search_customer();"
@@ -347,6 +348,7 @@ if($action=="add"){
             . $form->show_select("binding",$binding,"label-3070","เข้าเล่ม",$info['binding_id'])
             . "</div><!-- #bind-sec -->"
             . $form->show_text("due","due",$info['plan_delivery'],"yyyy-mm-dd","กำหนดส่ง","","label-3070")
+            . $form->show_text("dueto","dueto",(isset($info['dueto'])?$info['dueto']:""),"yyyy-mm-dd","ถึงวันที่","","label-3070")
             . $form->show_num("credit",$info['credit'],1,"","เครดิต(วัน)","","label-3070")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
     $pack = $form->show_checkbox_winput("pack","pack",$pack_checked,"การแพ็ค","label-3070")
@@ -381,7 +383,7 @@ if($action=="add"){
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("check_quote(e);")
             . "<script>"
-            . "$('#due').datepicker({dateFormat: 'yy-mm-dd'});"
+            . "$('#due, #dueto').datepicker({dateFormat: 'yy-mm-dd'});"
             . "view_more_section('quote-comp');"
             . "select_option_byval('type');"
             . "quote_function();"

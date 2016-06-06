@@ -131,3 +131,23 @@ td.mycd-bg-today {
     padding-right:3px;
     vertical-align: top;
 }
+
+/*=============================================================   DELI RANGE  ==============================================================*/
+.deli-range {
+    background-color:#9fe1e7;
+}
+/*=============================================================   BAR COLOR  =================================================================*/
+.bar-color-0{background-color:#9fe1e7;}
+.bar-color-1{background-color:#fbd75b;}
+.bar-color-2{background-color:#a4bdfc;}
+.bar-color-3{background-color:#46d6db;}
+.bar-color-4{background-color:#5484ed;}
+.bar-color-5{background-color:#ffb878;}
+.bar-color-6{background-color:#dbadff;}
+.bar-color-7{background-color:#e1e1e1;}
+.bar-color-8{background-color:#009688;}
+.bar-color-9{background-color:#4CAF50;}
+.bar-color-10{background-color:#8BC34A;}
+.bar-color-11{background-color:#CDDC39;}
+.bar-color-12{background-color:#FFC107;}
+.bar-color-13{background-color:#607D8B;}

@@ -780,7 +780,8 @@ if($req == "login"){
         "cal_amount" => implode(",",$arramount),
         "other_price" => json_encode($other),
         "coat2" => json_encode($coat2),
-        "coatpage" => json_encode($coatpage)
+        "coatpage" => json_encode($coatpage),
+        "dueto" => $_POST['dueto']
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
@@ -977,9 +978,9 @@ if($req == "login"){
         "page_inside" => $page_inside,
         "other_price" => json_encode($other),
         "coat2" => json_encode($coat2),
-        "coatpage" => json_encode($coatpage)
+        "coatpage" => json_encode($coatpage),
+        "dueto" => $_POST['dueto']
     );
-
     //ต่อรองราคา
     if($status==4){
         $meta['n_price'] = $_POST['n_price'];
@@ -1464,6 +1465,8 @@ if($req == "login"){
     $db->update_data("pap_order", "order_id", $_POST['oid'],$arrinfo);
     //update quote
     $db->update_data("pap_quotation","quote_id",$_POST['qid'],array("plan_delivery"=>$_POST['due']));
+    //update quote meta
+    $db->update_meta("pap_quote_meta", "quote_id", $_POST['qid'], array("dueto"=>$_POST['dueto']));
     //paper cut check with original
     for($i=0;$i<count($_POST['comp']);$i++){
         if($_POST['comp'][$i]!=$_POST['compo'][$i]){

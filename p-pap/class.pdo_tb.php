@@ -391,15 +391,16 @@ meta1.meta_value AS qsign,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,":<br/>",pq.name,"</a>"),
 cus.customer_name,
 FORMAT(amount,0),
-DATE_FORMAT(pq.plan_delivery,'%d-%b') AS due,
+CONCAT(DATE_FORMAT(pq.plan_delivery,'%d-%b'),IF(ISNULL(meta2.meta_value) OR meta2.meta_value="","",CONCAT(" to ",DATE_FORMAT(meta2.meta_value,'%d-%b')))) AS due,
 IF(ISNULL(plate_plan),"",DATE_FORMAT(plate_plan,'%e-%b')),
 po.status,
 IF(ISNULL(plate_plan),1,IF(ISNULL(plate_received),IF(now()>plate_plan,5,2),IF(plate_received>plate_plan,5,4))) AS stc
 FROM pap_order AS po
-LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
+JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
+JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key ="page_inside"
 LEFT JOIN pap_quote_meta AS meta1 ON meta1.quote_id=po.quote_id AND meta1.meta_key ="quote_sign"
+LEFT JOIN pap_quote_meta AS meta2 ON meta2.quote_id=po.quote_id AND meta2.meta_key="dueto"
 $filter
 ORDER BY pq.plan_delivery ASC
 $lim_sql
@@ -448,14 +449,15 @@ po.order_id,
 CONCAT("<a href='order.php?action=print&oid=",po.order_id,"' title='View' target='_blank'>",order_no,": <br/>",pq.name,"</a>"),
 cus.customer_name,
 meta.meta_value AS pages,FORMAT(amount,0),
-DATE_FORMAT(pq.plan_delivery,'%d-%b') AS due,
+CONCAT(DATE_FORMAT(pq.plan_delivery,'%d-%b'),IF(ISNULL(meta1.meta_value) OR meta1.meta_value="","",CONCAT(" to ",DATE_FORMAT(meta1.meta_value,'%d-%b')))) AS due,
 IF(ISNULL(plate_plan),1,IF(ISNULL(plate_received),IF(now()>plate_plan,5,2),IF(plate_received>plate_plan,5,4))) AS plate,
 IF(ISNULL(paper_plan),1,IF(ISNULL(paper_received),IF(now()>paper_plan,5,2),IF(paper_received>paper_plan,5,4))) AS paper,
 po.prod_plan AS plan
 FROM pap_order AS po
-LEFT JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
+JOIN pap_quotation AS pq on pq.quote_id=po.quote_id
+JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key ="page_inside"
+LEFT JOIN pap_quote_meta AS meta1 ON meta1.quote_id=po.quote_id AND meta1.meta_key="dueto"
 $filter
 ORDER BY pq.plan_delivery ASC
 $lim_sql

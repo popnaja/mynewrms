@@ -269,13 +269,27 @@ function add_papera(e){
 function check_quote(e){
     var type = $("#type").val(); //หนังสือ และ สมุด
     var binding = $("#binding").val();
+    var due = parseInt($("#due").val().replace(/-/g,""));
+    var dueto = parseInt($("#dueto").val().replace(/-/g,""));
+    var error = 0;
+    if(dueto<due){
+        pg_dialog("คำเตือน","กำหนดส่งถึงวันที่ ต้องเป็นวันหลังกำหนดส่ง");
+        $("#dueto").parent().css({"background-color":"#ff9282"});
+        error++;
+    } else{
+        $("#dueto").parent().css({"background-color":"inherit"});
+    }
     if((type==10||type==69)&&binding==0){
         pg_dialog("คำเตือน","ชนิดงานหนังสือและสมุด ต้องกำหนดการเข้าเล่ม");
         $("#binding").parent().css({"background-color":"#ff9282"});
-        e.preventDefault();
+        error++;
     } else {
         $("#binding").parent().css({"background-color":"inherit"});
+    }
+    if(error===0){
         $('#papform').submit();
+    } else {
+        e.preventDefault();
     }
 }
 function reflex_adj(){

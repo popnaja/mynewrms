@@ -1181,30 +1181,27 @@ END_OF_TEXT;
             $filter = "WHERE type=2 AND DATE_FORMAT(crm_date,'%Y%m') BETWEEN :st AND :en";
             if($pauth<3){
                 $filter .= " AND pap_crm.user_id=$uid";
-                $name = 'GROUP_CONCAT(CONCAT(customer_name,"=>",crm_detail))';
+                $name = 'CONCAT(customer_name,"=>",crm_detail)';
             } else {
-                $name = 'GROUP_CONCAT(CONCAT("(",user.user_login,")",customer_name,"=>",crm_detail))';
+                $name = 'CONCAT("(",user.user_login,")",customer_name,"=>",crm_detail)';
             }
             $sql = <<<END_OF_TEXT
 SELECT
 DATE_FORMAT(crm_date,"%Y%m%d") AS date,
-COUNT(crm_id) AS num,
-GROUP_CONCAT(crm_id) AS id,
+crm_id AS id,
 $name AS name
 FROM pap_crm
 JOIN pap_user AS user ON user.user_id=pap_crm.user_id
 JOIN pap_customer AS cus ON cus.customer_id=pap_crm.customer_id
 $filter
-GROUP BY DATE_FORMAT(crm_date,"%Y%m%d")
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":st",$st);
             $stmt->bindParam(":en",$en);
             $stmt->execute();
-            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $res1 = array();
-            foreach($res as $k=>$v){
-                $res1[$v['date']] = array($v['num'],$v['id'],$v['name']);
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                prep_calendar($res1,$row['date'],$row['id'],$row['name'],1);
             }
             return $res1;
         } catch (Exception $ex) {
@@ -1221,22 +1218,36 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 DATE_FORMAT(quo.plan_delivery,"%Y%m%d") AS date,
-COUNT(job.order_id) AS num,
-GROUP_CONCAT(job.order_id) AS id,
-GROUP_CONCAT(CONCAT(job.order_no,":",quo.name)) AS name
+job.order_id AS id,
+CONCAT(job.order_no,":",quo.name) AS name,
+IF(ISNULL(meta_value) OR meta_value='',1,DATEDIFF(meta_value,quo.plan_delivery)+1) AS days
 FROM pap_order AS job
 JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=job.quote_id AND meta_key='dueto'
 WHERE DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en AND job.status<79
-GROUP BY DATE_FORMAT(quo.plan_delivery,"%Y%m%d")
+ORDER BY quo.plan_delivery ASC, quo.quote_id ASC
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":st",$st);
             $stmt->bindParam(":en",$en);
             $stmt->execute();
-            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $res1 = array();
-            foreach($res as $k=>$v){
-                $res1[$v['date']] = array($v['num'],$v['id'],$v['name']);
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                $date = $row['date'];
+                $days = $row['days'];
+                if($days>1){
+                    $tdate = new DateTime($date,new DateTimeZone("Asia/Bangkok"));
+                    $rm = $days;
+                    while($rm>0){
+                        $ew = 7-$tdate->format("w");
+                        $d = ($ew>$rm?$rm:$ew);
+                        prep_calendar($res1, $tdate->format("Ymd"), $row['id'], $row['name'], $d);
+                        $tdate->add(new DateInterval("P".$d."D"));
+                        $rm -= $d;
+                    }
+                } else {
+                    prep_calendar($res1, $date, $row['id'], $row['name'], 1);
+                }
             }
             return $res1;
         } catch (Exception $ex) {
@@ -1265,8 +1276,8 @@ LEFT JOIN (
 	comp.order_id AS id,
 	SUM(IF(quo.cat_id=69 AND comp.type=1,1,ceil(page/paper_lay))) AS frame
 	FROM pap_order_comp AS comp
-	LEFT JOIN pap_order AS job ON job.order_id=comp.order_id
-	LEFT JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+	JOIN pap_order AS job ON job.order_id=comp.order_id
+	JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
 	GROUP BY comp.order_id
 ) AS frame ON frame.id=job.order_id
 WHERE job.plate_plan IS NOT NULL AND DATE_FORMAT(quo.plan_delivery,"%Y%m") BETWEEN :st AND :en
@@ -1275,20 +1286,14 @@ END_OF_TEXT;
             $stmt->bindParam(":st",$st);
             $stmt->bindParam(":en",$en);
             $stmt->execute();
-            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $res1 = array();
-            foreach($res as $k=>$v){
-                $day = ($v['rcdate']==""?$v['plandate']:$v['rcdate']);
-                $frame = $v['frame'];
-                if(!isset($res1[$day])){
-                    $res1[$day] = array(0,"","");
-                }
-                $res1[$day][0]++;
-                $res1[$day][1] .= ($res1[$day][0]>1?",":"").$v['id'];
-                $res1[$day][2] .= ($res1[$day][0]>1?",":"")
-                        . ($v['status']>7?"(PR)":$op[$v['status']])
-                        . mb_substr($v['name'],0,10,"utf-8")
+            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                $date = ($row['rcdate']==""?$row['plandate']:$row['rcdate']);
+                $frame = $row['frame'];
+                $name = ($row['status']>7?"(PR)":$op[$row['status']])
+                        . mb_substr($row['name'],0,10,"utf-8")
                         . " ($frame)";
+                prep_calendar($res1, $date, $row['id'], $name, 1);
             }
             return $res1;
         } catch (Exception $ex) {
