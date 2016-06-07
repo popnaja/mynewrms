@@ -130,8 +130,13 @@ td.mycd-bg-today {
     padding-left:3px;
     padding-right:3px;
     vertical-align: top;
+    cursor:pointer;
+    border:1px solid #fff;
 }
-
+/*=============================================================   hover  ==============================================================*/
+.mycd-rec:hover {
+    border:1px solid #FB8C00;
+}
 /*=============================================================   DELI RANGE  ==============================================================*/
 .deli-range {
     background-color:#9fe1e7;

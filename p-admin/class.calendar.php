@@ -7,6 +7,8 @@ class mycalendar{
     private $data;
     private $type;
     private $adj = 150;
+    private $bcolor = 0;
+    private $idcolor = array();
     private $thm = array("ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค","ก.ย.","ต.ค.","พ.ย.","ธ.ค.");
     private $thmonth = array("มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฏาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม");
     private $dayname = array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");
@@ -189,12 +191,20 @@ class mycalendar{
                 $move = 1;
                 if(isset($this->data[$date])){
                     $dinfo = $this->data[$date];
+                    $c = "";
                     if(isset($dinfo[$j])&&is_array($dinfo[$j])){
                         $oid = $dinfo[$j][0];
                         $name = $dinfo[$j][1];
                         $days = $dinfo[$j][2];
                         $rclass = "";
                         if($days>1){
+                            //checkcolor
+                            if(isset($this->idcolor[$oid])){
+                                $c = $this->idcolor[$oid];
+                            } else {
+                                $c = $this->idcolor[$oid] = $this->bcolor;
+                                $this->bcolor++;
+                            }
                             $rclass = "deli-range";
                             $tnext = new DateTime($st->format("Ymd"),new DateTimeZone("Asia/Bangkok"));
                             for($ii=0;$ii<$days-1;$ii++){
@@ -208,7 +218,7 @@ class mycalendar{
                             $i += $days-1;
                             $move = $days;
                         }
-                        $info .= "<td class='mycd-rec $rclass' oid='$oid' colspan='$days'>$name</td>";
+                        $info .= "<td class='mycd-rec $rclass bar-color-$c' oid='$oid' colspan='$days'>$name</td>";
                     } else {
                         $info .= "<td>&nbsp;</td>";
                     }
