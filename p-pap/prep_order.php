@@ -193,114 +193,167 @@ function add_data(&$data,$pid,$n,$vol,$cid){
     array_push($data,array($cid,$pid,$name,$vol,$time));
 }
 function recal_process($compid){
+    global $op_print_toplate,$op_print_color;
     __autoload("pappdo");
     include_once("quote_formular.php");
     $db = new PAPdb(DB_PAP);
     $info = $db->get_comps_recal($compid);
-    $process = $db->get_infos("pap_comp_process", "comp_id", $compid);
+    $qinfo = $db->get_info("pap_quotation", "quote_id", $info['quote_id'])+$db->get_meta("pap_quote_meta", "quote_id", $info['quote_id']);
+    $order_comp = $db->get_infos("pap_order_comp", "order_id", $info['order_id']);
+    $comps = $db->get_comp($info['quote_id']);
+    $coat2 = json_decode($qinfo['coat2'],true);
+    for($i=0;$i<count($comps);$i++){
+        if($order_comp[$i]['id']==$compid){
+            $comp = $comps[$i];
+            $c2 = $coat2[$i];
+            break;
+        }
+    }
+    $color = $op_print_color[$comp['comp_print_id']];
     $amount = $info['amount'];
     $page = $info['page'];
     $paper_lay = $info['paper_lay'];
     $allo = $info['allowance'];
     $frame = $page/$paper_lay;
     $set = plate_div($frame);
-    //case สมุด
-    if($info['cat_id']==69&&$info['type']==1){
-        $unit['sheet'] = $amount*$page/2/$paper_lay+$allo;
-        $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-        $unit['cut'] = $div/2*$unit['sheet'];
-        $unit['set'] = ($amount*ceil($page/2/$paper_lay)+$allo)*$div;
-        $name = "1,กลับใน,,".$unit['sheet'];
-        $unit['round'] = array(array($name,$unit['sheet']*2));
-    } else if($page>1){
-        $i = 1;
-        $sheet = 0;
-        $cut = 0;
-        $yok = 0;
-        $unit['round'] = array();
-        foreach($set as $key=>$s){
-            if($s>0){
-                if($key==0){
-                    $sheet += $temp = ($amount+$allo)*$s/2;
+    $type = $info['type'];
+    $unit = array(
+        "sheet" => 0,
+        "set" => 0,
+        "kong" => 0,
+        "cut" => 0
+    );
+    if($type==2||$type==6){                //เนื้อใน
+        $frame = $page/$paper_lay;
+        $unit['sinfo'] = array();
+        if($info['cat_id']==69){               //case สมุด
+            $unit['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>1);
+            $unit['sheet'] = $amount*$page/2/$paper_lay+$allo;
+            $name = "1,กลับใน,$color/$color,".$unit['sheet'];
+            $unit['round'] = array(array($name,$unit['sheet']*2));
+            $unit['color'] = $color."/$color";
+            //check folding
+            $st = $paper_lay*2;
+            check_folding($unit,$st, $unit['sheet']);
+        } else {                                //case หนังสือทั่วไป
+            $unit['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>ceil($frame));
+            $unit['round'] = array();
+            $unit['color'] = $color."/$color";
+            $fdiv = plate_div($frame);
+            foreach($fdiv as $key=>$s){
+                if($key==0&&$s>0){
+                    $unit['sheet'] += ($amount+$allo)*$s/2;
                     $round = $tsheet = $amount+$allo;
-                    $name = "$s,กลับนอก,,".$tsheet;
+                    $name = "$s,กลับนอก,$color/$color,".$tsheet;
                     array_push($unit['round'],array($name,$s*$round));
-                    $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-                    $cut += ($div>1?$div/2*$temp:0);
-                    $yok += $div*$temp;
-                } else {
+                    //check folding
+                    $st = $paper_lay*2;
+                    check_folding($unit,$st,$tsheet,$s/2);
+                } else if($s>0) {
                     $ss = ($s>0.5?1:$s);
-                    $sheet += $tsheet = $amount*$ss/2+$allo;
+                    $unit['sheet'] += $tsheet = $amount*$ss/2+$allo;
                     $round = $tsheet*2;
-                    $name = "$s,กลับใน,,".$tsheet;
+                    $name = "$s,กลับใน,$color/$color,".$tsheet;
                     array_push($unit['round'],array($name,$round));
-                    $div = (is_int($paper_lay*$s/2/8)&&$paper_lay*$s/2/8>=2?$paper_lay*$s/2/8:1);
-                    $cut += $div*($amount+$allo);
-                    $yok += $div*($amount+$allo);
-                    $i++;
+                    //check folding
+                    $tkong = check_folding($unit,$paper_lay*2,$tsheet,1,$s*$paper_lay);
+                    $unit['kong'] -= $tkong-1; //แก้จำนวนกองของเศษ
                 }
             }
         }
-        $unit['sheet'] = $sheet;
-        $unit['cut'] = $cut;
-        $unit['set'] = $yok;
-    } else {
-        $unit['sheet'] = $amount*$frame+$allo;
-        $name = "$frame,หน้าเดียว,,".$unit['sheet'];
-        $unit['round'] = array(array($name,$unit['sheet']));
-        $unit['cut'] = $amount+$allo;
-        $unit['set'] = $amount+$allo;
+    } else {            //อื่นๆ ปก ใบพาด แจ็คเก็ด
+        $piece = $page;
+        $unit['kong'] = (in_array($type,array(4,5,7))?0:$piece);
+        $sheet = $unit["sheet"] = $amount*$piece/$paper_lay+$allo;
+        $unit['cut'] = $sheet*$paper_lay;
+        $unit['set'] = $sheet*$paper_lay;
+        $frame = $page*($comp['comp_print2']>0?2:1)/$paper_lay;
+        $unit['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>ceil($frame));
+        if($comp['comp_print2']==0){            //พิมพ์ด้านเดียว
+            $name = "$frame,หน้าเดียว,$color/0,".$unit['sheet'];
+            $unit['round'] = array(array($name,$unit['sheet']));
+            $unit['color'] = $color."/0";
+        } else if($comp['comp_print2']==$comp['comp_print_id']){     //พิมพ์สองด้านสีเดียวกัน
+            $name = "$frame,กลับใน,$color/$color,".$sheet;
+            $unit['round'] = array(array($name,$sheet*2));
+            $unit['color'] = $color."/".$color;
+        } else {                                //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1 ทำเหมือน สีเดียวกัน lay รวมไปเลย ประหยัด plate และเวลาเปลี่ยนเพลต
+            $color2 = $op_print_color[$comp['comp_print2']];
+            $name = "1,กลับใน,$color/$color2,".$sheet;
+            $unit['round'] = array(array($name,$sheet*2));
+            $unit['color'] = $color."/".$color2;
+        }
     }
     $paperinfo = $db->get_info("pap_mat", "mat_id", $info['paper_id']);
     $sheet = ceil($unit['sheet']/$paperinfo['mat_order_lot_size'])*$paperinfo['mat_order_lot_size'];
     $i=0;
-    //var_dump($unit);
-    //var_dump($process);
-    foreach($process as $k => $v){
-        $pinfo = $db->get_info("pap_process", "process_id", $v['process_id']);
-        $cat = $pinfo['process_cat_id'];
-        $name = explode(",",$v['name']);
-        if(count($name)>1){
-            $setup = ceil($name[0]);
-            $nname = str_replace(",,",",$name[2],",$unit['round'][$i][0]);
-            $i++;
-        } else {
-            $setup = 1;
-            $nname = $name[0];
-        }
-        switch ($cat){
+
+    $catinfo = $db->get_info("pap_option", "op_id", $info['cat_id']);
+    $plist = explode(",",$catinfo['op_value']);
+    $data = array();
+    $name = null;
+    foreach($plist as $k => $v){
+        $process = $db->get_mm_arr("pap_process", "process_id", "process_cat_id", $v);
+        switch ($v){
+            case 1: //ออกแบบ
+                break;
+            case 2: //เจียน
+                $pid = $process[0];
+                add_data($data,$pid,$name,$sheet,$compid);
+                break;
             case 3: //พิมพ์
-                $arrinfo = array(
-                    "volume" => $unit['round'][$i-1][1],
-                    "est_time_hour" => time_cal($pinfo, $setup, $unit['round'][$i-1][1]),
-                    "name" => $nname
-                );
-                $db->update_data("pap_comp_process", "id", $v['id'], $arrinfo);
-                //var_dump($arrinfo);
+                $pid = $comp['comp_print_id'];
+                foreach($unit['round'] AS $key=>$value){
+                    add_data($data,$pid,$value[0],$value[1],$compid);
+                }
+                break;
+            case 4: //เคลือบ
+                $coat = explode(",",$comp['comp_coating']);
+                foreach($coat as $pid){
+                    if($pid>0){
+                        add_data($data,$pid,$name,$sheet,$compid);
+                    }
+                }
+                if($c2>0){
+                    add_data($data,$c2,$name,$sheet,$compid);
+                }
+                break;
+            case 5: //ไดตัท
+                $post = explode(",",$comp['comp_postpress']);
+                foreach($post as $pdata){
+                    $pdata = explode(";",$pdata);
+                    $pid = $pdata[0];
+                    if($pid>0){
+                        add_data($data,$pid,$name,$sheet,$compid);
+                    }
+                }
                 break;
             case 6: //ตัด
-                $arrinfo = array(
-                    "volume" => $unit['cut'],
-                    "est_time_hour" => time_cal($pinfo, $setup, $unit['cut'])
-                );
-                $db->update_data("pap_comp_process", "id", $v['id'], $arrinfo);
-                //var_dump($arrinfo);
+                if($unit['cut']>0){
+                    $pid = $process[0];
+                    add_data($data,$pid,$name,$unit['cut'],$compid);
+                }
                 break;
             case 7: //พับ
-                $arrinfo = array(
-                    "volume" => $unit['set'],
-                    "est_time_hour" => time_cal($pinfo, $setup, $unit['set'])
-                );
-                $db->update_data("pap_comp_process", "id", $v['id'], $arrinfo);
-                //var_dump($arrinfo);
+                $pid = ($type==3&&$qinfo['folding']>0?$qinfo['folding']:$process[0]);
+                if($type==1){
+                    //ปก ไม่พับ
+                } else if(in_array($info['cat_id'],array(11,12,13))){ //ใบปลิว โปสเตอร์ แผ่นพับ
+                    if(isset($qinfo['folding'])&&$qinfo['folding']>0){
+                        add_data($data,$qinfo['folding'],$name,$unit['set'],$compid);
+                    }
+                } else {
+                    foreach($unit['sinfo'] as $kk=>$vv){
+                        add_data($data,$vv['foldid'],$name,$vv['set'],$compid);
+                    }
+                }
                 break;
-            default: //2,4,5
-                $arrinfo = array(
-                    "volume" => $sheet,
-                    "est_time_hour" => time_cal($pinfo, $setup, $sheet)
-                );
-                $db->update_data("pap_comp_process", "id", $v['id'], $arrinfo);
-                //var_dump($arrinfo);
+            default:
         }
     }
+    //del old comp process
+    $db->delete_data("pap_comp_process", "comp_id", $compid);
+    
+    //add new
+    $db->add_comp_process($data);
 }

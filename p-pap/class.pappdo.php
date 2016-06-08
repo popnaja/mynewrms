@@ -842,7 +842,7 @@ END_OF_TEXT;
     public function add_comp_process($data){
         try {
             $sql = <<<END_OF_TEXT
-INSERT INTO `pap_comp_process`(`id`, `comp_id`, `process_id`, `name`, `volume`, `est_time_hour`, `machine_id`, `result`, `plan_start`, `plan_end`, `start`, `end`, `remark`) VALUES (null,:cid,:pid,:name,:vol,:time,null,null,null,null,null,null,null)
+INSERT INTO `pap_comp_process`(`id`, `comp_id`, `process_id`, `name`, `volume`, `est_time_hour`, `machine_id`, `result`, `plan_start`, `plan_end`, `start`, `end`, `remark`) VALUES (null,:cid,:pid,:name,:vol,:time,null,null,null,null,null,null,:name)
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":cid",$cid);
@@ -1556,10 +1556,10 @@ END_OF_TEXT;
         try {
             $sql = <<<END_OF_TEXT
 SELECT
-comp.*,quo.amount,quo.cat_id
+comp.*,quo.amount,quo.cat_id,quo.quote_id,quo.cat_id
 FROM pap_order_comp AS comp
 JOIN pap_order AS job ON job.order_id=comp.order_id
-JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id
+JOIN pap_quotation AS quo ON quo.quote_id=job.quote_id            
 WHERE comp.id=:compid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);

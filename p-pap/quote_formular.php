@@ -16,7 +16,7 @@ function cal_quote($info,$comps){
     $res['แพ็ค'] = array();
     $res['ขนส่ง'] = array();
     $res['อื่นๆ'] = array();
-  
+
     $ex = explode(",",$info['exclude']);
     foreach($op_comp_type AS $k=>$v){
         $run[$k] = 0;
@@ -25,7 +25,7 @@ function cal_quote($info,$comps){
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     for($i=0;$i<count($units);$i++){
         $unit = $units[$i];
-        var_dump($unit);
+        //var_dump($unit);
         if($unit['type']==9){
             $overall = $unit;
             //prepress
@@ -110,9 +110,8 @@ function cal_quote($info,$comps){
         //ทำเพลต
         if(!in_array("1",$ex)){
             $temp = array();
-            foreach($unit['finfo'] as $key=>$val){
-                $tunit = $val+$unit;
-                $fid = $val['frameid'];
+            foreach($unit['frame'] as $fid=>$val){
+                $tunit = array("frame"=>$val,"round"=>$unit['allo']+$unit['piece'])+$unit;
                 $pcost = new_pcost($fid,$tunit);
                 array_push($res['ทำเพลต'],array_merge(array($cname." ".str_replace("ทำเพลต","",$processes[$fid])),$pcost));
             }
@@ -298,7 +297,7 @@ function check_folding(&$res,$page,$sheet,$times=1,$max=INF){
         if($t>10){break;}
         foreach($op_page_fid as $fpage=>$fid){
             if($page==0){break;}
-            if($fpage>=$max){continue;}
+            if($fpage>$max){continue;}
             while(($page/$fpage)>=1&&$page%$fpage==0){
                 if($t>10){break;}
                 if(!isset($temp[$fid])){
@@ -322,6 +321,7 @@ function check_folding(&$res,$page,$sheet,$times=1,$max=INF){
             "set" => $set*$times
         ));
     }
+    return $kong*$times;
 }
 function unit_cal($quote,$comps){
     __autoload("pappdo");
@@ -363,24 +363,18 @@ function unit_cal($quote,$comps){
         $type = $comp['comp_type'];
         if($type==2||$type==6){                //เนื้อใน
             $frame = $page/$paper_lay;
-            $res[$k]['finfo'] = array();
             $res[$k]['sinfo'] = array();
             if($quote['cat_id']==69){               //case สมุด
-                $res[$k]['frame'] = array($comp['comp_print_id']=>1);
+                $res[$k]['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>1);
                 $res[$k]['sheet'] = $amount*$page/2/$paper_lay+$allo;
                 $name = "1,กลับใน,$color/$color,".$res[$k]['sheet'];
                 $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
                 $res[$k]['color'] = $color."/$color";
-                array_push($res[$k]['finfo'],array(
-                    "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                    "frame" => 1,
-                    "round" => $res[$k]['sheet']*2
-                ));
                 //check folding
                 $st = $paper_lay*2;
                 check_folding($res[$k],$st, $res[$k]['sheet']);
             } else {                                //case หนังสือทั่วไป
-                $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
+                $res[$k]['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>ceil($frame));
                 $res[$k]['round'] = array();
                 $res[$k]['color'] = $color."/$color";
                 $fdiv = plate_div($frame);
@@ -390,11 +384,6 @@ function unit_cal($quote,$comps){
                         $round = $tsheet = $amount+$allo;
                         $name = "$s,กลับนอก,$color/$color,".$tsheet;
                         array_push($res[$k]['round'],array($name,$s*$round));
-                        array_push($res[$k]['finfo'],array(
-                            "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                            "frame" => $s,
-                            "round" => $round
-                        ));
                         //check folding
                         $st = $paper_lay*2;
                         check_folding($res[$k],$st,$tsheet,$s/2);
@@ -404,14 +393,9 @@ function unit_cal($quote,$comps){
                         $round = $tsheet*2;
                         $name = "$s,กลับใน,$color/$color,".$tsheet;
                         array_push($res[$k]['round'],array($name,$round));
-                        array_push($res[$k]['finfo'],array(
-                            "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                            "frame" => 1,
-                            "round" => $round
-                        ));
                         //check folding
-                        $st = $s*$paper_lay;
-                        check_folding($res[$k],$st,$tsheet,1,$paper_lay*2);
+                        $tkong = check_folding($res[$k],$paper_lay*2,$tsheet,1,$s*$paper_lay);
+                        $res[$k]['kong'] -= $tkong-1; //แก้จำนวนกองของเศษ
                     }
                 }
             }
@@ -422,36 +406,20 @@ function unit_cal($quote,$comps){
             $res[$k]['cut'] = $sheet*$paper_lay;
             $res[$k]['set'] = $sheet*$paper_lay;
             $frame = $page*($comp['comp_print2']>0?2:1)/$paper_lay;
-            $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
-            $res[$k]['finfo'] = array();
+            $res[$k]['frame'] = array($op_print_toplate[$comp['comp_print_id']]=>ceil($frame));
             if($comp['comp_print2']==0){            //พิมพ์ด้านเดียว
                 $name = "$frame,หน้าเดียว,$color/0,".$res[$k]['sheet'];
                 $res[$k]['round'] = array(array($name,$res[$k]['sheet']));
                 $res[$k]['color'] = $color."/0";
-                array_push($res[$k]['finfo'],array(
-                    "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                    "frame" => ceil($frame),
-                    "round" => $sheet
-                ));
             } else if($comp['comp_print2']==$comp['comp_print_id']){     //พิมพ์สองด้านสีเดียวกัน
                 $name = "$frame,กลับใน,$color/$color,".$sheet;
                 $res[$k]['round'] = array(array($name,$sheet*2));
                 $res[$k]['color'] = $color."/".$color;
-                array_push($res[$k]['finfo'],array(
-                    "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                    "frame" => ceil($frame),
-                    "round" => $sheet*2
-                ));
             } else {                                //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1 ทำเหมือน สีเดียวกัน lay รวมไปเลย ประหยัด plate และเวลาเปลี่ยนเพลต
                 $color2 = $op_print_color[$comp['comp_print2']];
                 $name = "1,กลับใน,$color/$color2,".$sheet;
                 $res[$k]['round'] = array(array($name,$sheet*2));
                 $res[$k]['color'] = $color."/".$color2;
-                array_push($res[$k]['finfo'],array(
-                    "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                    "frame" => ceil($frame),
-                    "round" => $sheet*2
-                ));
             }
         }
         $res[$k]['ff'] = $frame;

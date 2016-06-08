@@ -1469,24 +1469,23 @@ if($req == "login"){
     $db->update_meta("pap_quote_meta", "quote_id", $_POST['qid'], array("dueto"=>$_POST['dueto']));
     //paper cut check with original
     for($i=0;$i<count($_POST['comp']);$i++){
-        if($_POST['comp'][$i]!=$_POST['compo'][$i]){
-            //update comp
-            $mult = $_POST['compo'][$i]/$_POST['comp'][$i];
-            $arrdata = array(
-                "paper_lay" => $_POST['clay'][$i]*$mult,
-                "paper_cut" => $_POST['comp'][$i],
-                "print_size" => $_POST['printsize'][$i],
-                "allowance" => $_POST['allo'][$i]
-            );
-            $db->update_data("pap_order_comp", "id", $_POST['compid'][$i],$arrdata);
+        //update comp
+        $mult = $_POST['compo'][$i]/$_POST['comp'][$i];
+        $arrdata = array(
+            "paper_lay" => $_POST['clay'][$i]*$mult,
+            "paper_cut" => $_POST['comp'][$i],
+            "print_size" => $_POST['printsize'][$i],
+            "allowance" => $_POST['allo'][$i]
+        );
+        $db->update_data("pap_order_comp", "id", $_POST['compid'][$i],$arrdata);
 
-            //update comp process
-            include_once("prep_order.php");
-            recal_process($_POST['compid'][$i]);
-        }
+        //update comp process
+        include_once("prep_order.php");
+        recal_process($_POST['compid'][$i]);
+
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']);
+    //header("Location:".$_POST['redirect']);
 } else if($req=="po_paper"){
     $_SESSION['upap']['po'] = $_POST['po_paper'];
     header("Location:".$_POST['redirect']);

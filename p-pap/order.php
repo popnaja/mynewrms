@@ -112,7 +112,7 @@ if(isset($oid)){
             . "</div><!-- .form-section -->"
             . "</div><!-- .col-50 -->";
 
-    $content .= $form->show_submit("submit","Update","but-right")
+    $content .= $form->show_submit("fsubmit","Update","but-right")
             . $form->show_hidden("request","request","edit_order")
             . $form->show_hidden("oid","oid",$oid)
             . $form->show_hidden("qid","qid",$info['qid'])
