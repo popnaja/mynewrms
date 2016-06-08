@@ -761,7 +761,7 @@ function my_float_box(id,st){
     }
 }
 function submit2(){
-    $("#submit").trigger("click");
+    $("input[type='submit']").eq(0).trigger("click");
 }
 function reload(){
     location.reload();

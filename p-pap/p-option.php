@@ -10,19 +10,12 @@ $op_type_unit = array(
     14 => "ชิ้น",
     69 => "เล่ม",
 );
-$op_set_id = array(
-    16 => 41,
-    8 => 40,
-    4 => 8,
-    2 => 0,
-    1 => 0,
-    0 => 0
-);
-$op_full_set = array(
+$op_page_fid = array(
     16 => 41,
     12 => 42,
     8 => 40,
-    4 => 8
+    4 => 8,
+    2 => 0
 );
 $op_authlevel = array(
     "0"=>"None",

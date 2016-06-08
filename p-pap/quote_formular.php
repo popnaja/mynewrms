@@ -25,7 +25,7 @@ function cal_quote($info,$comps){
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     for($i=0;$i<count($units);$i++){
         $unit = $units[$i];
-        //var_dump($unit);
+        var_dump($unit);
         if($unit['type']==9){
             $overall = $unit;
             //prepress
@@ -286,13 +286,48 @@ function plate_div($num){
     $res[2] = ceil($t*4)/4;
     return $res;
 }
+function check_folding(&$res,$page,$sheet,$times=1,$max=INF){
+    global $op_page_fid;
+    $temp = array();
+    $t = 0;
+    $yok = 0;
+    $kong = 0;
+    $cut = -1;
+    while($page>0){
+        $t++;
+        if($t>10){break;}
+        foreach($op_page_fid as $fpage=>$fid){
+            if($page==0){break;}
+            if($fpage>=$max){continue;}
+            while(($page/$fpage)>=1&&$page%$fpage==0){
+                if($t>10){break;}
+                if(!isset($temp[$fid])){
+                    $temp[$fid] = $sheet;
+                } else {
+                    $temp[$fid] += $sheet;
+                }
+                $yok += $sheet;
+                $kong++;
+                $cut++;
+                $page -= $fpage;
+            }
+        }
+    }
+    $res['set'] += $yok*$times;
+    $res['kong'] += $kong*$times;
+    $res['cut'] += ($cut>0?$cut*$sheet*$times:0);
+    foreach($temp as $fid=>$set){
+        array_push($res['sinfo'],array(
+            "foldid" => $fid,
+            "set" => $set*$times
+        ));
+    }
+}
 function unit_cal($quote,$comps){
     __autoload("pappdo");
     $db = new PAPdb(DB_PAP);
     include_once("p-option.php");
-    global $op_print_color,$op_print_toplate,$op_set_id,$op_full_set,$op_unit,$op_binding_not_collect;
-    $set_id = $op_set_id;
-    $n = count($comps);
+    global $op_print_color,$op_print_toplate,$op_page_fid,$op_unit,$op_binding_not_collect;
     $amount = $quote['amount'];
     $res = array();
     $c = 0;
@@ -317,27 +352,22 @@ function unit_cal($quote,$comps){
             "print_id" => $comp['comp_print_id'],
             "print_id2" => $comp['comp_print2'],
             "piece" => $amount,
-            "kong" => 0
+            "kong" => 0,
+            "cut" => 0
         );
         foreach($op_unit as $ukey=>$uval){
             if(!isset($res[$k][$ukey])){
                 $res[$k][$ukey] = 0;
             }
         }
-        
         $type = $comp['comp_type'];
-        if($type==2||$type==6){                   //เนื้อใน
-            $yok = 0;
-            $kong = 0;
+        if($type==2||$type==6){                //เนื้อใน
             $frame = $page/$paper_lay;
             $res[$k]['finfo'] = array();
             $res[$k]['sinfo'] = array();
-            if($quote['cat_id']==69){   //case สมุด
+            if($quote['cat_id']==69){               //case สมุด
                 $res[$k]['frame'] = array($comp['comp_print_id']=>1);
                 $res[$k]['sheet'] = $amount*$page/2/$paper_lay+$allo;
-                $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-                $res[$k]['cut'] = $div/2*$res[$k]['sheet'];
-                $res[$k]['set'] = ($amount*ceil($page/2/$paper_lay)+$allo)*$div;
                 $name = "1,กลับใน,$color/$color,".$res[$k]['sheet'];
                 $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
                 $res[$k]['color'] = $color."/$color";
@@ -348,145 +378,42 @@ function unit_cal($quote,$comps){
                 ));
                 //check folding
                 $st = $paper_lay*2;
-                $setcomp = array();
-                $y = 0;
-                while($st>0){
-                    $y++;
-                    if($y>10){break;}
-                    foreach($op_full_set as $fpage=>$sid){
-                        if($st==0){break;}
-                        while(is_int($st/$fpage)&&($st/$fpage)>0){
-                            if($y>10){break;}
-                            $fid = $op_full_set[$fpage];
-                            if(!isset($setcomp[$fid])){
-                                $setcomp[$fid] = $res[$k]['sheet'];
-                            } else {
-                                $setcomp[$fid] += $res[$k]['sheet'];
-                            }
-                            $st -= $fpage;
-                        }
-                    }
-                }
-                foreach($setcomp as $fid=>$set){
-                    $yok += $set;
-                    $kong += $set/$res[$k]['sheet'];
-                    array_push($res[$k]['sinfo'],array(
-                        "foldid" => $fid,
-                        "set" => $set
-                    ));
-                }
-            } else {                    //case หนังสือทั่วไป
+                check_folding($res[$k],$st, $res[$k]['sheet']);
+            } else {                                //case หนังสือทั่วไป
                 $res[$k]['frame'] = array($comp['comp_print_id']=>ceil($frame));
-                $set = plate_div($frame);
-                $i = 1;
-                $sheet = 0;
-                $cut = 0;
-                $yok = 0;
-                $res[$k]['color'] = $color."/$color";
                 $res[$k]['round'] = array();
-                foreach($set as $key=>$s){
-                    if($s>0){
-                        if($key==0){
-                            $sheet += $temp = ($amount+$allo)*$s/2;
-                            $round = $tsheet = $amount+$allo;
-                            $name = "$s,กลับนอก,$color/$color,".$tsheet;
-                            array_push($res[$k]['round'],array($name,$s*$round));
-                            $div = (is_int($paper_lay/8)&&$paper_lay/8>=2?$paper_lay/8:1);
-                            $cut += ($div>1?$div/2*$temp:0);
-                            //check folding
-                            $st = $paper_lay*2;
-                            $setcomp = array();
-                            $y = 0;
-                            while($st>0){
-                                $y++;
-                                if($y>10){break;}
-                                foreach($op_full_set as $fpage=>$sid){
-                                    if($st==0){break;}
-                                    while(is_int($st/$fpage)&&($st/$fpage)>0){
-                                        if($y>10){break;}
-                                        $fid = $op_full_set[$fpage];
-                                        if(!isset($setcomp[$fid])){
-                                            $setcomp[$fid] = $tsheet;
-                                        } else {
-                                            $setcomp[$fid] += $tsheet;
-                                        }
-                                        $st -= $fpage;
-                                    }
-                                }
-                            }
-                            foreach($setcomp as $fid=>$set){
-                                $yok += $set;
-                                $kong += $set/$tsheet;
-                                array_push($res[$k]['sinfo'],array(
-                                    "foldid" => $fid,
-                                    "set" => $set*$s/2
-                                ));
-                            }
-                            $yok = $yok*$s/2;
-                            $kong = $kong*$s/2;
-
-                            array_push($res[$k]['finfo'],array(
-                                "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                                "frame" => $s,
-                                "round" => $round
-                            ));
-                        } else {
-                            $ss = ($s>0.5?1:$s);
-                            $sheet += $tsheet = $amount*$ss/2+$allo;
-                            $round = $tsheet*2;
-                            $name = "$s,กลับใน,$color/$color,".$tsheet;
-                            array_push($res[$k]['round'],array($name,$round));
-                            $div = (is_int($paper_lay*$s/2/8)&&$paper_lay*$s/2/8>=2?$paper_lay*$s/2/8:1);
-                            $cut += $div*($amount+ceil($allo*$s*$paper_lay));
-                            $i++;
-                            array_push($res[$k]['finfo'],array(
-                                "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                                "frame" => 1,
-                                "round" => $round
-                            ));
-                            //check folding
-                            $st = $s*$paper_lay; //remainding page
-                            if(isset($set_id[$st])){
-                                $yok += $amount+$allo;
-                                $kong += 1;
-                                array_push($res[$k]['sinfo'],array(
-                                    "foldid" => $set_id[$st],
-                                    "set" => $amount+$allo
-                                ));
-                            } else {
-                                $setcomp = array();
-                                while($st>0){
-                                    foreach($set_id as $fpage=>$sid){
-                                        if($st==0){break;}
-                                        if($fpage<$paper_lay*2){
-                                            while($st/$fpage>=1){
-                                                $fid = $set_id[$fpage];
-                                                if(!isset($setcomp[$fid])){
-                                                    $setcomp[$fid] = $amount+$allo;
-                                                } else {
-                                                    $setcomp[$fid] += $amount+$allo;
-                                                }
-                                                $st -= $fpage;
-                                            }
-                                        }
-                                    }
-                                }
-                                foreach($setcomp as $fid=>$set){
-                                    $yok += $set;
-                                    $kong += $set/($amount+$allo);
-                                    array_push($res[$k]['sinfo'],array(
-                                        "foldid" => $fid,
-                                        "set" => $set
-                                    ));
-                                }
-                            }
-                        }
+                $res[$k]['color'] = $color."/$color";
+                $fdiv = plate_div($frame);
+                foreach($fdiv as $key=>$s){
+                    if($key==0&&$s>0){
+                        $res[$k]['sheet'] += ($amount+$allo)*$s/2;
+                        $round = $tsheet = $amount+$allo;
+                        $name = "$s,กลับนอก,$color/$color,".$tsheet;
+                        array_push($res[$k]['round'],array($name,$s*$round));
+                        array_push($res[$k]['finfo'],array(
+                            "frameid" => $op_print_toplate[$comp['comp_print_id']],
+                            "frame" => $s,
+                            "round" => $round
+                        ));
+                        //check folding
+                        $st = $paper_lay*2;
+                        check_folding($res[$k],$st,$tsheet,$s/2);
+                    } else if($s>0) {
+                        $ss = ($s>0.5?1:$s);
+                        $res[$k]['sheet'] += $tsheet = $amount*$ss/2+$allo;
+                        $round = $tsheet*2;
+                        $name = "$s,กลับใน,$color/$color,".$tsheet;
+                        array_push($res[$k]['round'],array($name,$round));
+                        array_push($res[$k]['finfo'],array(
+                            "frameid" => $op_print_toplate[$comp['comp_print_id']],
+                            "frame" => 1,
+                            "round" => $round
+                        ));
+                        //check folding
+                        $st = $s*$paper_lay;
+                        check_folding($res[$k],$st,$tsheet,1,$paper_lay*2);
                     }
                 }
-                $res[$k]['sheet'] = $sheet;
-                $res[$k]['cut'] = $cut;
-                $res[$k]['set'] = $yok;
-                $res[$k]['kong'] = $kong;
             }
         } else {            //อื่นๆ ปก ใบพาด แจ็คเก็ด
             $piece = $page;
@@ -507,29 +434,23 @@ function unit_cal($quote,$comps){
                     "round" => $sheet
                 ));
             } else if($comp['comp_print2']==$comp['comp_print_id']){     //พิมพ์สองด้านสีเดียวกัน
-                $name = "$frame,กลับใน,$color/$color,".$res[$k]['sheet'];
-                $res[$k]['round'] = array(array($name,$res[$k]['sheet']*2));
+                $name = "$frame,กลับใน,$color/$color,".$sheet;
+                $res[$k]['round'] = array(array($name,$sheet*2));
                 $res[$k]['color'] = $color."/".$color;
                 array_push($res[$k]['finfo'],array(
                     "frameid" => $op_print_toplate[$comp['comp_print_id']],
                     "frame" => ceil($frame),
                     "round" => $sheet*2
                 ));
-            } else {                                //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1
-                $res[$k]['frame'][$comp['comp_print2']] = 1;
+            } else {                                //case พิมพ์ 2 ด้าน สี่ไม่เหมือน เช่น 4/1 ทำเหมือน สีเดียวกัน lay รวมไปเลย ประหยัด plate และเวลาเปลี่ยนเพลต
                 $color2 = $op_print_color[$comp['comp_print2']];
-                $name = "2,กลับนอก,$color/$color2,".$res[$k]['sheet'];
-                $res[$k]['round'] = array(array($name,$res[$k]['sheet']));
+                $name = "1,กลับใน,$color/$color2,".$sheet;
+                $res[$k]['round'] = array(array($name,$sheet*2));
                 $res[$k]['color'] = $color."/".$color2;
                 array_push($res[$k]['finfo'],array(
                     "frameid" => $op_print_toplate[$comp['comp_print_id']],
-                    "frame" => ceil($page/$paper_lay),
-                    "round" => $sheet
-                ));
-                array_push($res[$k]['finfo'],array(
-                    "frameid" => $op_print_toplate[$comp['comp_print2']],
-                    "frame" => ceil($page/$paper_lay),
-                    "round" => $sheet
+                    "frame" => ceil($frame),
+                    "round" => $sheet*2
                 ));
             }
         }
@@ -558,7 +479,7 @@ function unit_cal($quote,$comps){
             $tinfo[$ukey] = 0;
         }
     }
-    //yok//ถ้าไสกาว binding_id=1 ยกไม่นับปก
+    //yok,กอง//ถ้าไสกาว binding_id=1 กองไม่นับปก
     for($i=0;$i<count($res);$i++){
         $unit = $res[$i];
         //frame

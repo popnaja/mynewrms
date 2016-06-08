@@ -272,6 +272,7 @@ function check_quote(e){
     var due = parseInt($("#due").val().replace(/-/g,""));
     var dueto = parseInt($("#dueto").val().replace(/-/g,""));
     var error = 0;
+    //check วันกำหนดส่ง
     if(dueto<due){
         pg_dialog("คำเตือน","กำหนดส่งถึงวันที่ ต้องเป็นวันหลังกำหนดส่ง");
         $("#dueto").parent().css({"background-color":"#ff9282"});
@@ -279,6 +280,7 @@ function check_quote(e){
     } else{
         $("#dueto").parent().css({"background-color":"inherit"});
     }
+    //check การเข้าเล่ม
     if((type==10||type==69)&&binding==0){
         pg_dialog("คำเตือน","ชนิดงานหนังสือและสมุด ต้องกำหนดการเข้าเล่ม");
         $("#binding").parent().css({"background-color":"#ff9282"});
@@ -287,7 +289,22 @@ function check_quote(e){
         $("#binding").parent().css({"background-color":"inherit"});
     }
     if(error===0){
-        $('#papform').submit();
+        //check เตือนลูกค้าตกลงซ้ำ
+        var ori = $("#ori_status").val();
+        var status = $("#status").val();
+        if(ori==9&&status==9){
+            e.preventDefault();
+            confirm_dialog("คำเตือน","การ Update ลูกค้าตกลงอีกครั้งจะเป็นการลบ Order ที่เคยส่งไปยังฝ่ายผลิตและสร้าง Order ใหม่ หากยื่นยันกด OK",ok,cancel);
+            function ok(){
+                console.log("ok");
+                $('#papform').submit();
+            }
+            function cancel(){
+                console.log("cancel");
+            }
+        } else {
+            $('#papform').submit();
+        }
     } else {
         e.preventDefault();
     }
@@ -481,6 +498,13 @@ $(document).ready(function(){
             $("#binding").val(0);
        }
     }
+    //prevent name with comma
+    var name = $("#name");
+    name.on("blur",function(){
+        console.log("YO");
+        var nname = $(this).val().replace(/,/g,"");
+        $(this).val(nname);
+    });
     
     //filter paper
     var comp = $("[name='comp_type[]']");

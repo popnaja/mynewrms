@@ -198,8 +198,6 @@ function recal_process($compid){
     $db = new PAPdb(DB_PAP);
     $info = $db->get_comps_recal($compid);
     $process = $db->get_infos("pap_comp_process", "comp_id", $compid);
-    
-    
     $amount = $info['amount'];
     $page = $info['page'];
     $paper_lay = $info['paper_lay'];

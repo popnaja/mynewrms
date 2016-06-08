@@ -1485,8 +1485,6 @@ if($req == "login"){
             recal_process($_POST['compid'][$i]);
         }
     }
-
-
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="po_paper"){

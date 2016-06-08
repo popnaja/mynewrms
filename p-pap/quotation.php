@@ -375,11 +375,12 @@ if($action=="add"){
             . "</div><!-- .col-50 -->";
 
     $content .= $del.$copy
-            . $form->show_submit("submit","Update","but-right")
+            . $form->show_submit("fsubmit","Update","but-right")
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)
             . $form->show_hidden("pauth","pauth",$pauth)
-            . $form->show_hidden("redirect","redirect",$redirect);
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . $form->show_hidden("ori_status","ori_status",$info['status']);
     $form->addformvalidate("ez-msg", array('name','amount'),null,null,array('cid','type','sid'));
     $content .= $form->submitscript("check_quote(e);")
             . "<script>"
