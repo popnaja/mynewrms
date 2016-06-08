@@ -294,7 +294,11 @@ function check_quote(e){
 }
 function reflex_adj(){
 $(document).ready(function(){
-    $(".tb-adj-cost").trigger("change");
+    $.each($(".tb-adj-cost"),function(){
+        if($(this).val()!=0){
+            $(this).trigger("change");
+        }
+    });
 });
 }
 function quote_adj(id){
@@ -339,7 +343,8 @@ function quote_adj(id){
             info[k] = parseFloat(v);
         });
         nvari = info['cost']+parseFloat($(this).val());
-        ncost = nvari*info['amount'];
+        var fcost = $.type(info['fcost'])==="undefined"?0:info['fcost'];
+        ncost = fcost+nvari*info['amount'];
         if(info['min']>0){
             ncost = Math.max(info['min'],ncost);
         }
