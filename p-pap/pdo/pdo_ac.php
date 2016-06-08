@@ -300,13 +300,13 @@ END_OF_TEXT;
                     if($v['bill']=="2"){
                         $aday = daystr_to_array($v['bill_day'],31);
                         foreach($aday as $index=>$val){
-                            $aday[$index] = $year.$month.$val;
+                            $aday[$index] = $year.$month.sprintf("%02d",$val);
                         }
                     } else if($v['bill']=="3"){
                         $aday = dofw_to_date($year, $month, $v['bill_weekday'], $v['bill_week']);
                     } else if($v['bill']=="1"){ //last day of month
                         $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                        $t = $st->format("t");
+                        $t = $st->format("t")-1;
                         $st->add(new DateInterval("P".$t."D"));
                         $aday = array($st->format("Ymd"));
                     }
@@ -321,13 +321,13 @@ END_OF_TEXT;
                     if($v['cheque']=="2"){
                         $aday = daystr_to_array($v['cheque_day'],31);
                         foreach($aday as $index=>$val){
-                            $aday[$index] = $year.$month.$val;
+                            $aday[$index] = $year.$month.sprintf("%02d",$val);
                         }
                     } else if($v['cheque']=="3"){
                         $aday = dofw_to_date($year, $month, $v['cheque_weekday'], $v['cheque_week']);
                     } else if($v['cheque']=="1"){
                         $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
-                        $t = $st->format("t");
+                        $t = $st->format("t")-1;
                         $st->add(new DateInterval("P".$t."D"));
                         $aday = array($st->format("Ymd"));
                     } else {
@@ -401,14 +401,14 @@ deli.total,
 rc.amount AS paid,
 iv.ivdiscount AS ivdiscount
 FROM pap_delivery AS deli
-LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=deli.id
+JOIN pap_delivery_dt AS ddt ON ddt.deli_id=deli.id
 LEFT JOIN (
     SELECT deli_id,SUM(rc.amount) AS amount FROM pap_invoice_dt AS dt
     LEFT JOIN pap_rc_dt AS rc ON rc.invoice_id=dt.invoice_id 
     WHERE deli_id=:did
     GROUP BY deli_id
 ) AS rc ON rc.deli_id=deli.id
-LEFT JOIN (
+JOIN (
 	SELECT 
     deli_id,sum(iv.discount) AS ivdiscount
     FROM pap_invoice_dt AS dt

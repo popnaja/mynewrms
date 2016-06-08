@@ -1813,6 +1813,9 @@ if($req == "login"){
 
         //update job
         $db->update_data("pap_order", "delivery", $_POST['did'][$i], array("billed"=>$bid));
+        
+        //update deli status
+        $db->update_data("pap_delivery", "id", $_POST['did'][$i], array("status"=>80));
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
@@ -1844,7 +1847,6 @@ if($req == "login"){
         } else {
             $db->update_data("pap_delivery", "id", $_POST['did'][$i], array("status"=>80)); //80 = มีใบแจ้งหนี้
         }
-
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
@@ -2024,9 +2026,9 @@ function update_job_paid($adid){
             $paid_before_tax = $v['paid'];
             $opaid = $paid_before_tax*$v['price']/$v['total'];
             $db->update_data("pap_order", "order_id", $v['oid'], array("paid"=>$opaid));
-            $paid = $paid_before_tax;
-            $tt = $v['total']-$v['ivdiscount'];
         }
+        $paid = $paid_before_tax;
+        $tt = $v['total']-$v['ivdiscount'];
         if($paid==$tt){
             //update deli status
             $db->update_data("pap_delivery", "id", $did, array("status"=>99)); //99 = ชำระครบ

@@ -88,7 +88,7 @@ if($action =="add"){
     $cus = $db->get_keypair("pap_customer", "customer_id", "customer_name", "WHERE customer_id IN ($str_cid)");
     $cinfo = $db->get_info("pap_customer", "customer_id", $arr_cid[0])+$db->get_meta("pap_customer_meta", "customer_id", $arr_cid[0]);
     $billg = find_date($cinfo,"bill");
-    $chequeg = find_date($cinfo,"cheque");
+    $chequeg = find_date($cinfo,"cheque",$billg);
     $ct = $db->get_keypair("pap_contact", "contact_id", "contact_name", "WHERE customer_id IN ($str_cid)");
     $content .= "<h1 class='page-title'>ออกใบวางบิล</h1>"
         . "<div id='ez-msg'>".  showmsg() ."</div>"
@@ -427,25 +427,47 @@ if($action =="add"){
 $content .= ($action=="print"?"":$menu->showfooter());
 echo $content;
 
-function find_date($info,$txt){
+function find_date($info,$txt,$check=null){
     if($txt == "bill"){
-        $type = $info['customer_collect_cheque'];
-    } else {
         $type = $info['customer_place_bill'];
+    } else {
+        $type = $info['customer_collect_cheque'];
     }
     $today = date_create(null,timezone_open("Asia/Bangkok"));
     $month = date_format($today,"m");
     $year = date_format($today,"Y");
-    if($type=="day"){
-        $d = sprintf("%02s",$info[$txt."_day"]);
-    } else if($type=="dofw"){
-        $d = dofw_to_date($year, $month, $info[$txt.'_weekday'], $info[$txt.'_week']);
-    } else if($type=="eofm"){
-        $d = date_format($today,"t");
+    $aday = array();
+    if($type=="2"){
+        $day = ($txt == "bill"?$info['bill_day']:$info['cheque_day']);
+        $aday = daystr_to_array($day,31);
+        foreach($aday as $index=>$val){
+            $aday[$index] = $year.$month.sprintf("%02d",$val);
+        }
+    } else if($type=="3"){
+        $wd = ($txt == "bill"?$info['bill_weekday']:$info['cheque_weekday']);
+        $w = ($txt == "bill"?$info['bill_week']:$info['cheque_week']);
+        $aday = dofw_to_date($year, $month, $wd, $w);
+    } else if($type=="1"){ //last day of month
+        $st = new DateTime("$year-$month-01",new DateTimeZone("Asia/Bangkok"));
+        $t = $st->format("t")-1;
+        $st->add(new DateInterval("P".$t."D"));
+        $aday = array($st->format("Ymd"));
     }
-    $res = date_create("$year-$month-$d",timezone_open("Asia/Bangkok"));
-    if($res<$today){
-        date_add($res,  date_interval_create_from_date_string("1 month"));
+    if(count($aday)>0){
+        $date = $aday[0];
+        $res = date_create($date,timezone_open("Asia/Bangkok"));
+        if($res<$today){
+            date_add($res,  date_interval_create_from_date_string("1 month"));
+        }
+        if(isset($check)){
+            $cdate = date_create($check,timezone_open("Asia/Bangkok"));
+            if($res<$cdate){
+                date_add($res,  date_interval_create_from_date_string("1 month"));
+            }
+        }
+        return date_format($res,"Y-m-d");
+    } else {
+        return "";
     }
-    return date_format($res,"Y-m-d");
+    
 }

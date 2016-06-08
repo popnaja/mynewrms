@@ -105,7 +105,7 @@ SELECT
 pro.process_cat_id AS cat,
 cpro.name,cpro.volume,meta_value AS cost
 FROM pap_comp_process AS cpro
-LEFT JOIN pap_process AS pro ON pro.process_id=cpro.process_id
+JOIN pap_process AS pro ON pro.process_id=cpro.process_id
 LEFT JOIN pap_process_meta AS meta ON meta.process_id=pro.process_id AND meta_key='cost'
 WHERE comp_id=:cid AND pro.process_cat_id IN $processcat
 END_OF_TEXT;
@@ -117,10 +117,11 @@ END_OF_TEXT;
                 $cost = json_decode($row['cost'],true);
                 $u = $unit[$cost[0]['vunit']];
                 $vol = ($withvol?" (".$row['volume']." $u)":"");
-                if(!isset($res[$row['cat']])){
-                    $res[$row['cat']] = $row['name']. $vol;
+                $cat = $row['cat'];
+                if(!isset($res[$cat])){
+                    $res[$cat] = $row['name']. $vol;
                 } else {
-                    $res[$row['cat']] .= ", ".$row['name']. $vol;
+                    $res[$cat] .= ($cat==3?";":", ").$row['name']. $vol;
                 }
             }
             return $res;

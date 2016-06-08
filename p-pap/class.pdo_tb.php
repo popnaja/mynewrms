@@ -663,7 +663,7 @@ END_OF_TEXT;
             $filter = "WHERE dt.order_id=''";
             $filter .= (isset($mm)?" AND DATE_FORMAT(deli.date,'%y%m')='$mm'":"");
             $filter .= (isset($status)&&$status>0?" AND deli.status=$status":"");
-            $filter .= (isset($s)?" AND job_name LIKE '%$s%'":"");
+            $filter .= (isset($s)?" AND dt.job_name LIKE '%$s%'":"");
             if(is_null($mm)&&is_null($status)&&is_null($s)){
                 $filter .= " AND deli.status<79";
             }
@@ -678,8 +678,8 @@ GROUP_CONCAT(CONCAT(tdeli.id,":",tdeli.no) ORDER BY tdeli.no ASC) AS tid,
 dt.qty AS dqty,
 tdt.tqty
 FROM pap_delivery_dt AS dt
-LEFT JOIN pap_delivery AS deli ON deli.id=dt.deli_id
-LEFT JOIN pap_customer AS cus ON cus.customer_id=dt.customer_id
+JOIN pap_delivery AS deli ON deli.id=dt.deli_id
+JOIN pap_customer AS cus ON cus.customer_id=dt.customer_id
 LEFT JOIN pap_temp_deli AS tdeli ON tdeli.deli_id=deli.id
 LEFT JOIN (
     SELECT

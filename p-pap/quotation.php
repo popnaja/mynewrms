@@ -461,7 +461,6 @@ function special_comp($info=null,$comps=null){
     $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     for($i=0;$i<8;$i++){
-        $print2class = "sel-print2_$i-".implode(" sel-print2_$i-",array_keys($print));
         if(isset($comps[$i])){
             $hid = "";
             $comp = $comps[$i];
@@ -503,7 +502,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-2 sel-compt$i-6'>"
                 . $form->show_num("coat_page_$i",(is_array($coatpage)?$coatpage[$i]:0),1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
                 . "</div>"
-                . "<div class='$print2class'>"
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",(is_array($coat2)?$coat2[$i]:0),"","coating2[]")
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
@@ -553,7 +552,7 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-compt$i-2 sel-compt$i-6'>"
                 . $form->show_num("coat_page_$i",0,1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
                 . "</div>"
-                . "<div class='$print2class'>"
+                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
                 . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",null,"","coating2[]")
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
