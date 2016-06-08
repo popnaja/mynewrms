@@ -229,6 +229,7 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 @no:=@no+1 AS no,
+deli.id,
 deli.no AS delino,
 deli.date,
 IF(MIN(ddt.credit)=0,"เงินสด",CONCAT("เครดิต ",MIN(ddt.credit),"วัน")),
@@ -249,12 +250,16 @@ END_OF_TEXT;
             $res =  $stmt->fetchAll(PDO::FETCH_ASSOC);
             $price = array();
             foreach($res as $k=>$v){
+                $did = $v['id'];
                 $res[$k]['date'] = thai_date($v['date'], true);
                 $res[$k]['due'] = thai_date($v['due'], true);
                 $bprice = $v['tax']==="yes" ? $v['price'] :$v['price']*1.07;
-                $res[$k]['price'] = number_format($bprice,2);
+                $tprice = round($bprice,2);
+                $res[$k]['price'] = number_format($bprice,2)
+                        . "<input type='hidden' name='did[]' value='$did'/><input type='hidden' name='price[]' value='$tprice'/>";
                 array_push($price,$bprice);
                 unset($res[$k]['tax']);
+                unset($res[$k]['id']);
             }
             return array($price,$res);
         } catch (Exception $ex) {

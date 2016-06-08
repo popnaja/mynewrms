@@ -328,9 +328,9 @@ GROUP_CONCAT(ddt.type) AS type,
 SUM((ddt.price-ddt.discount)*IF(meta.meta_value='no',1.07,1)) AS price,
 MIN(DATE_ADD(deli.date, INTERVAL ddt.credit DAY)) AS due
 FROM pap_pbill_dt AS bdt
-LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=bdt.deli_id
-LEFT JOIN pap_delivery AS deli ON deli.id=bdt.deli_id
-LEFT JOIN pap_customer_meta AS meta ON meta.customer_id=ddt.customer_id AND meta.meta_key='tax_exclude'
+JOIN pap_delivery_dt AS ddt ON ddt.deli_id=bdt.deli_id
+JOIN pap_delivery AS deli ON deli.id=bdt.deli_id
+JOIN pap_customer_meta AS meta ON meta.customer_id=ddt.customer_id AND meta.meta_key='tax_exclude'
 WHERE bdt.pbill_id=:bid
 GROUP BY deli.id
 END_OF_TEXT;

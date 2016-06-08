@@ -100,10 +100,6 @@ if($action =="add"){
         . $form->show_text("paydate","paydate",$chequeg,"yyyy-mm-dd","วันนัดชำระ","","label-inline")
         . $form->show_select("payment", $op_bill_payment, "label-inline", "วิธีการชำระ", null)
         . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-inline");
-    for($i=0;$i<count($arr_did);$i++){
-        $content .= $form->show_hidden("did_$i","did[]",$arr_did[$i])
-            . $form->show_hidden("price_$i","price[]",$rec[0][$i]);
-    }
 
     $content .= "</div><!-- .col-50 -->"
         . "<div class='col-100'>"

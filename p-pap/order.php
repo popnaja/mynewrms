@@ -40,7 +40,7 @@ $menu->__autoloadall("form");
 $menu->__autoloadall("table");
 $menu->__autoloadall("media");
 $menu->pap_menu();
-$menu->pageTitle = "PAP | Quotation";
+$menu->pageTitle = "PAP | $pagename";
 $menu->ascript[] = AROOTS."js/autocomplete.js";
 $menu->astyle[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.css";
 $menu->ascript[] = AROOTS."js/jquery-ui-1.11.4.custom/jquery-ui.min.js";
