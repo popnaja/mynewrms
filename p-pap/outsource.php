@@ -194,7 +194,7 @@ if($action=="add"){
             . "<div id='po-list'>"
             . $tb->show_table($header,$rec,"tb-po-list")
             . "</div>";
-    if($pauth==4){
+    if($pauth>3){
         $del = "<span id='del-process-po' class='red-but'>Delete</span>"
                     . "<script>del_process_po();</script>";
     } else {

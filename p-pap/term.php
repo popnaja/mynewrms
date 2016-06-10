@@ -63,7 +63,7 @@ if(isset($tid)){
             . $form->show_hidden("tax","tax",$tax)
             . $form->show_hidden("tid","tid",$tid)
             . $form->show_hidden("oparent","oparent",$info['parent']);
-    if($pauth==4){
+    if($pauth>3){
         $del = "<span id='del-term' class='red-but'>Delete</span>"
                     . "<script>del_term();</script>";
     } else {

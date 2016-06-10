@@ -120,7 +120,7 @@ if(isset($poid)){
     $head = array("ลำดับ","รายการ","งาน","จำนวน","ที่เก็บ");
     $dt = $pdo_po->view_ppo_deli_dt($dyid);
 
-    if($pauth==4){
+    if($pauth>3){
         $del = "<span id='del-process-deli' class='red-but'>Delete</span>"
                     . $form->show_hidden("redirect","redirect",$redirect)
                     . $form->show_hidden("dyid","dyid",$dyid)

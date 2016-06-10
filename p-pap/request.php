@@ -982,7 +982,7 @@ if($req == "login"){
         "dueto" => $_POST['dueto']
     );
     //ต่อรองราคา
-    if($status==4){
+    if($status>3){
         $meta['n_price'] = $_POST['n_price'];
     }
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);

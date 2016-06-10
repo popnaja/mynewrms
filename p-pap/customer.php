@@ -101,7 +101,7 @@ if($action=="add"){
     $pictab = $md->show_minput("cpics","cpics","");
     
     //form-tab
-    if($pauth==4){
+    if($pauth>3){
         $saletab = $form->show_select("sale",$sale,"label-3070","Sale รับผิดชอบ",null);
         $content .= $form->show_tabs("cus-tab",array("Sales","ภาพประกอบ"),array($saletab,$pictab),0);
     } else {
@@ -339,7 +339,7 @@ if($action=="add"){
                 . $form->show_hidden("ori_media","ori_media",(isset($info['picture'])?$info['picture']:""));
 
         //form-tab
-        if($pauth==4){
+        if($pauth>3){
             $saletab = $form->show_select("sale",$sale,"label-3070","Sale รับผิดชอบ",(isset($salerep['user_id'])?$salerep['user_id']:null));
             $content .= $form->show_tabs("cus-tab",array("Sales","ภาพประกอบ"),array($saletab,$pictab),0);
             $del = "<span id='del-cus' class='red-but'>Delete</span>"

@@ -184,7 +184,7 @@ if($action=="add"){
     $ship_checked = $form->checked_array($shipping, (isset($info['shipping'])?explode(",",$info['shipping']):array()));
 
     //show tb-cost
-    if($pauth==4){
+    if($pauth>3){
         //margin
         $cinfo = $db->get_keypair("pap_option", "op_name", "op_value","WHERE op_type='cinfo'");
         $cmargin = $cinfo['margin'];
@@ -424,7 +424,7 @@ if($action=="add"){
     }
     $csv = "<a id='quote-csv' href='$csvlink' title='Download Data'><input type='button' class='blue-but' value='โหลดข้อมูล'/></a>";
     $fil_sale = "";
-    if($pauth==4){
+    if($pauth>3){
         $fil_sale = $tb->show_filter(current_url(), "sid", $sale, $sid,"--Sale--");
         array_push($head,"Sale");
     }
