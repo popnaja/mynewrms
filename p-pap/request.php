@@ -1485,7 +1485,7 @@ if($req == "login"){
 
     }
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    //header("Location:".$_POST['redirect']);
+    header("Location:".$_POST['redirect']);
 } else if($req=="po_paper"){
     $_SESSION['upap']['po'] = $_POST['po_paper'];
     header("Location:".$_POST['redirect']);

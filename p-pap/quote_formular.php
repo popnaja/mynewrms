@@ -75,8 +75,8 @@ function cal_quote($info,$comps){
                 if($pid>0){
                     $meta = $db->get_meta("pap_process_meta", "process_id", $pid);
                     $cost = json_decode($meta['cost'],true);
-                    if(isset($pro[1])){
-                        $tunit = $unit;
+                    $tunit = $unit;
+                    if(isset($pro[1])&&$pro[1]>0){
                         $tunit[$cost[0]['vunit']]=$pro[1];
                     }
                     $pcost = new_pcost($pid, $tunit);
@@ -199,7 +199,7 @@ function cal_quote($info,$comps){
                 $cost = json_decode($meta['cost'],true);
                 $tunit = $unit;
                 $tunit['sheet'] = $lots*$lot;
-                if(isset($pro[1])){
+                if(isset($pro[1])&&$pro[1]>0){
                     $tunit[$cost[0]['vunit']]=$pro[1];
                 }
                 $pcost = new_pcost($pid, $tunit);
@@ -341,7 +341,7 @@ function unit_cal($quote,$comps){
         $pinfo = $db->get_info("pap_mat", "mat_id", $comp['comp_paper_id']);
         $size = $db->get_info("pap_option","op_id",$pinfo['mat_size']);
         $sinfo = json_decode($size['op_value'],true);
-        
+
         $res[$k] = array(
             "allo" => $allo,
             "type" => $comp['comp_type'],
@@ -426,7 +426,7 @@ function unit_cal($quote,$comps){
         //คำนวณพื้นที่เคลือบ
         if($type==2||$type==6){
             $cpage = (is_array($coatpage)?$coatpage[$c]:0);
-            $csheet = ceil($amount*$cpage/$paper_lay);
+            $csheet = $amount*ceil($cpage/$paper_lay);
             $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
         } else {
             $res[$k]['in2'] = $res[$k]['sheet']*$sinfo['width']*$sinfo['length'];
