@@ -76,14 +76,14 @@ if($action=="add"||isset($qid)){
     $paper = array("0"=>"--กระดาษ--")+$db->get_paper_keypair("mat_type");
     $gram = array("0"=>"--แกรม--")+$db->get_paper_keypair("mat_weight");
 
-    $prepress = $process_keypair[1];
-    $binding = array("0"=>"--ไม่มี--")+$process_keypair[9];
-    $coating = array("0"=>"--ไม่มี--")+$process_keypair[4];
-    $print = $process_keypair[3];
+    $prepress = (isset($process_keypair[1])?$process_keypair[1]:array());
+    $binding = array("0"=>"--ไม่มี--")+(isset($process_keypair[9])?$process_keypair[9]:array());
+    $coating = array("0"=>"--ไม่มี--")+(isset($process_keypair[4])?$process_keypair[1]:array());
+    $print = (isset($process_keypair[3])?$process_keypair[3]:array());
     $after =  $db->get_process_wunit($op_unit,5);
     $packing = $db->get_process_wunit($op_unit,11);
     $shipping = $db->get_process_wunit($op_unit,12);
-    $fold = array("0"=>"--ไม่มี--")+$process_keypair[7];
+    $fold = array("0"=>"--ไม่มี--")+(isset($process_keypair[7])?$process_keypair[7]:array());
     //$scolor = $process_keypair[13];
 }
 

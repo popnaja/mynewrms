@@ -45,7 +45,7 @@ $form = new myform("lay","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $sid = filter_input(INPUT_GET,'sid',FILTER_SANITIZE_STRING);
 $process_keypair = $db->get_process_keypair();
-$fold = array("0"=>"--พับ--")+$process_keypair[7];
+$fold = array("0"=>"--พับ--")+(isset($process_keypair[7])?$process_keypair[7]:array());
 if($action=="add"){
 /*--------------------------------------------------------------  ADD NEW ----------------------------------------------------------*/
     //check
