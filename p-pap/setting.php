@@ -74,7 +74,7 @@ $grip = "<h4></h4>"
         . $form->show_num("bleed",(isset($info['bleed_size'])?$info['bleed_size']:""),0.01,"","ขนาด Bleed (ซ.ม.)","","label-3070");
 
 $process_keypair = $db->get_process_keypair();
-$print = $process_keypair[3];
+$print = (isset($process_keypair[3])?$process_keypair[3]:array());
 $allo = (isset($info['paper_allo'])?json_decode($info['paper_allo'],true):array());
 $con_unit = array(
     "piece" => "ชิ้น/เล่ม",

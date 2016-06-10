@@ -7,11 +7,15 @@ class tbPDO{
     public function view_option($type,$auth=3){
         try {
             $edit = "";
+            $filter = "";
             $value_sql = ($type=="role_auth"?"":",op_value");
             $sort = ($type=="paper_weight"?"CAST(op_name AS DECIMAL) ASC":"op_name ASC");
+            if($auth<9){
+                $filter = " AND op_name<>'Admin'";
+            }
             if($auth>1){
                 $href = ($type=="role_auth"?"role.php?opid=":"pap_option.php?type=$type&opid=");
-                $edit = <<<END_OF_TEXT
+                $edit .= <<<END_OF_TEXT
                         CONCAT("<a href='$href",op_id,"' title='Edit' class='icon-page-edit'></a>"),
 END_OF_TEXT;
             }
@@ -21,7 +25,7 @@ END_OF_TEXT;
                     op_name
                     $value_sql
                     FROM pap_option
-                    WHERE op_type=:type
+                    WHERE op_type=:type $filter
                     ORDER BY $sort
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);

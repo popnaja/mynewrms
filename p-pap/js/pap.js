@@ -828,3 +828,33 @@ $(document).ready(function(){
     });
 });
 }
+function del_option(){
+$(document).ready(function(){
+    var but = $("#del-option");
+    var url = $("#ajax_req").val();
+    but.on("click",function(){
+        if(confirm("คุณแน่ใจแล้วที่จะลบรายการ")){
+            var data = {};
+            data['request'] = "delete_option";
+            data['opid'] = $("#opid").val();
+            data['redirect'] = $("#redirect").val();
+            post_ajax(data,url);
+        }
+    });
+});
+}
+function del_lay(){
+$(document).ready(function(){
+    var but = $("#del-lay");
+    var url = $("#ajax_req").val();
+    but.on("click",function(){
+        if(confirm("คุณแน่ใจแล้วที่จะลบรายการ")){
+            var data = {};
+            data['request'] = "delete_lay";
+            data['sid'] = $("#sid").val();
+            data['redirect'] = $("#redirect").val();
+            post_ajax(data,url);
+        }
+    });
+});
+}

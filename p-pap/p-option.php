@@ -22,7 +22,8 @@ $op_authlevel = array(
     "1"=>"View",
     "2"=>"Add & Edit",
     "3"=>"Delete",
-    "4"=>"Manager"
+    "4"=>"Manager",
+    "9"=>"Admin"
 );
 $op_note_type = array(
     1 => "โน๊ต",

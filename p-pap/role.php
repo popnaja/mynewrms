@@ -35,6 +35,10 @@ $content .= $menu->pappanel("ผู้ดูแลระบบ","กลุ่ม
 $form = new myform("ulogin","",PAP."request.php");
 $action = filter_input(INPUT_GET,'action',FILTER_SANITIZE_STRING);
 $opid = filter_input(INPUT_GET,'opid',FILTER_SANITIZE_STRING);
+$level = $op_authlevel;
+if($pauth<9){
+    unset($level[9]);
+}
 if(isset($opid)) {
     //check
     if($pauth<=1){
@@ -51,7 +55,7 @@ if(isset($opid)) {
             . "<div class='col-100'>"
             . $form->show_text("name","name",$rinfo['op_name'],"เช่น Sales,Production","ชื่อกลุ่ม","","label-inline")
             . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>"
-            . $form->show_select("adj_all",$op_authlevel,"label-3070","ปรับทั้งหมด",null)
+            . $form->show_select("adj_all",$level,"label-3070","ปรับทั้งหมด",null)
             . "<script>adj_role();</script>";
     //table
     $i=1;
@@ -68,7 +72,7 @@ if(isset($opid)) {
                 . "<td>$k</td>"
                 . "<td>"
                 . $form->show_hidden("page_".$i,"page[]",$file)
-                . $form->show_select("auth_".$i,$op_authlevel,"",null,$op,"","auth[]")
+                . $form->show_select("auth_".$i,$level,"",null,$op,"","auth[]")
                 . "</td>"
                 . "</tr>";
             $i++;
@@ -81,7 +85,7 @@ if(isset($opid)) {
                 . "<td class='role-sub'>$kk</td>"
                 . "<td>"
                 . $form->show_hidden("page_".$i,"page[]",$file)
-                . $form->show_select("auth_".$i,$op_authlevel,"",null,$op,"","auth[]")
+                . $form->show_select("auth_".$i,$level,"",null,$op,"","auth[]")
                 . "</td>"
                 . "</tr>";
                 $i++;
@@ -108,7 +112,7 @@ if(isset($opid)) {
                 . $form->show_st_form()
                 . $form->show_text("name","name","","เช่น Sales,Production","ชื่อกลุ่ม","","label-inline")
                 . "<h3 class='section-title'>กำหนดเมนูที่สามารถใช้งานได้</h3>"
-                . $form->show_select("adj_all",$op_authlevel,"label-3070","ปรับทั้งหมด",null)
+                . $form->show_select("adj_all",$level,"label-3070","ปรับทั้งหมด",null)
                 . "<script>adj_role();</script>";
         $i=1;
         $content .= "<div id='tb-menu' class='ez-table'><table>"
@@ -123,7 +127,7 @@ if(isset($opid)) {
                     . "<td>$k</td>"
                     . "<td>"
                     . $form->show_hidden("page_".$i,"page[]",$file)
-                    . $form->show_select("auth_".$i,$op_authlevel,"",null,0,"","auth[]")
+                    . $form->show_select("auth_".$i,$level,"",null,0,"","auth[]")
                     . "</td>"
                     . "</tr>";
                 $i++;
@@ -135,7 +139,7 @@ if(isset($opid)) {
                     . "<td class='role-sub'>$kk</td>"
                     . "<td>"
                     . $form->show_hidden("page_".$i,"page[]",$file)
-                    . $form->show_select("auth_".$i,$op_authlevel,"",null,0,"","auth[]")
+                    . $form->show_select("auth_".$i,$level,"",null,0,"","auth[]")
                     . "</td>"
                     . "</tr>";
                     $i++;
@@ -158,11 +162,9 @@ if(isset($opid)) {
     $tb = new mytable();
     //view
     $head = array("กลุ่มผู้ใช้");
-    if($pauth==1){
-        $rec = $tbpdo->view_option("role_auth",1);
-    } else {
+    $rec = $tbpdo->view_option("role_auth",$pauth);
+    if($pauth>1){
         array_unshift($head,"แก้ไข");
-        $rec = $tbpdo->view_option("role_auth");
     }
     
     $content .= "<div class='col-50'>"

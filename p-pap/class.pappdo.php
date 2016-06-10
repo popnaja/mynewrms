@@ -345,6 +345,7 @@ END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $cat = $stmt->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_NUM);
+            $res = array();
             foreach($cat as $k=>$v){
                 $res[$k] = array();
                 foreach($v as $vv){

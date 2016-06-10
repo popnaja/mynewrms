@@ -15,15 +15,19 @@ $menu->__autoloadall("form");
 $menu->__autoloadall("table");
 $menu->pap_menu();
 $menu->pageTitle = "PAP | Option";
+$menu->ascript[]  = PAP."js/pap.js";
 $menu->extrascript = <<<END_OF_TEXT
 <style>
-        h3 {
-            margin-bottom:15px;
-        }
-        #tb-prod-cat tr th:first-child,
-        #tb-prod-cat tr td:first-child {
-            width:12%;
-        }
+h3 {
+    margin-bottom:15px;
+}
+#tb-prod-cat tr th:first-child,
+#tb-prod-cat tr td:first-child {
+    width:12%;
+}
+.but-right {
+        width:auto;
+}
 </style>
 END_OF_TEXT;
 
@@ -68,11 +72,14 @@ if(isset($opid)) {
             . $name
             . $value
             . $form->show_hidden("type","type",$type);
-    
-    $content .= $form->show_submit("submit","Update","but-right")
+    $del = ($pauth==9?"<span id='del-option' class='red-but'>Delete</span>"
+            . "<script>del_option();</script>":"");
+    $content .= $del
+            . $form->show_submit("submit","Update","but-right")
             . $form->show_hidden("request","request","edit_option")
             . $form->show_hidden("opid","opid",$opid)
             . $form->show_hidden("redirect","redirect",$redirect)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
             . "</div><!-- .col-100 -->";
     $form->addformvalidate("ez-msg", array('name'));
     $content .= $form->submitscript("$('#new').submit();");

@@ -184,6 +184,8 @@ if($action=="add"){
                 . "</div>";
         }
     }
+    $del = ($pauth==9?"<span id='del-lay' class='red-but'>Delete</span>"
+            . "<script>del_lay();</script>":"");
     $custom .= "<input id='view-more-but' type='button' value='เพิ่ม Custom Lay' style='width:100%'/>";
     $content .= "<h1 class='page-title'>แก้ไขการ Lay</h1>"
             . "<div id='ez-msg'>".  showmsg() ."</div>"
@@ -197,6 +199,7 @@ if($action=="add"){
             . "<div class='col-50'>"
             . "<h4>เลือกกระดาษ</h4>"
             . $form->show_tabs("lay-tab", array("ปกและเนื้อ","Custom"), array($normal,$custom))
+            . $del
             . $form->show_submit("submit","Update","but-right")
             . "</div><!-- .col-50 -->"
             . "</div><!-- .cheight -->";
@@ -210,7 +213,8 @@ if($action=="add"){
             . show_layguide($form,$paper_info);
     $content .= $form->show_hidden("request","request","edit_job_size")
             . $form->show_hidden("sid","sid",$sid)
-            . $form->show_hidden("redirect","redirect",$redirect);
+            . $form->show_hidden("redirect","redirect",$redirect)
+            . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php");
     $form->addformvalidate("ez-msg", array('name','height','width','cover_lay','inside_lay'));
     $content .= $form->submitscript("$('#new').submit();")
             . "<script>"

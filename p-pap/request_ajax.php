@@ -216,6 +216,18 @@ if($req=="show_pic"){
     //delete
     $db->delete_data("pap_comp_process", "id", $_POST['cproid']);
     echo json_encode(array("redirect",$_POST['redirect']));
+} else if($req == "delete_option"){
+    //log
+    $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
+    //delete
+    $db->delete_data("pap_option", "op_id", $_POST['opid']);
+    echo json_encode(array("redirect",$_POST['redirect']));
+} else if($req == "delete_lay"){
+    //log
+    $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
+    //delete
+    $db->delete_data("pap_size", "size_id", $_POST['sid']);
+    echo json_encode(array("redirect",$_POST['redirect']));
 /* =======================================================  COPY ===================================================================*/
 } else if($req == "copy_quote"){
     //copy
