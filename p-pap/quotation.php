@@ -78,7 +78,7 @@ if($action=="add"||isset($qid)){
 
     $prepress = (isset($process_keypair[1])?$process_keypair[1]:array());
     $binding = array("0"=>"--ไม่มี--")+(isset($process_keypair[9])?$process_keypair[9]:array());
-    $coating = array("0"=>"--ไม่มี--")+(isset($process_keypair[4])?$process_keypair[1]:array());
+    $coating = array("0"=>"--ไม่มี--")+(isset($process_keypair[4])?$process_keypair[4]:array());
     $print = (isset($process_keypair[3])?$process_keypair[3]:array());
     $after =  $db->get_process_wunit($op_unit,5);
     $packing = $db->get_process_wunit($op_unit,11);
