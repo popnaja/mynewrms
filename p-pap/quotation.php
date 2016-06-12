@@ -68,6 +68,12 @@ $form = new myform("papform","",PAP."request.php");
 $ajax = PAP."request_ajax.php";
 $content = $menu->showhead();
 $content .= $menu->pappanel("เสนอราคา",$pagename);
+$packhelp = "<span class='icon-question form-required'>"
+        . "<span class='des'>"
+        . "<span class='des-arr-up'></span>"
+        . "ใส่ 0 คือตามยอดพิมพ์"
+        . "</span>"
+        . "</span>";
 //prep info
 if($action=="add"||isset($qid)){
     $process_keypair = $db->get_process_keypair();
@@ -118,7 +124,7 @@ if($action=="add"){
             . $form->show_text("dueto","dueto","","yyyy-mm-dd","ถึงวันที่","","label-3070")
             . $form->show_textarea("remark","",4,10,"","หมายเหตุ","label-3070");
 
-    $pack = $form->show_checkbox_winput("pack","pack",$packing,"การแพ็ค","label-3070")
+    $pack = $form->show_checkbox_winput("pack","pack",$packing,"การแพ็ค $packhelp","label-3070")
             . $form->show_checkbox_winput("ship","ship",$shipping,"การขนส่ง","label-3070");
 
     $multi = "";
@@ -268,7 +274,8 @@ if($action=="add"){
             . "</div><!-- .sel-status-9 -->"
             . $qprice
             . "<div class='sel-status-4'>"
-            . $form->show_num("n_price",(isset($info['n_price'])?$info['n_price']:""),0.01,"","ราคาค่อรอง","","label-3070 ","min='0'")
+            . $form->show_num("n_price",(isset($info['n_price'])?$info['n_price']:""),0.01,"","ราคาค่อรอง","","label-3070 left-50","min='0'")
+            . $form->show_num("nperu",(isset($info['n_price'])?$info['n_price']/$info['amount']:""),0.01,"","ราคาค่อรอง(ต่อหน่วย)","","label-3070 right-50","min='0'")
             . "</div><!-- .sel-status-4 -->"
             . $form->show_hidden("ttcost","ttcost",$pcost)
             . $form->show_hidden("ajax_req","ajax_req",PAP."request_ajax.php")
@@ -351,7 +358,7 @@ if($action=="add"){
             . $form->show_text("dueto","dueto",(isset($info['dueto'])?$info['dueto']:""),"yyyy-mm-dd","ถึงวันที่","","label-3070")
             . $form->show_num("credit",$info['credit'],1,"","เครดิต(วัน)","","label-3070")
             . $form->show_textarea("remark",$info['remark'],4,10,"","หมายเหตุ","label-3070");
-    $pack = $form->show_checkbox_winput("pack","pack",$pack_checked,"การแพ็ค","label-3070")
+    $pack = $form->show_checkbox_winput("pack","pack",$pack_checked,"การแพ็ค $packhelp","label-3070")
             . $form->show_checkbox_winput("ship","ship",$ship_checked,"การขนส่ง","label-3070");
 
     $aamount = (isset($info['cal_amount'])?explode(",",$info['cal_amount']):"");
@@ -461,6 +468,14 @@ function special_comp($info=null,$comps=null){
     $html = "";
     $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
+    //diecut help
+    $diecuthelp = "<span class='icon-question form-required'>"
+        . "<span class='des'>"
+        . "<span class='des-arr-up'></span>"
+        . "ราคาต่อแผ่นใส่ 0 <br/>"
+        . "ราคาต่อตารางนิ้วใส่ ตารางนิ้วต่อแผ่น"
+        . "</span>"
+        . "</span>";
     for($i=0;$i<8;$i++){
         if(isset($comps[$i])){
             $hid = "";
@@ -508,7 +523,7 @@ function special_comp($info=null,$comps=null){
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
-                . $form->show_checkbox_winput("post_$i","post_$i",$post,"ไดคัท และอื่นๆ","label-3070")
+                . $form->show_checkbox_winput("post_$i","post_$i",$post,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
@@ -558,7 +573,7 @@ function special_comp($info=null,$comps=null){
                 . "</div>"
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
-                . $form->show_checkbox_winput("post_$i","post_$i",$after,"ไดคัท และอื่นๆ","label-3070")
+                . $form->show_checkbox_winput("post_$i","post_$i",$after,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
                 . "<div class='sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")

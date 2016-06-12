@@ -582,6 +582,16 @@ $(document).ready(function(){
     price.on("change",function(){
         peru.val($(this).val()/$("#amount").val());
     });
+    //adjust nego price
+    var nperu = $("#nperu");
+    var nprice = $("#n_price");
+    nperu.on("change",function(){
+        nprice.val($(this).val()*$("#amount").val());
+        nprice.trigger("change");
+    });
+    nprice.on("change",function(){
+        nperu.val($(this).val()/$("#amount").val());
+    });
 });
 }
 function filter_papern(size,index){

@@ -178,7 +178,7 @@ function cal_quote($info,$comps){
                 $tunit['sheet'] = $coatpage[$i]/$unit['page']*$lots*$lot*2;
                 $cost = new_pcost($com['comp_coating'],$tunit);
             } else {
-                $tunit['sheet'] = $lots*$lot;;
+                $tunit['sheet'] = $lots*$lot;
                 $cost = new_pcost($com['comp_coating'],$tunit);
                 $cpage = "";
             }
@@ -186,7 +186,9 @@ function cal_quote($info,$comps){
         }
         //coat2
         if(is_array($coat2)&&$coat2[$i]>0){
-            $cost = new_pcost($coat2[$i],$unit);
+            $tunit = $unit;
+            $tunit['sheet'] = $lots*$lot;
+            $cost = new_pcost($coat2[$i],$tunit);
             array_push($res['หลังพิมพ์'],array_merge(array($processes[$coat2[$i]]." $cname(ด้านใน)"),$cost));
         }
         //post process หลังงานพิมพ์คิดเต็มริม
@@ -200,7 +202,7 @@ function cal_quote($info,$comps){
                 $tunit = $unit;
                 $tunit['sheet'] = $lots*$lot;
                 if(isset($pro[1])&&$pro[1]>0){
-                    $tunit[$cost[0]['vunit']]=$pro[1];
+                    $tunit[$cost[0]['vunit']]=$pro[1]*$tunit['sheet'];
                 }
                 $pcost = new_pcost($pid, $tunit);
                 array_push($res['หลังพิมพ์'],array_merge(array($processes[$pid]." ".$cname),$pcost));
@@ -339,6 +341,7 @@ function unit_cal($quote,$comps){
         $paper_cut = $comp['comp_paper_cut'];
         $page = $comp['comp_page'];
         $pinfo = $db->get_info("pap_mat", "mat_id", $comp['comp_paper_id']);
+        $lotsize = $pinfo['mat_order_lot_size'];
         $size = $db->get_info("pap_option","op_id",$pinfo['mat_size']);
         $sinfo = json_decode($size['op_value'],true);
 
@@ -423,13 +426,18 @@ function unit_cal($quote,$comps){
             }
         }
         $res[$k]['ff'] = $frame;
-        //คำนวณพื้นที่เคลือบ
+        //คำนวณพื้นที่เคลือบ เต็มริม
+        $csheet = ceil($res[$k]['sheet']/$lotsize)*$lotsize;
         if($type==2||$type==6){
             $cpage = (is_array($coatpage)?$coatpage[$c]:0);
-            $csheet = $amount*ceil($cpage/$paper_lay);
-            $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
+            if($cpage>0){
+                $csheet = $amount*ceil($cpage/$paper_lay);
+                $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
+            } else {
+                $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
+            }
         } else {
-            $res[$k]['in2'] = $res[$k]['sheet']*$sinfo['width']*$sinfo['length'];
+            $res[$k]['in2'] = $csheet*$sinfo['width']*$sinfo['length'];
         }
         $c++;
     }
