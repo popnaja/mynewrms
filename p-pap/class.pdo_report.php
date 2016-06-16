@@ -351,7 +351,8 @@ END_OF_TEXT;
                     $job .= "<li>$jname[$j] จำนวน $qty[$j] $unit</li>";
                 }
                 $job .= "</ul>";
-                $res1[$k] = array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>$job",$date,$due,$v['amount']);
+                $prefix = ($v['amount']>0?"ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ":"ส่วนลดหนี้ ");
+                $res1[$k] = array($i,"<p>$prefix".$v['no']." : </p>$job",$date,$due,$v['amount']);
                 $i++;
             }
             return $res1;
@@ -388,15 +389,14 @@ END_OF_TEXT;
 SELECT
 deli.no,
 ivdt.amount,
-GROUP_CONCAT(ddt.job_name) AS jname,
-GROUP_CONCAT(ddt.qty) AS qty,
-GROUP_CONCAT(ddt.type) AS type,
-deli.total AS price
+ddt.job_name AS jname,
+ddt.qty AS qty,
+ddt.price AS price,
+ddt.type AS type
 FROM pap_invoice_dt AS ivdt
-LEFT JOIN pap_delivery_dt AS ddt ON ddt.deli_id=ivdt.deli_id
-LEFT JOIN pap_delivery AS deli ON deli.id=ivdt.deli_id
+JOIN pap_delivery_dt AS ddt ON ddt.deli_id=ivdt.deli_id
+JOIN pap_delivery AS deli ON deli.id=ivdt.deli_id
 WHERE ivdt.invoice_id=:ivid
-GROUP BY deli.id
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":ivid",$ivid);
@@ -404,19 +404,30 @@ END_OF_TEXT;
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $i=1;
             $res1 = array();
+            //check w total
+            $tt = 0;
             foreach($res as $k=>$v){
-                $jname = explode(",",$v['jname']);
-                $qty = explode(",",$v['qty']);
-                $type = explode(",",$v['type']);
-                array_push($res1,array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no']." : </p>",1,$v['amount'],$v['amount']));
-
-                for($j=0;$j<count($jname);$j++){
-                    $unit = $op[$type[$j]];
-                    $amount = number_format($qty[$j],0);
-                    $job = "<p class='job-list'>$jname[$j] จำนวน $amount $unit</p>";
-                    array_push($res1,array("",$job,"","",""));
+                $tt += $v['price'];
+            }
+            if($tt==(int)$v['amount']){
+                array_push($res1,array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no'].":","&nbsp;","&nbsp;","&nbsp;"));
+            } else {
+                array_push($res1,array($i,"<p>ค่าบริการงานพิมพ์ ตามใบแจ้งหนี้ ".$v['no'].":",1,$v['amount'],$v['amount']));
+            }
+            foreach($res as $k=>$v){
+                $jname = $v['jname'];
+                $qty = $v['qty'];
+                $price = $v['price'];
+                $peru = $price/$qty;
+                $type = $v['type'];
+                $unit = $op[$type];
+                $amount = number_format($qty,0);
+                $job = "<p class='job-list'>$jname จำนวน $amount $unit</p>";
+                if($tt==$v['amount']){
+                    array_push($res1,array("",$job,$qty,$peru,$price));
+                } else {
+                    array_push($res1,array("",$job,"&nbsp;","&nbsp;","&nbsp;"));
                 }
-                $i++;
             }
             return $res1;
         } catch (Exception $ex) {

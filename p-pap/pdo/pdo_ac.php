@@ -216,7 +216,11 @@ END_OF_TEXT;
                         array_push($res1[implode(";",$res[$k])],array($addinv,""));
                     }
                 } else {
-                    array_push($res1[implode(";",$res[$k])],array($addinv,""));
+                    if($v['total']>0){
+                        array_push($res1[implode(";",$res[$k])],array($addinv,""));
+                    } else {
+                        array_push($res1[implode(";",$res[$k])],array("&nbsp;",""));
+                    }
                 }
             }
             return $res1;
