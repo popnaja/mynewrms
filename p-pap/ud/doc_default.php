@@ -191,14 +191,23 @@ function show_order($oid,$edit=false){
 
     $rp = new reportPDO();
     $info = $rp->rp_order($oid);
+    $qmeta = $db->get_meta("pap_quote_meta", "quote_id", $info['quote_id'],"('comp_piece','comp_piece_dt','dueto')");
+    $info += $qmeta;
     $comp = $rp->rp_order_comp($oid);
     $cinfo = $db->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
 
+    //due date
+    $dueto = thai_date($info['plan_delivery']).($info['dueto']!=""?" - ".thai_date($info['dueto']):"");
+
+    
     $paper_html = "";
     $plate_html = "";
     $after = "";
     $packing = "";
-
+    $comp_piece = (isset($info['comp_piece'])?json_decode($info['comp_piece'],true):0);
+    $comp_piece_dt = (isset($info['comp_piece_dt'])?json_decode($info['comp_piece_dt'],true):0);
+    $c = 0;
+    $piece = "";
     foreach($comp as $k=>$com){
         if($com['type']==9){
             //packing & shipping
@@ -256,6 +265,15 @@ function show_order($oid,$edit=false){
                 . "<td colspan='3'>".(isset($post[4])?$post[4]:"")."</td>"
                 . "<td colspan='2'>".(isset($post[5])?$post[5]:"")."</td>"
                 . "</tr>";
+        //ชิ้นส่วนหลายแบบ
+        if(is_array($comp_piece)&&$comp_piece[$c]>1){
+            $dt = $comp_piece_dt[$c];
+            $piece .= "$cname จำนวน $comp_piece[$c] แบบ";
+            for($n=0;$n<count($dt);$n++){
+                $piece .= ", ".$dt[$n]['dt']." (".number_format($dt[$n]['vol']).")";
+            }
+        }
+        $c++;
     }
     //header
     if($edit){
@@ -280,11 +298,19 @@ function show_order($oid,$edit=false){
     } else {
         $pic = "";
     }
+    //pages สมุด หนังสือ
+    if(in_array($info['cat_id'],array(10,69))){
+        $pages = number_format($info['pages'])."(รวมปก)";
+    } else {
+        $pages = ($info['pages']==2?"พิมพ์สองด้าน":"พิมพ์ด้านเดียว");
+    }
+    $show_piece = "<tr><th>แบบ*</th><td colspan='6' ><b style='color:red;'>".$piece."</b></td></tr>";
+    
     $content .= "<table id='pto'>"
             . "<tr><th>ชื่องาน</th><td colspan='6'>".$info['name']."</td></tr>"
             . "<tr>"
             . "<th>รหัสงาน</th><td colspan='2'>".$info['order_no']."</td>"
-            . "<th>วันที่ขอรับงาน</th><td colspan='3'>".thai_date($info['plan_delivery'])."</td>"
+            . "<th>วันที่ขอรับงาน</th><td colspan='3'>".$dueto."</td>"
             . "</tr>"
             . "<tr>"
             . "<th>เพลตเข้า</th><td colspan='2'>".$plate."</td>"
@@ -293,9 +319,10 @@ function show_order($oid,$edit=false){
             . "<tr class='space'></tr>"
             . "<tr><th>ลักษณะงาน</th><td colspan='3'>".$info['cat']."</td><td colspan='3' rowspan='5' class='job-pic'>$pic</td></tr>"
             . "<tr><th>ยอดพิมพ์</th><td colspan='3'>".number_format($info['amount'],0)."</td></tr>"
-            . "<tr><th>จำนวนหน้า</th><td colspan='3'>".number_format($info['pages'],0)."</td></tr>"
-            . "<tr><th>เข้าเล่ม</th><td colspan='3'>".$info['bind']."</td></tr>"
+            . "<tr><th>จำนวนหน้า</th><td colspan='3'>".$pages."</td></tr>"
+            . "<tr><th>เข้าเล่ม</th><td colspan='3'>".($info['bind']==""?"---":$info['bind'])."</td></tr>"
             . "<tr><th>ขนาดเสร็จ</th><td colspan='3'>".$info['size']."</td></tr>"
+            . $show_piece
             . "<tr><th>คำสั่งพิเศษ**</th><td colspan='6' ><b style='color:red;'>".$info['remark']."</b></td></tr>"
             . "<tr class='space'></tr>"
             . "<tr><th colspan='5'>กระดาษ</th><th colspan='2'>จำนวน(ริม)</th></tr>"
@@ -864,6 +891,8 @@ function job_detail($qid){
     }
     $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
+    $cpiece = (isset($info['comp_piece'])?json_decode($info['comp_piece'],true):0);
+    $cpiece_dt = (isset($info['comp_piece_dt'])?json_decode($info['comp_piece_dt'],true):0);
     for($i=0;$i<count($comps);$i++){
         $v = $comps[$i];
         $post = explode(",",$v['comp_postpress']);
@@ -910,6 +939,14 @@ function job_detail($qid){
             $p = explode(";",$p);
             if($p[0]>0){
                 array_push($data[$cname],$process[$p[0]]);
+            }
+        }
+        //จำนวนแบบ
+        if(is_array($cpiece)&&$cpiece[$i]>1){
+            $dt = $cpiece_dt[$i];
+            array_push($data[$cname],"จำนวน $cpiece[$i] แบบ");
+            for($n=0;$n<count($dt);$n++){
+                array_push($data[$cname],$n+1 .") ".$dt[$n]['dt']." ".number_format($dt[$n]['vol']));
             }
         }
     }

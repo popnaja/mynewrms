@@ -62,12 +62,14 @@ END_OF_TEXT;
 SELECT
 order_id,po.quote_id,order_no,pq.name,pq.plan_delivery,plate_plan,plate_received,paper_plan,paper_received,picture,remark,
 op.op_name AS cat,pq.amount,po.quote_id AS qid,
-meta.meta_value AS pages,pq.plan_delivery,
-pro.process_name AS bind,CONCAT(size_height,'x',size_width,' cm') AS size,pq.credit
+(meta.meta_value+meta1.meta_value) AS pages,pq.plan_delivery,
+pro.process_name AS bind,CONCAT(size_height,'x',size_width,' cm') AS size,pq.credit,
+pq.cat_id
 FROM pap_order AS po
 LEFT JOIN pap_quotation AS pq ON pq.quote_id=po.quote_id
 LEFT JOIN pap_option AS op ON op.op_id=pq.cat_id
-LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key='page_inside'
+JOIN pap_quote_meta AS meta ON meta.quote_id=po.quote_id AND meta.meta_key='page_inside'
+JOIN pap_quote_meta AS meta1 ON meta1.quote_id=po.quote_id AND meta1.meta_key='page_cover'
 LEFT JOIN pap_size ON size_id=job_size_id
 LEFT JOIN pap_process AS pro ON pro.process_id=binding_id
 WHERE order_id=:oid

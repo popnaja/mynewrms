@@ -402,10 +402,9 @@ function unit_cal($quote,$comps){
                     }
                 }
             }
-        } else {            //อื่นๆ ปก ใบพาด แจ็คเก็ด
-            $piece = $page;
-            $res[$k]['kong'] = (in_array($type,array(4,5,7))?0:$piece);
-            $sheet = $res[$k]["sheet"] = $amount*$piece/$paper_lay+$allo;
+        } else if(in_array($type,array(1,3,4,5,7))){            //อื่นๆ ปก ใบพาด แจ็คเก็ด
+            $res[$k]['kong'] = (in_array($type,array(4,5,7))?0:1);
+            $sheet = $res[$k]["sheet"] = ceil($amount/$paper_lay)+$allo;
             $res[$k]['cut'] = $sheet*$paper_lay;
             $res[$k]['set'] = $sheet*$paper_lay;
             $frame = $page*($comp['comp_print2']>0?2:1)/$paper_lay;
@@ -423,6 +422,22 @@ function unit_cal($quote,$comps){
                 $name = "1,กลับใน,$color/$color2,".$sheet;
                 $res[$k]['round'] = array(array($name,$sheet*2));
                 $res[$k]['color'] = $color."/".$color2;
+            }
+        } else if(in_array($type,array(10,11,12,13))){   //สำหรับงาน digital
+            $res[$k]['set'] = $amount;
+            if($comp['comp_print2']==0){            //พิมพ์ด้านเดียว
+                $res[$k]["sheet"] = $amount*$page/$paper_lay+$allo;
+                $res[$k]['round'] = array(array($color." หน้าเดียว",$res[$k]['sheet'],$comp['comp_print_id']));
+                $res[$k]['color'] = $color."/0";
+            } else {
+                $color2 = $processn[$comp['comp_print2']];
+                $res[$k]["sheet"] = $amount*$page/2/$paper_lay+$allo;
+                $res[$k]['color'] = $color."/".$color;
+                if($color==$color){
+                    $res[$k]['round'] = array(array($color."( หน้า-หลัง)",$res[$k]['sheet']*2,$comp['comp_print_id']));
+                } else {
+                    $res[$k]['round'] = array(array($color."(หน้า)",$res[$k]['sheet'],$comp['comp_print_id']),array($color2."(หลัง)",$res[$k]['sheet'],$comp['comp_print2']));
+                }
             }
         }
         $res[$k]['ff'] = $frame;

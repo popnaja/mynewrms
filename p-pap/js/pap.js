@@ -502,7 +502,6 @@ $(document).ready(function(){
     //prevent name with comma
     var name = $("#name");
     name.on("blur",function(){
-        console.log("YO");
         var nname = $(this).val().replace(/,/g,"");
         $(this).val(nname);
     });
@@ -592,6 +591,30 @@ $(document).ready(function(){
     });
     nprice.on("change",function(){
         nperu.val($(this).val()/$("#amount").val());
+    });
+    //เพิ่มจำนวนแบบมากกว่า 1 แบบ
+    var piece = $("[name='piece[]']");
+    var detail = $(".p-detail");
+    piece.on("blur",function(){
+        var i = piece.index($(this));
+        var dtinput = detail.eq(i).children(".p-detail-g");
+        if($(this).val()>=2){
+            for(var x=0;x<dtinput.length;x++){
+                if(x<$(this).val()){
+                    dtinput.eq(x).removeClass("form-hide");
+                } else {
+                    dtinput.eq(x).addClass("form-hide");
+                    $.each(dtinput.eq(x).find("input"),function(){
+                        $(this).val("");
+                    });
+                }
+            }
+        } else {
+            dtinput.addClass("form-hide");
+            $.each(dtinput.find("input"),function(){
+                $(this).val("");
+            });
+        }
     });
 });
 }

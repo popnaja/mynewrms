@@ -560,7 +560,7 @@ END_OF_TEXT;
             $sql = <<<END_OF_TEXT
 SELECT
 no,DATE_FORMAT(created,"$date") AS date
-FROM pap_quote_g
+FROM pap_group
 WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
 ORDER BY id DESC
 LIMIT 1
@@ -570,7 +570,7 @@ END_OF_TEXT;
             if($stmt->rowCount()>0){
                 $info = $stmt->fetch(PDO::FETCH_ASSOC);
                 $qrun = $pre.$conn.$info['date'].$conn;
-                $next = (int)str_replace($qrun,"",$info['quote_no'])+1;
+                $next = (int)str_replace($qrun,"",$info['no'])+1;
                 $res = $qrun.sprintf("%0".$digit."s",$next);
             } else {
                 $month = $this->conn->query("SELECT DATE_FORMAT(now(),'$date')");

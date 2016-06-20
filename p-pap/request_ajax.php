@@ -101,8 +101,14 @@ if($req=="show_pic"){
 } else if($req == "delete_quote"){
     //log
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
+    //check group
+    $before = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $_POST['gid']);
     //delete
     $db->delete_data("pap_quotation", "quote_id", $_POST['qid']);
+    if(count($before)==1){
+        //only quote in group delete group also
+        $db->delete_data("pap_group", "id", $_POST['gid']);
+    }
     //rename quote no
     $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $_POST['gid']);
     $ginfo = $db->get_info("pap_group", "id", $_POST['gid']);
@@ -116,7 +122,7 @@ if($req=="show_pic"){
             $db->update_data("pap_quotation", "quote_id", $arr_q[$i], array("quote_no"=>$new_no));
         }
     }
-    //echo json_encode(array("redirect",$_POST['redirect']));
+    echo json_encode(array("redirect",$_POST['redirect']));
 } else if($req == "delete_process_deli"){
     //log
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));

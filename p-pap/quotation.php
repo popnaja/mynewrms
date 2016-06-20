@@ -481,6 +481,8 @@ function special_comp($info=null,$comps=null){
     $html = "";
     $coat2 = (isset($info['coat2'])?json_decode($info['coat2'],true):0);
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
+    $comp_piece = (isset($info['comp_piece'])?json_decode($info['comp_piece'],true):0);
+    $comp_piece_dt = (isset($info['comp_piece_dt'])?json_decode($info['comp_piece_dt'],true):0);
     //diecut help
     $diecuthelp = "<span class='icon-question form-required'>"
         . "<span class='des'>"
@@ -502,6 +504,25 @@ function special_comp($info=null,$comps=null){
                 $selpost = 0;
                 $post = $after;
             }
+            $print1 = $comp['comp_print_id'];
+            $print2 = $comp['comp_print2'];
+            
+            $pdetail = "<div class='p-detail'>";
+            for($pd=0;$pd<5;$pd++){
+                if(is_array($comp_piece_dt)&&isset($comp_piece_dt[$i][$pd])){
+                    $dt = $comp_piece_dt[$i][$pd];
+                    $pdetail .= "<div class='p-detail-g'>"
+                        . $form->show_text("pdt_$i$pd","pdt_$i"."[]",$dt["dt"],"รายละเอียด","","","label-inline left-70")
+                        . $form->show_num("pdt_no_$i$pd",$dt['vol'],1,"จำนวน","","","label-inline right-30","min=1","pdt_no_$i"."[]")
+                        . "</div>";
+                } else {
+                    $pdetail .= "<div class='p-detail-g form-hide'>"
+                        . $form->show_text("pdt_$i$pd","pdt_$i"."[]","","รายละเอียด","","","label-inline left-70")
+                        . $form->show_num("pdt_no_$i$pd","",1,"จำนวน","","","label-inline right-30","min=1","pdt_no_$i"."[]")
+                        . "</div>";
+                }
+            }
+            $pdetail .= "</div><!-- .p-detail -->";
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",$comp['comp_type'],"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",$comp['mat_size'],"","paper_size[]")
@@ -538,10 +559,12 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox_winput("post_$i","post_$i",$post,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
-                . "<div class='sel-compt$i-3'>"
+                . "<div class='sel-compt$i-13 sel-compt$i-3'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
-                . "</div>"
-                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-6 sel-compt$i-7'>"
+                . $form->show_num("piece_$i",(is_array($comp_piece)?$comp_piece[$i]:1),1,"","จำนวน(แบบ)","","label-3070","min=1","piece[]")
+                . $pdetail
+                . "</div><!-- comp detail -->"
+                . "<div class='sel-compt$i-2 sel-compt$i-6 sel-compt$i-10 sel-compt$i-11 sel-compt$i-12'>"
                 . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
                 . "</div><!-- .sel-compt$i-2 -->"
         . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อยก)","","label-3070","min=0","allowance[]")
@@ -554,6 +577,14 @@ function special_comp($info=null,$comps=null){
                 . "</script>";
         } else {
             $hid = ($i==0?"":"form-hide");
+            $pdetail = "<div class='p-detail'>";
+            for($pd=0;$pd<5;$pd++){
+                $pdetail .= "<div class='p-detail-g form-hide'>"
+                        . $form->show_text("pdt_$i$pd","pdt_$i"."[]","","รายละเอียด","","","label-inline left-70")
+                        . $form->show_num("pdt_no_$i$pd","",1,"จำนวน","","","label-inline right-30","min=1","pdt_no_$i"."[]")
+                        . "</div>";
+            }
+            $pdetail .= "</div><!-- .p-detail -->";
             $html .= "<div class='form-section quote-comp $hid'>"
                 . $form->show_select("compt$i",array("0"=>"--ชิ้นส่วน--")+$op_comp_type,"label-3070","ชิ้นส่วน",null,"","comp_type[]")
                 . $form->show_select("paper_size_$i",$size,"label-3070","ขนาดกระดาษ",null,"","paper_size[]")
@@ -588,10 +619,12 @@ function special_comp($info=null,$comps=null){
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox_winput("post_$i","post_$i",$after,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
-                . "<div class='sel-compt$i-3'>"
+                . "<div class='sel-compt$i-3 sel-compt$i-13'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")
+                . $form->show_num("piece_$i",1,1,"","จำนวน(แบบ)","","label-3070","min=1","piece[]")
+                . $pdetail
                 . "</div>"
-                . "<div class='sel-compt$i-2 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-6 sel-compt$i-7'>"
+                . "<div class='sel-compt$i-2 sel-compt$i-6 sel-compt$i-10 sel-compt$i-11 sel-compt$i-12'>"
                 . $form->show_num("page_$i",1,1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
                 . "</div><!-- .sel-compt$i-2 -->"
                 . "</div><!-- .form-section -->"

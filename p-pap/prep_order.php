@@ -6,6 +6,7 @@ function prep_order($qid){
     include_once("quote_formular.php");
     $db = new PAPdb(DB_PAP);
     $data = array();
+    $process_name = $db->get_keypair("pap_process", "process_id", "process_name");
     if($db->check_dup("pap_order","quote_id",$qid)){
         $db->delete_data("pap_order", "quote_id", $qid);
         //return false;
@@ -86,7 +87,8 @@ function prep_order($qid){
                         }
                     }
                     if($c2>0){
-                        add_data($data,$c2,$name,$sheet,$comp_id);
+                        $coat2_name = $process_name[$c2]."(ด้านหลัง)";
+                        add_data($data,$c2,$coat2_name,$sheet,$comp_id);
                     }
                     break;
                 case 5: //ไดตัท
@@ -197,6 +199,7 @@ function recal_process($compid){
     __autoload("pappdo");
     include_once("quote_formular.php");
     $db = new PAPdb(DB_PAP);
+    $process_name = $db->get_keypair("pap_process", "process_id", "process_name");
     $info = $db->get_comps_recal($compid);
     $qinfo = $db->get_info("pap_quotation", "quote_id", $info['quote_id'])+$db->get_meta("pap_quote_meta", "quote_id", $info['quote_id']);
     $order_comp = $db->get_infos("pap_order_comp", "order_id", $info['order_id']);
@@ -315,7 +318,8 @@ function recal_process($compid){
                     }
                 }
                 if($c2>0){
-                    add_data($data,$c2,$name,$sheet,$compid);
+                    $coat2_name = $process_name[$c2]."(ด้านหลัง)";
+                    add_data($data,$c2,$coat2_name,$sheet,$compid);
                 }
                 break;
             case 5: //ไดตัท

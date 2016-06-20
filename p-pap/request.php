@@ -730,23 +730,34 @@ if($req == "login"){
     $meta['cwing'] = 0;
     $coat2 = array();
     $coatpage = array();
+    $piece = array();
+    $piece_dt = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
             $print2 = $_POST['print2'][$i];
             if($type=="1"){ //ปก
-                $page = $page_cover = 1;
+                $page = $page_cover = ($print2>0?4:2);
                 //ปกปีก
                 $meta['cwing'] = $_POST['cwing'][$i];
                 if($_POST['cwing'][$i]=="1"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2||$type==6){
+            } else if(in_array($type,array(2,6))){
                 $page_inside += $page = $_POST['page'][$i];
                 $print2 = $_POST['print'][$i];
+            } else if($type==12){   //เนื้อใน digital
+                $page_inside += $page = $_POST['page'][$i];
+                if($_POST['side'][$i]==1){
+                    $print2 = 0;
+                } else {
+                    $print2 = $_POST['print'][$i];
+                }
+            } else if(in_array($type,array(10,11))){    //ปก digital
+                $page = $page_cover = $_POST['page'][$i];
             } else {
-                $page = $_POST['page'][$i];
+                $page_inside = $page = ($print2>0?2:1);
             }
             //แผ่นพับ
             if($type==3){
@@ -767,6 +778,16 @@ if($req == "login"){
             array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
             //coat pages
             array_push($coatpage,($type=="2"||$type=="6"?$_POST['coatpage'][$i]:0));
+            //piece
+            array_push($piece,($type=="13"||$type=="3"?$_POST['piece'][$i]:1));
+            //piece detail
+            $tarray = array();
+            for($p=0;$p<count($_POST["pdt_$i"]);$p++){
+                if($_POST["pdt_no_$i"][$p]>0){
+                    array_push($tarray,array("dt"=>$_POST["pdt_$i"][$p],"vol"=>$_POST["pdt_no_$i"][$p]));
+                }
+            }
+            array_push($piece_dt,$tarray);
         }
     }
     //คำนวนหลายยอดพิมพ์
@@ -800,7 +821,9 @@ if($req == "login"){
         "other_price" => json_encode($other),
         "coat2" => json_encode($coat2),
         "coatpage" => json_encode($coatpage),
-        "dueto" => $_POST['dueto']
+        "dueto" => $_POST['dueto'],
+        "comp_piece" => json_encode($piece),
+        "comp_piece_dt" => json_encode($piece_dt),
     );
     $db->update_meta("pap_quote_meta", "quote_id", $qid, $meta);
 
@@ -908,23 +931,34 @@ if($req == "login"){
     $meta['cwing'] = 0;
     $coat2 = array();
     $coatpage = array();
+    $piece = array();
+    $piece_dt = array();
     for($i=0;$i<$n;$i++){
         if($_POST['paper_size'][$i]>0&&$_POST['paper_type'][$i]>0&&$_POST['paper_gram'][$i]>0){
             $type = $_POST['comp_type'][$i];
             $print2 = $_POST['print2'][$i];
             if($type=="1"){ //ปก
-                $page = $page_cover = 1;
+                $page = $page_cover = ($print2>0?4:2);
                 //ปกปีก
                 $meta['cwing'] = $_POST['cwing'][$i];
                 if($_POST['cwing'][$i]=="1"){
                     $meta['fwing'] = $_POST['fwing'][$i];
                     $meta['bwing'] = $_POST['bwing'][$i];
                 }
-            } else if($type==2||$type==6){
+            } else if(in_array($type,array(2,6))){
                 $page_inside += $page = $_POST['page'][$i];
                 $print2 = $_POST['print'][$i];
+            } else if($type==12){   //เนื้อใน digital
+                $page_inside += $page = $_POST['page'][$i];
+                if($_POST['side'][$i]==1){
+                    $print2 = 0;
+                } else {
+                    $print2 = $_POST['print'][$i];
+                }
+            } else if(in_array($type,array(10,11))){    //ปก digital
+                $page = $page_cover = $_POST['page'][$i];
             } else {
-                $page = $_POST['page'][$i];
+                $page_inside = $page = ($print2>0?2:1);
             }
             //แผ่นพับ
             if($type==3){
@@ -946,6 +980,16 @@ if($req == "login"){
             array_push($coat2,($_POST['print2'][$i]>0?$_POST['coating2'][$i]:0));
             //coat pages
             array_push($coatpage,($type=="2"||$type=="6"?$_POST['coatpage'][$i]:0));
+            //piece
+            array_push($piece,($type=="13"||$type=="3"?$_POST['piece'][$i]:1));
+            //piece detail
+            $tarray = array();
+            for($p=0;$p<count($_POST["pdt_$i"]);$p++){
+                if($_POST["pdt_no_$i"][$p]>0){
+                    array_push($tarray,array("dt"=>$_POST["pdt_$i"][$p],"vol"=>$_POST["pdt_no_$i"][$p]));
+                }
+            }
+            array_push($piece_dt,$tarray);
         }
     }
     if($_POST['pauth']>=3){
@@ -1007,7 +1051,9 @@ if($req == "login"){
         "other_price" => json_encode($other),
         "coat2" => json_encode($coat2),
         "coatpage" => json_encode($coatpage),
-        "dueto" => $_POST['dueto']
+        "dueto" => $_POST['dueto'],
+        "comp_piece" => json_encode($piece),
+        "comp_piece_dt" => json_encode($piece_dt),
     );
     //ต่อรองราคา
     if($status>3){
