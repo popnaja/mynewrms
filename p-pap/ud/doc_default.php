@@ -10,6 +10,8 @@ function show_quote_df($qid){
     
     //load info
     $info = $db->get_quote_info($qid)+$db->get_meta("pap_quote_meta","quote_id",$qid);
+    $group = $db->get_info("pap_quote_group", "quote_id", $qid);
+    $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $group['group_id']);
     $cus= $db->get_info("pap_customer","customer_id",$info['customer_id'])+$db->get_meta("pap_customer_meta", "customer_id", $info['customer_id']);
     $ct = $db->get_info("pap_contact", "contact_id", $info['contact_id']);
     $show_date = (is_null($info['approved'])?$info['created']:$info['approved']);
@@ -24,57 +26,69 @@ function show_quote_df($qid){
         . "<div class='doc-600'> <span class='float-left'>Sale Rep : </span>". $info['user_login']."</div>"
         . "</div>"
         . "</div>";
-    
+    $x=0;
+    $list = 1;
+    $rec = array();
+    $discount = 0;
     //job detail
-    $jdetail = job_detail($qid);
-    $dttb = job_dttb_ghpp($jdetail);
-    $x = ceil((count($jdetail,1)-count($jdetail))/2);
-    
+    foreach($arr_q as $q){
+        $qinfo = $db->get_quote_info($q)+$db->get_meta("pap_quote_meta", "quote_id", $q, "('detail_price','discount')");
+        $tt = (float)$qinfo['q_price'];
+        $amount = (int)$qinfo['amount'];
+        $peru = $tt/$amount;
+        $discount += $qinfo['discount'];
+        $jdetail = job_detail($q);
+        $dttb = job_dttb_ghpp($jdetail);
+        $x += ceil((count($jdetail,1)-(count($jdetail)-3))/2);
+        $tg = ceil($x/10);
+        if(!isset($rec[$tg])){
+            $rec[$tg] = array();
+        }
+        if(isset($qinfo['detail_price'])){
+            $dt = json_decode($qinfo['detail_price'],true);
+            $sub = 0; //เก็บข้อมูลราคา เอาไปหักออกจาก total เพื่อ show ค่าพิมพ์
+            foreach($dt as $k=>$v){
+                if($v[0]>0){
+                    array_push($rec[$tg],array($list,$v[1],$v[2],$v[3],$v[4]));
+                    $sub += $v[4];
+                    $list++;
+                    $x++;
+                }
+            }
+            array_push($rec[$tg],array($list,$dttb,$amount,($tt-$sub)/$amount,$tt-$sub));
+            $list++;
+        } else {
+            array_push($rec[$tg],array($list,$dttb,$amount,$peru,$tt));
+            $list++;
+        }
+    }
     //$due = ($info['plan_delivery']>0?"<div class='print-list-title'>กำหนดส่งงาน : ".thai_date($info['plan_delivery'])."</div>":"");
     //multi quote
     $extra = "";
-    $x++;
-    if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
-        $dt = json_decode($info['multi_quote_info'],true);
-        $qhead = array("ลำดับ","หมายเหตุ","ยอดพิมพ์","ราคาหน่วยละ","จำนวนเงิน");
-        $qrec = array();
-        $i = 1;
-        foreach($dt as $k=>$v){
-            if($v['show']>0){
-                array_push($qrec,array($i,$v['remark'],number_format($v['amount']),number_format($v['price']/$v['amount'],2),number_format($v['price'],2)));
-                $i++;
-                $x++;
+    $ex = 0;
+    if(count($arr_q)==1){
+        if(isset($info['multi_quote_info'])&&strlen($info['multi_quote_info'])>3){
+            $dt = json_decode($info['multi_quote_info'],true);
+            $qhead = array("ลำดับ","หมายเหตุ","ยอดพิมพ์","ราคาหน่วยละ","จำนวนเงิน");
+            $qrec = array();
+            $i = 1;
+            $ex++;
+            foreach($dt as $k=>$v){
+                if($v['show']>0){
+                    array_push($qrec,array($i,$v['remark'],number_format($v['amount']),number_format($v['price']/$v['amount'],2),number_format($v['price'],2)));
+                    $i++;
+                    $ex++;
+                }
+            }
+            if(count($qrec)>0){
+                $extra = "<div class='print-extra'>"
+                    . "<b>เสนอราคาที่ยอดพิมพ์ปริมาณอื่น (ราคายังไม่รวมภาษีมูลค่าเพิ่ม)</b>"
+                    . $tb->show_table($qhead,$qrec,"tb-multi-q")
+                    . "</div>";
             }
         }
-        if(count($qrec)>0){
-            $extra = "<div class='print-extra'>"
-                . "<b>เสนอราคาที่ยอดพิมพ์ปริมาณอื่น (ราคายังไม่รวมภาษีมูลค่าเพิ่ม)</b>"
-                . $tb->show_table($qhead,$qrec,"tb-multi-q")
-                . "</div>";
-        }
     }
-    //detail
-    $tt = (float)$info['q_price'];
-    $amount = (int)$info['amount'];
-    $peru = $tt/$amount;
-    $header = array("ลำดับ","รายการ","จำนวน","ราคาหน่วยละ","จำนวนเงิน");
-    $recs = array();
-    if(isset($info['detail_price'])){
-        $dt = json_decode($info['detail_price'],true);
-        $sub = 0; //เก็บข้อมูลราคา เอาไปหักออกจาก total เพื่อ show ค่าพิมพ์
-        $i = 1;
-        foreach($dt as $k=>$v){
-            if($v[0]>0){
-                array_push($recs,array($i,$v[1],$v[2],$v[3],$v[4]));
-                $sub += $v[4];
-                $i++;
-                $x++;
-            }
-        }
-        array_push($recs,array($i,$dttb,$amount,($tt-$sub)/$amount,$tt-$sub));
-    } else {
-        array_push($recs,array(1,$dttb,$amount,$peru,$tt));
-    }
+    
     //sign
     $pay = ($info['credit']>0?"เครดิต ".$info['credit']." วัน":"ชำระเป็นเงินสด");
     $sign = "";
@@ -110,36 +124,63 @@ function show_quote_df($qid){
             . "<tr><td>ประทับตราบริษัท(ถ้ามี)<span class='float-right'>วันที่:____/_____/______</span></td></tr>"
             . "</table>";
     //check row
-    $discount = (int)$info['discount'];
+    $header = array("ลำดับ","รายการ","จำนวน","ราคาหน่วยละ","จำนวนเงิน");
     $tax = ($cus['tax_exclude']=="yes"?0:0.07);
-    if($x>8){
-        $page1 = print_header("ใบเสนอราคา","หน้า 1/2","ghpp_font")
-            . $head
-            . "<div class='doc-dt head-color'>"
-            . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
-            . "</div><!-- .doc-dt -->";
-        $page2 = "</div><!-- .print-a4-fix -->"
-                . "<div class='print-a4-fix'>"
-                . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
-                . $head
-                . $extra;
+    $content = "";
+    $ttpage = count($rec);
+    $p = 1;
+    $accum = 0;
+    if($ttpage>1){
+        foreach($rec as $k=>$v){
+            if($k==$ttpage){
+                $detail =  $tb->show_tb_wtax($header,$v,"tb-rp",$tax,$discount,"",null,null,true,$accum);
+            } else {
+                $detail =  $tb->show_tb_wtax($header,$v,"tb-rp",$tax,$discount,"",null,null,false);
+            }
+            //cal accum
+            foreach($v as $dt){
+                $accum += $dt[4];
+            }
+            $content .= "<div class='print-a4-fix'>"
+                    . print_header("ใบเสนอราคา","หน้า $p/$ttpage","ghpp_font")
+                    . $head
+                    . "<div class='doc-dt head-color'>"
+                    . $detail
+                    . "</div><!-- .doc-dt -->"
+                    . $sig
+                    . $cussign
+                    . "</div><!-- .print-a4-fix -->";
+            $p++;
+        }
     } else {
-        $page1 = print_header("ใบเสนอราคา","","ghpp_font")
-            . $head
-            . "<div class='doc-dt head-color'>"
-            . $tb->show_tb_wtax($header,$recs,"tb-rp",$tax,$discount)
-            . "</div><!-- .doc-dt -->"
-            . "$extra";
-        $page2 = "";
-
+        if($x+$ex>10){
+            $content .= "<div class='print-a4-fix'>"
+                    . print_header("ใบเสนอราคา","หน้า 1/2","ghpp_font")
+                    . $head
+                    . "<div class='doc-dt head-color'>"
+                    . $tb->show_tb_wtax($header,$rec[1],"tb-rp",$tax,$discount)
+                    . "</div><!-- .doc-dt -->"
+                    . $sig
+                    . $cussign
+                    . "</div><!-- .print-a4-fix -->"
+                    . "<div class='print-a4-fix'>"
+                    . print_header("ใบเสนอราคา","หน้า 2/2","ghpp_font")
+                    . $head
+                    . $extra
+                    . "</div><!-- .print-a4-fix -->";
+        } else {
+            $content .= "<div class='print-a4-fix'>"
+                    . print_header("ใบเสนอราคา","","ghpp_font")
+                    . $head
+                    . "<div class='doc-dt head-color'>"
+                    . $tb->show_tb_wtax($header,$rec[1],"tb-rp",$tax,$discount)
+                    . "</div><!-- .doc-dt -->"
+                    . $extra
+                    . $sig
+                    . $cussign
+                    . "</div><!-- .print-a4-fix -->";
+        }
     }
-    $content = "<div class='print-a4-fix'>"
-            . $page1
-            . $sig
-            . $cussign
-            . $page2;
-            
-    $content .= "</div><!-- .print-a4-fix -->";
     return $content;
 }
 function show_order($oid,$edit=false){

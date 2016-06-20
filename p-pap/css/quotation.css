@@ -21,7 +21,8 @@
     font-weight:600;
 }
 #tb-quote tr th:first-child,
-#tb-quote tr th:nth-child(2){
+#tb-quote tr th:nth-child(2),
+#tb-quote tr th:nth-child(3){
     width:35px;
 }
 @media only screen and (min-width: 320px) {
@@ -31,7 +32,7 @@
     
 }
 @media only screen and (min-width: 769px) {
-    #tb-quote tr th:nth-child(3){
+    #tb-quote tr th:nth-child(4){
         width:105px;
     }
 }

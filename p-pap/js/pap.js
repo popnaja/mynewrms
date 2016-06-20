@@ -357,7 +357,8 @@ function quote_adj(id){
         var ncost,nvari,frame;
         info = $.parseJSON($(this).attr("info"));
         $.each(info,function(k,v){
-            info[k] = parseFloat(v);
+            if(k=="vunit"||k=="formular"){return true;}
+            info[k] = v==""?0:parseFloat(v);
         });
         nvari = info['cost']+parseFloat($(this).val());
         var fcost = $.type(info['fcost'])==="undefined"?0:info['fcost'];
@@ -813,6 +814,7 @@ $(document).ready(function(){
             var data = {};
             data['request'] = "delete_quote";
             data['qid'] = $("#qid").val();
+            data['gid'] = $("#gid").val();
             data['redirect'] = $("#redirect").val();
             post_ajax(data,url);
         }

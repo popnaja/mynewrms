@@ -233,6 +233,10 @@
 #tb-rp .list-inlist {
     padding-left:0.2in;
 }
+.tb-graying,
+.tb-graying th{
+    background-color:#D7D8D7 !important;
+}
 /*------------------------------------------------------------------- MULTI QUOTE ---------------------------------------------------------*/
 .print-extra {
     font-size:11pt;

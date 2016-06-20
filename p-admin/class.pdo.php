@@ -19,9 +19,13 @@ class myDB{
             db_error(__METHOD__, $ex);
         }
     }
-    public function get_meta($tb,$field,$id){
+    public function get_meta($tb,$field,$id,$arrkey=null){
         try {
-            $stmt = $this->conn->prepare("SELECT meta_key,meta_value FROM $tb WHERE $field=:id");
+            $key = "";
+            if(isset($arrkey)){
+                $key .= " AND meta_key IN $arrkey";
+            }
+            $stmt = $this->conn->prepare("SELECT meta_key,meta_value FROM $tb WHERE $field=:id $key");
             $stmt->bindParam(":id",$id);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);

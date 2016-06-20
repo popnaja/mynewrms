@@ -246,10 +246,12 @@ END_OF_TEXT;
 $sql = <<<END_OF_TEXT
 SELECT
 pq.*,
-cus.customer_name
+cus.customer_name,
+qg.group_id
 FROM pap_quotation AS pq
-LEFT JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
-WHERE quote_id=:qid
+JOIN pap_customer AS cus ON cus.customer_id=pq.customer_id
+JOIN pap_quote_group AS qg on qg.quote_id=pq.quote_id
+WHERE pq.quote_id=:qid
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(":qid",$qid);
@@ -539,6 +541,39 @@ END_OF_TEXT;
                 $res = $qrun.sprintf("%0".$digit."s",$next);
             } else {
                 $month = $this->conn->query("SELECT DATE_FORMAT('$ddate','$date')");
+                $tmonth = $month->fetch(PDO::FETCH_NUM);
+                $res = $pre.$conn.$tmonth[0].$conn.sprintf("%0".$digit."s",1);
+            }
+            return $res;
+        } catch (Exception $ex) {
+            db_error(__METHOD__, $ex);
+        }
+    }
+    public function check_group(){
+        try {
+            $cinfo = $this->get_keypair("pap_option", "op_name", "op_value", "WHERE op_type='cinfo'");
+            $qr = explode(",",$cinfo['rno_quote']);
+            $pre = $qr[0];
+            $date = $qr[1];
+            $digit = $qr[2];
+            $conn = $qr[3];
+            $sql = <<<END_OF_TEXT
+SELECT
+no,DATE_FORMAT(created,"$date") AS date
+FROM pap_quote_g
+WHERE DATE_FORMAT(created,"$date")=DATE_FORMAT(now(),"$date")
+ORDER BY id DESC
+LIMIT 1
+END_OF_TEXT;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            if($stmt->rowCount()>0){
+                $info = $stmt->fetch(PDO::FETCH_ASSOC);
+                $qrun = $pre.$conn.$info['date'].$conn;
+                $next = (int)str_replace($qrun,"",$info['quote_no'])+1;
+                $res = $qrun.sprintf("%0".$digit."s",$next);
+            } else {
+                $month = $this->conn->query("SELECT DATE_FORMAT(now(),'$date')");
                 $tmonth = $month->fetch(PDO::FETCH_NUM);
                 $res = $pre.$conn.$tmonth[0].$conn.sprintf("%0".$digit."s",1);
             }

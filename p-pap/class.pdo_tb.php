@@ -316,7 +316,10 @@ END_OF_TEXT;
             if($auth>1){
                 $edit = <<<END_OF_TEXT
                         CONCAT("<a href='quotation.php?qid=",quo.quote_id,"' title='Edit' class='icon-page-edit'></a>"),
+                        CONCAT("<a href='quotation.php?action=add&gid=",gr.group_id,"' title='เพิ่มรายการ' class='icon-plus-square'></a>") AS moreq,
 END_OF_TEXT;
+            } else {
+                $edit = "'-','-',";
             }
             $sale = "";
             if($auth>3){
@@ -338,19 +341,21 @@ meta.meta_value AS pages,
 FORMAT(amount,0),
 DATE_FORMAT(created,'%d-%b') AS dcreated,
 quo.status AS status,
-meta1.meta_value AS qsign
+meta1.meta_value AS qsign,
+gr.group_id
 $sale
-FROM pap_quotation AS quo
-LEFT JOIN pap_option AS op ON op.op_id=cat_id
-LEFT JOIN pap_size ON size_id=job_size_id
+FROM pap_quote_group AS gr
+JOIN pap_quotation AS quo on quo.quote_id=gr.quote_id
+JOIN pap_option AS op ON op.op_id=cat_id
+JOIN pap_size ON size_id=job_size_id
+JOIN pap_customer AS cus ON cus.customer_id=quo.customer_id
+LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=cus.customer_id
+LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 LEFT JOIN pap_quote_meta AS meta ON meta.quote_id=quo.quote_id AND meta.meta_key ="page_inside"
 LEFT JOIN pap_quote_meta AS meta1 ON meta1.quote_id=quo.quote_id AND meta1.meta_key ="quote_sign"
 LEFT JOIN pap_quote_meta AS meta2 ON meta2.quote_id=quo.quote_id AND meta2.meta_key ="n_price"
-LEFT JOIn pap_customer AS cus ON cus.customer_id=quo.customer_id
-LEFT JOIN pap_sale_cus AS sale ON sale.cus_id=cus.customer_id
-LEFT JOIN pap_user AS user ON user.user_id=sale.user_id
 $filter
-ORDER BY created ASC
+ORDER BY quo.quote_no ASC, created ASC
 $lim_sql
 END_OF_TEXT;
             $stmt = $this->conn->prepare($sql);
@@ -360,6 +365,7 @@ END_OF_TEXT;
             }
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $gid = 0;
             foreach($res as $k=>$v){
                 $view = "";
                 //hide print if status = draft
@@ -371,7 +377,15 @@ END_OF_TEXT;
                     $view = ($v['status']==9?"<a href='$qsign' title='View Doc' class='icon-search' target='_blank'></a>":"");
                 }
                 $res[$k]['status'] = $op[$v['status']].$view;
+                //not show add and print on same group
+                if($v['group_id']==$gid){
+                    $res[$k]['print'] = "&nbsp;";
+                    $res[$k]['moreq'] = "&nbsp;";
+                    $res[$k]['customer_name'] = "<span class='icon-arrow-circle-up'></span>";
+                }
+                $gid = $v['group_id'];
                 unset($res[$k]['qsign']);
+                unset($res[$k]['group_id']);
             }
             return $res;
         } catch (Exception $ex) {

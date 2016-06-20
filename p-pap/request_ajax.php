@@ -103,7 +103,20 @@ if($req=="show_pic"){
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));
     //delete
     $db->delete_data("pap_quotation", "quote_id", $_POST['qid']);
-    echo json_encode(array("redirect",$_POST['redirect']));
+    //rename quote no
+    $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $_POST['gid']);
+    $ginfo = $db->get_info("pap_group", "id", $_POST['gid']);
+    $max = count($arr_q);
+    if($max==1){
+        $db->update_data("pap_quotation", "quote_id", $arr_q[0], array("quote_no"=>$ginfo['no']));
+    } else if($max>1){
+        for($i=0;$i<$max;$i++){
+            $n = $i+1;
+            $new_no = $ginfo['no']."($n/$max)";
+            $db->update_data("pap_quotation", "quote_id", $arr_q[$i], array("quote_no"=>$new_no));
+        }
+    }
+    //echo json_encode(array("redirect",$_POST['redirect']));
 } else if($req == "delete_process_deli"){
     //log
     $db->pap_log($_SESSION['upap'][0], $req, json_encode($_POST));

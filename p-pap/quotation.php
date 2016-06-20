@@ -100,15 +100,28 @@ if($action=="add"){
         exit();
     }
 /*----------------------------------------------------------------- ADD  ---------------------------------------------------------*/
-    $content .= "<h1 class='page-title'>สร้าง$pagename</h1>"
+    $gid = filter_input(INPUT_GET,'gid',FILTER_SANITIZE_NUMBER_INT);
+    if(isset($gid)){
+        $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $gid);
+        $qinfo = $db->get_info("pap_quotation", "quote_id", $arr_q[0]);
+        $meta = $db->get_meta("pap_quote_meta", "quote_id", $arr_q[0],"('contact_id')");
+        $titlename = "<h1 class='page-title'>เพิ่มงานในใบเสนอราคา ".$qinfo['quote_no']." </h1>";
+        $cusinfo =  $form->show_hidden("cid","cid",$qinfo['customer_id'])
+                . $form->show_hidden("cusct","cusct",$meta['contact_id'])
+                . $form->show_hidden("gid","gid",$gid);
+    } else {
+        $titlename = "<h1 class='page-title'>สร้าง$pagename</h1>";
+        $cusinfo = $form->show_text("scid","scid","","ค้นหา 3 ตัวอักษรขึ้นไป","บริษัท","","label-3070")
+            . $form->show_hidden("cid","cid","0")
+            . "<div id='cus_ct'></div>";
+    }
+    $content .= $titlename
             . "<div id='ez-msg'>".  showmsg() ."</div>"
             . "<div class='col-100'>"
             . $form->show_st_form()
             . "<div class='col-50'>"
             . $form->show_text("name","name","","","ชื่องาน","","label-3070")
-            . $form->show_text("scid","scid","","ค้นหา 3 ตัวอักษรขึ้นไป","บริษัท","","label-3070")
-            . $form->show_hidden("cid","cid","0")
-            . "<div id='cus_ct'></div>"
+            . $cusinfo
             . $form->show_select("type",$product_type,"label-3070","ประเภทงาน",null)
             . $form->show_text("search_size","search_size","","ค้นหา 2 ตัวอักษรขึ้นไป","ขนาดชิ้นงาน","","label-3070")
             . $form->show_hidden("sid","sid",0)
@@ -385,6 +398,7 @@ if($action=="add"){
             . $form->show_submit("fsubmit","Update","but-right")
             . $form->show_hidden("request","request","edit_quote")
             . $form->show_hidden("qid","qid",$qid)
+            . $form->show_hidden("gid","gid",$info['group_id'])
             . $form->show_hidden("pauth","pauth",$pauth)
             . $form->show_hidden("redirect","redirect",$redirect)
             . $form->show_hidden("ori_status","ori_status",$info['status']);
@@ -412,7 +426,7 @@ if($action=="add"){
     $iperpage = 20;
 
     //view
-    $head = array("พิมพ์","งาน","ลูกค้า","ราคา","ต่อรองราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
+    $head = array("แก้ไข","เพิ่ม","พิมพ์","งาน","ลูกค้า","ราคา","ต่อรองราคา","ขนาด","หน้า","ยอดผลิต","วันที่สร้าง","สถานะ");
     $rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm, ($pauth>3?$sid:$uid),$page, $iperpage);
     $all_rec = $tbpdo->view_quote($pauth,$op_quote_status_icon, $cat, $status, $mm,($pauth>3?$sid:$uid));
     $sale = array("0"=>"ไม่กำหนด")+$db->get_keypair("pap_user", "pap_user.user_id", "user_login", "LEFT JOIN pap_usermeta AS um ON um.user_id=pap_user.user_id AND meta_key='user_auth' WHERE meta_value='17'");
@@ -421,7 +435,6 @@ if($action=="add"){
     if($pauth>1){
         $add = $redirect."?action=add";
         $addhtml = "<a class='add-new' href='$add' title='Add New'>Add New</a>";
-        array_unshift($head, "แก้ไข");
     }
 
     if($pauth>3){

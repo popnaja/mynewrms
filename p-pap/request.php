@@ -686,7 +686,24 @@ if($req == "login"){
     $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     header("Location:".$_POST['redirect']);
 } else if($req=="add_quote"){
-    $qno = $db->check_quote_no();
+    if(isset($_POST['gid'])){
+        $gid = filter_input(INPUT_POST,'gid',FILTER_SANITIZE_NUMBER_INT);
+        $ginfo = $db->get_info("pap_group", "id", $gid);
+        $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $gid);
+        //find max in group
+        $max = count($arr_q)+1;
+        $qno = $ginfo['no']."($max/$max)";
+        //rename old quote no
+        for($i=0;$i<count($arr_q);$i++){
+            $n = $i+1;
+            $new_qno = $ginfo['no']."($n/$max)";
+            $db->update_data("pap_quotation", "quote_id", $arr_q[$i], array("quote_no"=>$new_qno));
+        }
+    } else {
+        $qno = $db->check_group();
+        //insert net group
+        $gid = $db->insert_data("pap_group", array(null,$qno,pap_now()));
+    }
     $prepress = (isset($_POST['prepress'])?implode(",",$_POST['prepress']):"");
     $exclude = (isset($_POST['exclude'])?implode(",",$_POST['exclude']):"");
     $tc = $db->get_info("pap_customer","customer_id",$_POST['cid']);
@@ -702,6 +719,8 @@ if($req == "login"){
         null, null);
 
     $qid = $db->insert_data("pap_quotation",$data);
+    //add quote-group
+    $db->insert_data("pap_quote_group", array($qid,$gid));
     $n = count($_POST['page']);
     $page_cover = 0;
     $page_inside = 0;
@@ -836,7 +855,7 @@ if($req == "login"){
     $db->update_data("pap_quotation", "quote_id", $qid, array("q_price"=>$price));
 
     $_SESSION['message'] = "เพิ่มข้อมูลสำเร็จ";
-    header("Location:".$_POST['redirect']."?qid=".$qid);
+    //header("Location:".$_POST['redirect']."?qid=".$qid);
 } else if($req == "edit_quote"){
     $qid = filter_input(INPUT_POST,"qid",FILTER_SANITIZE_NUMBER_INT);
     $status = (int)filter_input(INPUT_POST,'status',FILTER_SANITIZE_NUMBER_INT);
@@ -855,18 +874,27 @@ if($req == "login"){
         "status" => $status,
     );
     // 39 == approved, 40=sent ,41=ok 42=reject
+    $st = array();
     if($status==1){
-        $arrinfo['finished'] = null;
+        $st['finished'] = null;
     } else if($status==2){
-        $arrinfo['approved'] = pap_now();
-        $arrinfo['finished'] = null;
+        $st['approved'] = pap_now();
+        $st['finished'] = null;
     } else if($status==10){
-        $arrinfo['finished'] = pap_now();
+        $st['finished'] = pap_now();
     } else if($status==9){
-        $arrinfo['finished'] = pap_now();
+        $st['finished'] = pap_now();
     }
-    $db->update_data("pap_quotation", "quote_id", $qid, $arrinfo);
-
+    $db->update_data("pap_quotation", "quote_id", $qid, $arrinfo+$st);
+    
+    //update status in quote group
+    //get quote in group
+    $arr_q = $db->get_mm_arr("pap_quote_group", "quote_id", "group_id", $_POST['gid']);
+    $stinfo = array("status" => $status)+$st;
+    foreach($arr_q AS $q){
+        $db->update_data("pap_quotation","quote_id",$q,$stinfo);
+    }
+    
     //del old comp
     $db->delete_data("pap_quote_comp", "quote_id", $qid);
 
@@ -1018,7 +1046,9 @@ if($req == "login"){
     if($status==9){
         //ok create order
         include_once("prep_order.php");
-        $create_order = prep_order($qid);
+        foreach($arr_q as $q){
+            $create_order = prep_order($q);
+        }
         if(!$create_order){
             $_SESSION['error'] = "ใบเสนอราคานี้อยู่ในแผนผลิตแล้ว";
         } else {
@@ -1027,7 +1057,7 @@ if($req == "login"){
     } else {
         $_SESSION['message'] = "แก้ไขข้อมูลสำเร็จ";
     }
-    header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
+    //header("Location:".$_POST['redirect'].($status==1?"?qid=$qid":""));
 } else if ($req=="update_qprice"){
     $db->update_data("pap_quotation", "quote_id", $_POST['qid'], array("q_price"=>$_POST['q_price']));
     echo json_encode("ok");
