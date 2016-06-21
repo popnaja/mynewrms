@@ -483,7 +483,6 @@ function special_comp($info=null,$comps=null){
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     $comp_piece = (isset($info['comp_piece'])?json_decode($info['comp_piece'],true):0);
     $comp_piece_dt = (isset($info['comp_piece_dt'])?json_decode($info['comp_piece_dt'],true):0);
-    $class_side2 = "sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7 sel-compt$i-10 sel-compt$i-11 sel-compt$i-13";
     //diecut help
     $diecuthelp = "<span class='icon-question form-required'>"
         . "<span class='des'>"
@@ -494,6 +493,7 @@ function special_comp($info=null,$comps=null){
         . "</span>";
     for($i=0;$i<8;$i++){
         if(isset($comps[$i])){
+        $class_side2 = "sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7 sel-compt$i-10 sel-compt$i-11 sel-compt$i-13";
             $hid = "";
             $comp = $comps[$i];
             $c_ptype = array("0"=>"--กระดาษ--") + $db->get_paper_keypair("mat_type", $comp['mat_size']);
