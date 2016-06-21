@@ -483,6 +483,7 @@ function special_comp($info=null,$comps=null){
     $coatpage = (isset($info['coatpage'])?json_decode($info['coatpage'],true):0);
     $comp_piece = (isset($info['comp_piece'])?json_decode($info['comp_piece'],true):0);
     $comp_piece_dt = (isset($info['comp_piece_dt'])?json_decode($info['comp_piece_dt'],true):0);
+    $class_side2 = "sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7 sel-compt$i-10 sel-compt$i-11 sel-compt$i-13";
     //diecut help
     $diecuthelp = "<span class='icon-question form-required'>"
         . "<span class='des'>"
@@ -537,10 +538,13 @@ function special_comp($info=null,$comps=null){
                 . $form->show_select("paper_gram_$i",$gram,"label-3070","แกรม",$comp['mat_weight'],"","paper_gram[]")
                 . "</div>"
                 . $form->show_select("print_$i",$print,"label-3070","สี",$comp['comp_print_id'],"","print[]")
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
+                // หน้าหลัง
+                . "<div class='$class_side2'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",$comp['comp_print2'],"","print2[]")
-                . "</div><!-- .sel-compt$i-1 -->"
+                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",(is_array($coat2)?$coat2[$i]:0),"","coating2[]")
+                . "</div><!-- side2 -->"
                 //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
+                // ปกปีก
                 . "<div class='sel-compt$i-1'>"
                 . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",($comp['comp_type']==1?$info['cwing']:null),"","cwing[]")
                 . "<div class='sel-cwing_$i-1'>"
@@ -549,24 +553,25 @@ function special_comp($info=null,$comps=null){
                 . "</div><!-- .sel-cwing_$i-1 -->"
                 . "</div><!-- .sel-compt$i-1 -->"
                 . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",$comp['comp_coating'],"","coating[]")
+                // หน้าเคลือบผิว สำหรับเนื้อ
                 . "<div class='sel-compt$i-2 sel-compt$i-6'>"
                 . $form->show_num("coat_page_$i",(is_array($coatpage)?$coatpage[$i]:0),1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
                 . "</div>"
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
-                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",(is_array($coat2)?$coat2[$i]:0),"","coating2[]")
-                . "</div>"
+                // ไดคัท
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",$selpost,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox_winput("post_$i","post_$i",$post,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
-                . "<div class='sel-compt$i-13 sel-compt$i-3'>"
+                // folding and comp piece
+                . "<div class='sel-compt$i-3 sel-compt$i-13'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",($comp['comp_type']=="3"&&isset($info['folding'])?$info["folding"]:null),"","folding[]")
                 . $form->show_num("piece_$i",(is_array($comp_piece)?$comp_piece[$i]:1),1,"","จำนวน(แบบ)","","label-3070","min=1","piece[]")
                 . $pdetail
-                . "</div><!-- comp detail -->"
+                . "</div><!-- show-piece -->"
+                // page
                 . "<div class='sel-compt$i-2 sel-compt$i-6 sel-compt$i-10 sel-compt$i-11 sel-compt$i-12'>"
                 . $form->show_num("page_$i",$comp['comp_page'],1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
-                . "</div><!-- .sel-compt$i-2 -->"
+                . "</div><!-- show-page -->"
         . $form->show_num("allowance_$i",$comp['comp_paper_allowance'],1,"","กระดาษเผื่อเสีย (แผ่นต่อยก)","","label-3070","min=0","allowance[]")
                 . "</div><!-- .form-section -->"
                 . "<script>"
@@ -597,10 +602,13 @@ function special_comp($info=null,$comps=null){
                 . "<div class='tg_pweight'>"
                 . "</div>"
                 . $form->show_select("print_$i",$print,"label-3070","สี",null,"","print[]")
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
+                // ด้านหลัง
+                . "<div class='$class_side2'>"
                 . $form->show_select("print2_$i",array("0"=>"--ไม่มี--")+$print,"label-3070","สีด้านใน",null,"","print2[]")
-                . "</div><!-- .sel-compt$i-1 -->"
+                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",null,"","coating2[]")
+                . "</div><!-- side2 -->"
                 //. $form->show_select("scolor_$i",array("0"=>"--ไม่มี--")+$scolor,"label-3070","สีพิเศษ",null,"","scolor[]")
+                // ปกปีก
                 . "<div class='sel-compt$i-1'>"
                 . $form->show_select("cwing_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ปกปีก",null,"","cwing[]")
                 . "<div class='sel-cwing_$i-1'>"
@@ -609,24 +617,25 @@ function special_comp($info=null,$comps=null){
                 . "</div><!-- .sel-cwing_$i-1 -->"
                 . "</div><!-- .sel-compt$i-1 -->"
                 . $form->show_select("coating_$i",$coating,"label-3070","เคลือบผิว",null,"","coating[]")
+                // หน้าเคลือบผิว สำหรับเนื้อ
                 . "<div class='sel-compt$i-2 sel-compt$i-6'>"
                 . $form->show_num("coat_page_$i",0,1,"","หน้าเคลือบผิว","","label-3070","min=0","coatpage[]")
                 . "</div>"
-                . "<div class='sel-compt$i-1 sel-compt$i-3 sel-compt$i-4 sel-compt$i-5 sel-compt$i-7'>"
-                . $form->show_select("coating2_$i",$coating,"label-3070","เคลือบผิวด้านใน",null,"","coating2[]")
-                . "</div>"
+                // ไดคัท
                 . $form->show_select("sother_$i",array("0"=>"--ไม่มี--","1"=>"มี"),"label-3070","ไดคัท",null,"","other[]")
                 . "<div class='sel-sother_$i-1'>"
                 . $form->show_checkbox_winput("post_$i","post_$i",$after,"ไดคัท และอื่นๆ $diecuthelp","label-3070")
                 . "</div>"
+                // พับ และ รายละเอียด
                 . "<div class='sel-compt$i-3 sel-compt$i-13'>"
                 . $form->show_select("folding_$i",$fold,"label-3070","พับ",null,"","folding[]")
                 . $form->show_num("piece_$i",1,1,"","จำนวน(แบบ)","","label-3070","min=1","piece[]")
                 . $pdetail
-                . "</div>"
+                . "</div><!-- show-piece -->"
+                // page
                 . "<div class='sel-compt$i-2 sel-compt$i-6 sel-compt$i-10 sel-compt$i-11 sel-compt$i-12'>"
                 . $form->show_num("page_$i",1,1,"","จำนวนหน้า","","label-3070 comp-page","min=0","page[]")
-                . "</div><!-- .sel-compt$i-2 -->"
+                . "</div><!-- show-page -->"
                 . "</div><!-- .form-section -->"
                 . "<script>"
                 . "select_option('sother_$i');"
